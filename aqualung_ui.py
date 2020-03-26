@@ -12,26 +12,24 @@ class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.connect()
 
     def connect(self):
-        self.ac_button.clicked.connect(self.ac_changed)
-        self.simv_button.clicked.connect(self.simv_changed)
+        self.peep_slider.valueChanged.connect(self.peep_changed)
+        self.mode_button.clicked.connect(self.mode_changed)
         self.bpm_slider.valueChanged.connect(self.bpm_changed)
         self.tv_slider.valueChanged.connect(self.tv_changed)
         self.ie_slider.valueChanged.connect(self.ie_changed)
         self.fio2_slider.valueChanged.connect(self.fio2_changed)
+        self.resp_rate_slider.valueChanged.connect(self.resp_rate_changed)
 
-    def ac_changed(self):
-        self.settings.ac = self.ac_button.isChecked()
-        if (self.settings.ac):
-            self.ac_button.setText("AC ON")
-        else:
-            self.ac_button.setText("AC OFF")
+    def peep_changed(self):
+        self.settings.peep = self.peep_slider.value()
+        self.peep_lcd.display(int(self.settings.peep))
 
-    def simv_changed(self):
-        self.settings.simv = self.simv_button.isChecked()
-        if (self.settings.simv):
-            self.simv_button.setText("SIMV ON")
+    def mode_changed(self):
+        self.settings.mode = self.mode_button.isChecked() #mode = True -> AC, False -> SIMV
+        if (self.settings.mode):
+            self.mode_button.setText("AC")
         else:
-            self.simv_button.setText("SIMV OFF")
+            self.mode_button.setText("SIMV")
 
     def bpm_changed(self):
         self.settings.bpm = self.bpm_slider.value()
@@ -48,6 +46,10 @@ class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
     def fio2_changed(self):
         self.settings.fio2 = self.fio2_slider.value()
         self.fio2_lcd.display(int(self.settings.fio2))
+
+    def resp_rate_changed(self):
+        self.settings.resp_rate = self.resp_rate_slider.value()
+        self.resp_rate_lcd.display(int(self.settings.resp_rate))
 
 app = QtWidgets.QApplication(sys.argv)
 

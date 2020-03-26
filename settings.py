@@ -2,28 +2,31 @@ import json
 
 class AqualungSettings:
     def __init__(self):
-        self.__ac = True
-        self.__simv = True
+        self.__mode = False #mode = True -> AC, mode = False -> SIMV
+        self.__peep = 0
         self.__bpm = 0
         self.__tv = 0
         self.__ie = 0
         self.__fio2 = 0
+        self.__resp_rate = 0
+        self.__peak_press = 0 #value comes from sensor
+        self.__plateau_press = 0 #value comes from sensor
 
     @property
-    def ac(self):
-        return self.__ac
+    def peep(self):
+        return self.__peep
 
-    @ac.setter
-    def ac(self, value):
-        self.__ac = value
+    @peep.setter
+    def peep(self, value):
+        self.__peep = value
 
     @property
-    def simv(self):
-        return self.__simv
+    def mode(self):
+        return self.__mode
 
-    @simv.setter
-    def simv(self, value):
-        self.__simv = value
+    @mode.setter
+    def mode(self, value):
+        self.__mode = value
 
     @property
     def bpm(self):
@@ -57,14 +60,41 @@ class AqualungSettings:
     def fio2(self, value):
         self.__fio2 = value
 
+    @property
+    def resp_rate(self):
+        return self.__resp_rate
+
+    @resp_rate.setter
+    def resp_rate(self, value):
+        self.__resp_rate = value
+
+    @property
+    def peak_press(self):
+        return self.__peak_press
+
+    @peak_press.setter
+    def peak_press(self, value):
+        self.__peak_press = value
+
+    @property
+    def plateau_press(self):
+        return self.__plateau_press
+
+    @plateau_press.setter
+    def plateau_press(self, value):
+        self.__plateau_press = value
+
 
     def toJSON(self):
         j = {}
-        j['ac'] = self.__ac
-        j['simv'] = self.__simv
+        j['peep'] = self.__peep
+        j['mode'] = self.__mode
         j['bpm'] = self.__bpm
         j['tv'] = self.__tv
         j['ie'] = self.__ie
         j['fio2'] = self.__fio2
+        j['resp_rate'] = self.__resp_rate
+        j['peak_press'] = self.__peak_press
+        j['plateau_press'] = self.__plateau_press
 
         return json.dumps(j)
