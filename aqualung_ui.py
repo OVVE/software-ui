@@ -54,6 +54,8 @@ class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
 app = QtWidgets.QApplication(sys.argv)
 
 window = AqualungUi()
+screen_size = app.desktop().screenGeometry()
+window.resize(screen_size.width()/4, screen_size.height()/4)
 window.show()
 app.exec()
 
