@@ -21,6 +21,110 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="7" column="0">
+     <widget class="QSplitter" name="splitter_8">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QLabel" name="resp_rate_label">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>Respiratory Rate</string>
+       </property>
+      </widget>
+      <widget class="QLCDNumber" name="resp_rate_lcd">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="resp_rate_slider">
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget> 
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QSplitter" name="splitter_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QLabel" name="plateau_press_label">
+       <property name="text">
+        <string>Plateau Pressure</string>
+       </property>
+      </widget>
+      <widget class="QLCDNumber" name="plateau_press_lcd"/>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QSplitter" name="splitter_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QLabel" name="fio2_label">
+       <property name="text">
+        <string>FIO2</string>
+       </property>
+      </widget>
+      <widget class="QLCDNumber" name="fio2_lcd"/>
+      <widget class="QSlider" name="fio2_slider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QSplitter" name="splitter_9">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QLabel" name="tv_label">
+       <property name="text">
+        <string>Tidal Volume</string>
+       </property>
+      </widget>
+      <widget class="QLCDNumber" name="tv_lcd"/>
+      <widget class="QSlider" name="tv_slider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QSplitter" name="splitter_4">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      
+       <widget class="QLabel" name="ie_label">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>47</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>I/E ratio</string>
+        </property>
+       </widget>
+      <widget class="QLCDNumber" name="ie_lcd"/>
+      <widget class="QSlider" name="ie_slider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       </widget>
+     </widget>
+    </item>
     <item row="0" column="0">
      <widget class="QSplitter" name="splitter_5">
       <property name="orientation">
@@ -46,17 +150,6 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QSlider" name="peep_slider">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
       <widget class="QLabel" name="peep_label">
        <property name="text">
         <string>PEEP</string>
@@ -70,12 +163,12 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QLCDNumber" name="peak_press_lcd"/>
       <widget class="QLabel" name="peak_press_label">
        <property name="text">
         <string>Peak Insp. Pressure</string>
        </property>
       </widget>
+      <widget class="QLCDNumber" name="peak_press_lcd"/>
      </widget>
     </item>
     <item row="3" column="0">
@@ -83,6 +176,12 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
+      <widget class="QLabel" name="bpm_label">
+       <property name="text">
+        <string>BPM</string>
+       </property>
+      </widget>
+       <widget class="QLCDNumber" name="bpm_lcd"/>
       <widget class="QSlider" name="bpm_slider">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -94,107 +193,6 @@
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
-      <widget class="QLabel" name="bpm_label">
-       <property name="text">
-        <string>BPM</string>
-       </property>
-      </widget>
-      <widget class="QLCDNumber" name="bpm_lcd"/>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QSplitter" name="splitter_9">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QSlider" name="tv_slider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLCDNumber" name="tv_lcd"/>
-      <widget class="QLabel" name="tv_label">
-       <property name="text">
-        <string>Tidal Volume</string>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <widget class="QSplitter" name="splitter_4">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QSlider" name="ie_slider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLCDNumber" name="ie_lcd"/>
-      <widget class="QLabel" name="ie_label">
-       <property name="text">
-        <string>I/E ratio</string>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="6" column="0">
-     <widget class="QSplitter" name="splitter_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QSlider" name="fio2_slider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLCDNumber" name="fio2_lcd"/>
-      <widget class="QLabel" name="fio2_label">
-       <property name="text">
-        <string>FIO2</string>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="7" column="0">
-     <widget class="QSplitter" name="splitter_8">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QSlider" name="resp_rate_slider">
-       <property name="layoutDirection">
-        <enum>Qt::RightToLeft</enum>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLCDNumber" name="resp_rate_lcd">
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-      </widget>
-      <widget class="QLabel" name="resp_rate_label">
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>Respiratory Rate</string>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item row="8" column="0">
-     <widget class="QSplitter" name="splitter_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <widget class="QLabel" name="plateau_press_label">
-       <property name="text">
-        <string>Plateau Pressure</string>
-       </property>
-      </widget>
-      <widget class="QLCDNumber" name="plateau_press_lcd"/>
      </widget>
     </item>
    </layout>

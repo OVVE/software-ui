@@ -12,17 +12,12 @@ class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.connect()
 
     def connect(self):
-        self.peep_slider.valueChanged.connect(self.peep_changed)
         self.mode_button.clicked.connect(self.mode_changed)
         self.bpm_slider.valueChanged.connect(self.bpm_changed)
         self.tv_slider.valueChanged.connect(self.tv_changed)
         self.ie_slider.valueChanged.connect(self.ie_changed)
         self.fio2_slider.valueChanged.connect(self.fio2_changed)
         self.resp_rate_slider.valueChanged.connect(self.resp_rate_changed)
-
-    def peep_changed(self):
-        self.settings.peep = self.peep_slider.value()
-        self.peep_lcd.display(int(self.settings.peep))
 
     def mode_changed(self):
         self.settings.mode = self.mode_button.isChecked() #mode = True -> AC, False -> SIMV
@@ -54,8 +49,8 @@ class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
 app = QtWidgets.QApplication(sys.argv)
 
 window = AqualungUi()
-screen_size = app.desktop().screenGeometry()
-window.resize(screen_size.width()/4, screen_size.height()/4)
+screen_size = app.desktop().screenGeometry() #get the current screensize as a PyQt5 QRect
+window.resize(screen_size.width(), screen_size.height()) #resize window to screensize
 window.show()
 app.exec()
 
