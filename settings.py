@@ -29,14 +29,6 @@ class AqualungSettings:
         self.__mode = value
 
     @property
-    def bpm(self):
-        return self.__bpm
-
-    @bpm.setter
-    def bpm(self, value):
-        self.__bpm = value
-
-    @property
     def tv(self):
         return self.__tv
 
@@ -89,7 +81,6 @@ class AqualungSettings:
         j = {}
         j['peep'] = self.__peep
         j['mode'] = self.__mode
-        j['bpm'] = self.__bpm
         j['tv'] = self.__tv
         j['ie'] = self.__ie
         j['fio2'] = self.__fio2

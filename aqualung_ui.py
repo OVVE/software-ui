@@ -13,22 +13,17 @@ class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def connect(self):
         self.mode_button.clicked.connect(self.mode_changed)
-        self.bpm_slider.valueChanged.connect(self.bpm_changed)
         self.tv_slider.valueChanged.connect(self.tv_changed)
         self.ie_slider.valueChanged.connect(self.ie_changed)
         self.fio2_slider.valueChanged.connect(self.fio2_changed)
         self.resp_rate_slider.valueChanged.connect(self.resp_rate_changed)
 
     def mode_changed(self):
-        self.settings.mode = self.mode_button.isChecked() #mode = True -> AC, False -> SIMV
-        if (self.settings.mode):
+        self.settings.mode = self.mode_button.isChecked()  # mode = True -> AC, False -> SIMV
+        if self.settings.mode:
             self.mode_button.setText("AC")
         else:
             self.mode_button.setText("SIMV")
-
-    def bpm_changed(self):
-        self.settings.bpm = self.bpm_slider.value()
-        self.bpm_lcd.display(int(self.settings.bpm))
 
     def tv_changed(self):
         self.settings.tv = self.tv_slider.value()
