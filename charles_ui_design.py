@@ -11,6 +11,7 @@ from settings import Settings
 from params import Params
 from random import randint
 import datetime
+from copy import deepcopy
 
 class FancyDisplayButton(QAbstractButton):
     def __init__(self, label, value, unit, parent=None, size = (200,100)):
@@ -124,12 +125,10 @@ class MainWindow(QWidget):
         self.local_settings = Settings()
         self.local_settings.set_test_settings() #local settings are just changed with the UI
 
-        self.resp_rate_increment = 0.5
-
         self.params = Params()
         self.params.set_test_params()
 
-        self.mode_dict = {True: "AC", False: "SIMV"}
+        self.ptr = 0
 
         self.setFixedSize(800,480) #hardcoded (non-adjustable) screensize
         self.stack = QStackedWidget(self)
@@ -137,6 +136,8 @@ class MainWindow(QWidget):
         self.page1 = QWidget()
         self.page2 = QWidget()
         self.page3 = QWidget()
+        self.page4 = QWidget()
+        self.page5 = QWidget()
 
         self.initalizeAndAddStackWidgets()
         hbox = QHBoxLayout(self)
@@ -149,9 +150,13 @@ class MainWindow(QWidget):
         self.initializeWidget1()
         self.initializeWidget2()
         self.initializeWidget3()
+        self.initializeWidget4()
+        self.initializeWidget5()
         self.stack.addWidget(self.page1)
         self.stack.addWidget(self.page2)
         self.stack.addWidget(self.page3)
+        self.stack.addWidget(self.page4)
+        self.stack.addWidget(self.page5)
 
     def initializeWidget1(self): #home screen
         h_box_1 = QHBoxLayout()
@@ -160,18 +165,23 @@ class MainWindow(QWidget):
         v_box_1mid = QVBoxLayout()
         v_box_1right = QVBoxLayout()
 
-        self.mode_button_main = SimpleDisplayButton(self.mode_dict[self.settings.ac_mode], size = (150, 25))
+        self.mode_button_main = SimpleDisplayButton(self.settings.get_mode_display(), size = (150, 25))
         self.mode_button_main.clicked.connect(lambda: self.display(1))
 
         self.resp_rate_button_main = FancyDisplayButton("Resp. Rate", self.settings.resp_rate, "b/min", size = (150, 80))
         self.resp_rate_button_main.clicked.connect(lambda: self.display(2))
 
-        self.tidal_vol_button_main = FancyDisplayButton("Minute Volume", self.settings.minute_volume, "l/min", size = (150, 80))
-        #TODO: Connect this
+        self.minute_vol_button_main = FancyDisplayButton("Minute Volume", self.settings.minute_volume, "l/min", size = (150, 80))
+        self.minute_vol_button_main.clicked.connect(lambda: self.display(3))
 
         self.ie_button_main = FancyDisplayButton("I/E Ratio", self.settings.get_ie_display(), "l/min", size = (150, 80))
-        # TODO: Connect this
+        self.ie_button_main.clicked.connect(lambda: self.display(4))
 
+        self.peep_display_main = DisplayRect("PEEP", 5, "cmH2O", size=(150, 80))
+        self.tv_insp_display_main = DisplayRect("TV Insp", self.params.tv_insp, "mL", size=(150, 80))
+        self.tv_exp_display_main = DisplayRect("TV Exp", self.params.tv_exp, "mL", size=(150, 80))
+        self.ppeak_display_main = DisplayRect("Ppeak", self.params.ppeak, "cmH2O", size=(150, 80))
+        self.pplat_display_main = DisplayRect("Pplat", self.params.pplat, "cmH2O", size=(150, 80))
 
         axisStyle = {'color': 'black', 'font-size': '20pt'}
         graph_pen = pg.mkPen(width=5, color = "b")
@@ -210,30 +220,25 @@ class MainWindow(QWidget):
 
         v_box_1left.addWidget(self.mode_button_main)
         v_box_1left.addWidget(self.resp_rate_button_main)
-        v_box_1left.addWidget(self.tidal_vol_button_main)
+        v_box_1left.addWidget(self.minute_vol_button_main)
         v_box_1left.addWidget(self.ie_button_main)
-        v_box_1left.addWidget(DisplayRect("PEEP", 5, "cmH2O", size = (150,80)))
+        v_box_1left.addWidget(self.peep_display_main)
 
         v_box_1mid.addWidget(self.flow_graph)
         v_box_1mid.addWidget(self.pressure_graph)
         v_box_1mid.addWidget(self.volume_graph)
 
-        self.tv_insp_rect = DisplayRect("TV Insp", self.params.tv_insp, "mL", size = (150,80))
-        self.tv_exp_rect = DisplayRect("TV Exp", self.params.tv_exp, "mL", size = (150,80))
-        self.ppeak_rect = DisplayRect("Ppeak", self.params.ppeak, "cmH2O", size=(150, 80))
-        self.pplat_rect = DisplayRect("Pplat", self.params.pplat, "cmH2O", size=(150, 80))
-
-        v_box_1right.addWidget(self.tv_insp_rect)
-        v_box_1right.addWidget(self.tv_exp_rect)
-        v_box_1right.addWidget(self.ppeak_rect)
-        v_box_1right.addWidget(self.pplat_rect)
+        v_box_1right.addWidget(self.tv_insp_display_main)
+        v_box_1right.addWidget(self.tv_exp_display_main)
+        v_box_1right.addWidget(self.ppeak_display_main)
+        v_box_1right.addWidget(self.pplat_display_main)
 
         h_box_1.addLayout(v_box_1left)
         h_box_1.addLayout(v_box_1mid)
         h_box_1.addLayout(v_box_1right)
         self.page1.setLayout(h_box_1)
 
-    def initializeWidget2(self):
+    def initializeWidget2(self): #Mode
         v_box_2 = QVBoxLayout()
         h_box_2top = QHBoxLayout()
         h_box_2middle = QHBoxLayout()
@@ -244,10 +249,10 @@ class MainWindow(QWidget):
         mode_cancel= SimpleDisplayButton("Cancel")
 
         mode_change.clicked.connect(lambda: self.changeMode(not self.local_settings.ac_mode))
-        mode_apply.clicked.connect(lambda: self.commitMode()) #TODO: fix so it updates the local setting
+        mode_apply.clicked.connect(lambda: self.commitMode())
         mode_cancel.clicked.connect(self.cancelChange)
 
-        self.mode_page_rect = DisplayRect("Mode", self.mode_dict[self.local_settings.ac_mode], "", size = (500,200))
+        self.mode_page_rect = DisplayRect("Mode", self.local_settings.get_mode_display(), "", size = (500,200))
 
         h_box_2top.addWidget(self.mode_page_rect)
         h_box_2middle.addWidget(mode_change)
@@ -260,7 +265,7 @@ class MainWindow(QWidget):
 
         self.page2.setLayout(v_box_2)
 
-    def initializeWidget3(self):
+    def initializeWidget3(self): #Resp_rate
         v_box_3 = QVBoxLayout()
         h_box_3top = QHBoxLayout()
         h_box_3mid = QHBoxLayout()
@@ -268,8 +273,8 @@ class MainWindow(QWidget):
 
         self.resp_rate_page_rect = DisplayRect("Resp. Rate", self.local_settings.resp_rate, "b/min", size = (500,200))
 
-        resp_rate_increment_button = SimpleDisplayButton("+ 0.5")
-        resp_rate_decrement_button = SimpleDisplayButton("- 0.5")
+        resp_rate_increment_button = SimpleDisplayButton("+ " + str(self.settings.resp_rate_increment))
+        resp_rate_decrement_button = SimpleDisplayButton("- " + str(self.settings.resp_rate_increment))
         resp_rate_apply = SimpleDisplayButton("APPLY")
         resp_rate_cancel = SimpleDisplayButton("CANCEL")
 
@@ -290,13 +295,101 @@ class MainWindow(QWidget):
 
         self.page3.setLayout(v_box_3)
 
+    def initializeWidget4(self): #Minute volume
+        v_box_4 = QVBoxLayout()
+        h_box_4top = QHBoxLayout()
+        h_box_4mid = QHBoxLayout()
+        h_box_4bottom = QHBoxLayout()
+
+        self.minute_vol_page_rect = DisplayRect("Minute Volume", self.local_settings.minute_volume, "l/min", size = (500,200))
+
+        minute_vol_increment_button = SimpleDisplayButton("+ " + str(self.settings.minute_volume_increment))
+        minute_vol_decrement_button = SimpleDisplayButton("- " + str(self.settings.minute_volume_increment))
+        minute_vol_apply = SimpleDisplayButton("APPLY")
+        minute_vol_cancel = SimpleDisplayButton("CANCEL")
+
+        minute_vol_increment_button.clicked.connect(self.incrementMinuteVol)
+        minute_vol_decrement_button.clicked.connect(self.decrementMinuteVol)
+        minute_vol_apply.clicked.connect(self.commitMinuteVol)
+        minute_vol_cancel.clicked.connect(self.cancelChange)
+
+        h_box_4top.addWidget(self.minute_vol_page_rect)
+        h_box_4mid.addWidget(minute_vol_increment_button)
+        h_box_4mid.addWidget(minute_vol_decrement_button)
+        h_box_4bottom.addWidget(minute_vol_apply)
+        h_box_4bottom.addWidget(minute_vol_cancel)
+
+        v_box_4.addLayout(h_box_4top)
+        v_box_4.addLayout(h_box_4mid)
+        v_box_4.addLayout(h_box_4bottom)
+
+        self.page4.setLayout(v_box_4)
+
+    def initializeWidget5(self): #ie ratio
+        v_box_5 = QVBoxLayout()
+        h_box_5top = QHBoxLayout()
+        h_box_5mid = QHBoxLayout()
+        h_box_5bottom = QHBoxLayout()
+
+        self.ie_page_rect = DisplayRect("I/E Ratio", self.settings.get_ie_display(),"", size = (500,200))
+
+        ie_change_size = (150,50)
+
+        ie_change_0 = SimpleDisplayButton(self.settings.ie_ratio_display[0], size = ie_change_size)
+        ie_change_1 = SimpleDisplayButton(self.settings.ie_ratio_display[1], size = ie_change_size)
+        ie_change_2 = SimpleDisplayButton(self.settings.ie_ratio_display[2], size = ie_change_size)
+        ie_change_3 = SimpleDisplayButton(self.settings.ie_ratio_display[3], size = ie_change_size)
+
+        ie_apply = SimpleDisplayButton("APPLY")
+        ie_cancel = SimpleDisplayButton("CANCEL")
+
+
+        ie_change_0.clicked.connect(lambda: self.changeIERatio(0))
+        ie_change_1.clicked.connect(lambda: self.changeIERatio(1))
+        ie_change_2.clicked.connect(lambda: self.changeIERatio(2))
+        ie_change_3.clicked.connect(lambda: self.changeIERatio(3))
+
+        ie_apply.clicked.connect(self.commitIERatio)
+        ie_cancel.clicked.connect(self.cancelChange)
+
+        h_box_5top.addWidget(self.ie_page_rect)
+        h_box_5mid.addWidget(ie_change_0)
+        h_box_5mid.addWidget(ie_change_1)
+        h_box_5mid.addWidget(ie_change_2)
+        h_box_5mid.addWidget(ie_change_3)
+
+        h_box_5bottom.addWidget(ie_apply)
+        h_box_5bottom.addWidget(ie_cancel)
+
+        v_box_5.addLayout(h_box_5top)
+        v_box_5.addLayout(h_box_5mid)
+        v_box_5.addLayout(h_box_5bottom)
+
+        self.page5.setLayout(v_box_5)
+
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
-    # TODO: Add all other UI elements
-    def update_ui(self):
-        self.tv_insp_rect.updateValue(self.params.tv_insp)
+    def update_main_page_ui(self):
+        self.updateMainDisplays()
         self.updateGraphs()
+
+    def updateMainDisplays(self):
+        self.mode_button_main.updateValue(self.settings.get_mode_display())
+        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
+        self.minute_vol_button_main.updateValue(self.settings.minute_volume)
+        self.ie_button_main.updateValue(self.settings.get_ie_display())
+        self.peep_display_main.updateValue(self.params.peep)
+        self.tv_insp_display_main.updateValue(self.params.tv_insp)
+        self.tv_exp_display_main.updateValue(self.params.tv_exp)
+        self.ppeak_display_main.updateValue(self.params.ppeak)
+        self.pplat_display_main.updateValue(self.params.pplat)
+
+    def updatePageDisplays(self):
+        self.mode_page_rect.updateValue(self.settings.get_mode_display())
+        self.resp_rate_page_rect.updateValue(self.settings.resp_rate)
+        self.minute_vol_page_rect.updateValue(self.settings.minute_volume)
+        self.ie_page_rect.updateValue(self.settings.get_ie_display())
 
     # TODO: Polish up and process data properly
     def updateGraphs(self):
@@ -339,27 +432,39 @@ class MainWindow(QWidget):
     def parseInputAndUpdate(self, text):
         self.params.tv_insp = int(text)
         #print(text)
-        self.update_ui()
+        self.update_main_page_ui()
 
     # TODO: Finish all of these for each var
     def changeMode(self, new_val):
         self.local_settings.ac_mode = new_val
-        self.mode_page_rect.updateValue(self.mode_dict[new_val])
+        self.mode_page_rect.updateValue(self.local_settings.get_mode_display())
 
     # TODO: Figure out how to handle increment properly (right now it's not in the settings)
     def incrementRespRate(self):
-        self.local_settings.resp_rate+=self.resp_rate_increment
+        self.local_settings.resp_rate+=self.settings.resp_rate_increment
         self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
 
     def decrementRespRate(self):
-        self.local_settings.resp_rate-=self.resp_rate_increment
+        self.local_settings.resp_rate-=self.settings.resp_rate_increment
         self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
+
+    def incrementMinuteVol(self):
+        self.local_settings.minute_volume+=self.settings.minute_volume_increment
+        self.minute_vol_page_rect.updateValue(self.local_settings.minute_volume)
+
+    def decrementMinuteVol(self):
+        self.local_settings.minute_volume-=self.settings.minute_volume_increment
+        self.minute_vol_page_rect.updateValue(self.local_settings.minute_volume)
+
+    def changeIERatio(self, new_val):
+        self.local_settings.ie_ratio_id = new_val
+        self.ie_page_rect.updateValue(self.local_settings.get_ie_display())
 
     #TODO: Finish all of these for each var
     def commitMode(self):
-        self.logChange(Change(datetime.datetime.now(),"Mode", self.mode_dict[self.settings.ac_mode], self.mode_dict[self.local_settings.ac_mode]))
+        self.logChange(Change(datetime.datetime.now(),"Mode", self.settings.get_mode_display(), self.local_settings.get_mode_display()))
         self.settings.ac_mode = self.local_settings.ac_mode
-        self.mode_button_main.updateValue(self.mode_dict[self.settings.ac_mode])
+        self.mode_button_main.updateValue(self.settings.get_mode_display())
         self.stack.setCurrentIndex(0)
 
     def commitRespRate(self):
@@ -368,18 +473,23 @@ class MainWindow(QWidget):
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.stack.setCurrentIndex(0)
 
-    def changeMinuteVol(self):
-        self.logChange(Change("Minute Volume", self.settings.minute_volume, self.local_settings.minute_volume))
+    def commitMinuteVol(self):
+        self.logChange(Change(datetime.datetime.now(), "Minute Vol", self.settings.minute_volume, self.local_settings.minute_volume))
         self.settings.minute_volume = self.local_settings.minute_volume
+        self.minute_vol_button_main.updateValue(self.settings.minute_volume)
+        self.stack.setCurrentIndex(0)
 
-    def changeIERatio(self):
-        #next line is designed to make sure i/e ratios are logged in readable format (not indices)
-        self.logChange("I/E Ratio", self.settings.ie_ratio_display[self.settings.ie_ratio_id], self.settings.ie_ratio_display[self.local_settings.ie_ratio_id])
+    def commitIERatio(self):
+        self.logChange(Change(datetime.datetime.now(), "I/E Ratio", self.settings.get_ie_display(), self.local_settings.get_ie_display()))
         self.settings.ie_ratio_id = self.local_settings.ie_ratio_id
+        self.ie_button_main.updateValue(self.settings.get_ie_display())
+        self.stack.setCurrentIndex(0)
 
     def cancelChange(self):
-        self.local_settings = self.settings
+        self.local_settings = deepcopy(self.settings)
+        self.updateMainDisplays()
         self.stack.setCurrentIndex(0)
+        self.updatePageDisplays()
 
     def passChanges(self, param, new_val):
         pass
