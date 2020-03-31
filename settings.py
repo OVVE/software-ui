@@ -19,7 +19,7 @@ class Settings:
     def set_test_settings(self):
         self.ac_mode = False
         self.minute_volume = 500
-        self.resp_rate = 14
+        self.resp_rate = 14.0
         self.ie_ratio_id = 0
 
     def get_ie_display(self):

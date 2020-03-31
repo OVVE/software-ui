@@ -2,10 +2,10 @@ import sys
 import os
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5 import QtWidgets, uic, QtSerialPort, QtCore
+from PyQt5 import QtWidgets, uic, QtSerialPort, QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, \
     QHBoxLayout, QStackedWidget, QAbstractButton
-
+import numpy as np
 import pyqtgraph as pg
 from settings import Settings
 from params import Params
@@ -176,13 +176,14 @@ class MainWindow(QWidget):
         axisStyle = {'color': 'black', 'font-size': '20pt'}
         graph_pen = pg.mkPen(width=5, color = "b")
 
-        self.counter = list(range(0,100))  # This is a dummy variable to graph against until we get time working
-        #TODO: Figure out how to do this without "priming the pump" with a bunch of 0s
-        self.tv_insp_data = [0]*100
+        graph_width = 400
+        self.tv_insp_data = np.linspace(0,0,graph_width)
+        self.flow_graph_ptr = -graph_width
 
+        # TODO: current graph system doesn't associate y values with x values. Need to fix?
         self.flow_graph = pg.PlotWidget()
-        self.flow_graph.setFixedWidth(400)
-        self.flow_graph_line = self.flow_graph.plot(self.counter,self.tv_insp_data, pen = graph_pen) #shows Serial (tv_insp) data for now
+        self.flow_graph.setFixedWidth(graph_width)
+        self.flow_graph_line = self.flow_graph.plot(self.tv_insp_data, pen = graph_pen) #shows Serial (tv_insp) data for now
         self.flow_graph.setBackground("w")
         self.flow_graph.setMouseEnabled(False, False)
         flow_graph_left_axis = self.flow_graph.getAxis('left')
@@ -192,7 +193,7 @@ class MainWindow(QWidget):
         data = [randint(-10,10) for _ in range(10)]
 
         self.pressure_graph = pg.PlotWidget()
-        self.pressure_graph.setFixedWidth(400)
+        self.pressure_graph.setFixedWidth(graph_width)
         self.pressure_graph_line = self.pressure_graph.plot(indices, data, pen = graph_pen)
         self.pressure_graph.setBackground("w")
         self.pressure_graph.setMouseEnabled(False, False)
@@ -200,7 +201,7 @@ class MainWindow(QWidget):
         pressure_graph_left_axis.setLabel('Pressure', **axisStyle)  #TODO: Add units
 
         self.volume_graph = pg.PlotWidget()
-        self.volume_graph.setFixedWidth(400)
+        self.volume_graph.setFixedWidth(graph_width)
         self.pressure_graph_line = self.volume_graph.plot(indices, data, pen = graph_pen)
         self.volume_graph.setBackground("w")
         self.volume_graph.setMouseEnabled(False, False)
@@ -277,7 +278,6 @@ class MainWindow(QWidget):
         resp_rate_apply.clicked.connect(self.commitRespRate)
         resp_rate_cancel.clicked.connect(self.cancelChange)
 
-
         h_box_3top.addWidget(self.resp_rate_page_rect)
         h_box_3mid.addWidget(resp_rate_increment_button)
         h_box_3mid.addWidget(resp_rate_decrement_button)
@@ -300,13 +300,12 @@ class MainWindow(QWidget):
 
     # TODO: Polish up and process data properly
     def updateGraphs(self):
-        self.counter.append(self.counter[-1] + 1)  # Add a new value 1 higher than the last.
-        self.counter = self.counter[1:]  # Remove the first element.
-
-        self.tv_insp_data.append(self.params.tv_insp)
-        self.tv_insp_data = self.tv_insp_data[1:]  # Remove the first
-
-        self.flow_graph_line.setData(self.counter, self.tv_insp_data)  # Update the data.
+        self.tv_insp_data[:-1] = self.tv_insp_data[1:]
+        self.tv_insp_data[-1] = self.params.tv_insp
+        self.flow_graph_line.setData(self.tv_insp_data)
+        self.ptr+=1
+        self.flow_graph_line.setPos(self.ptr,0)
+        QtGui.QApplication.processEvents()
 
     def open_serial(self):
         if not self.serial.isOpen():
@@ -388,11 +387,9 @@ class MainWindow(QWidget):
 
     # change is a Change object
     def logChange(self, change):
-        print(change.display())
-        pass
+        if change.old_val != change.new_val:
+            print(change.display())
         #TODO: Actually log the change in some data structure
-
-
 
 def main():
     app = QApplication(sys.argv)
