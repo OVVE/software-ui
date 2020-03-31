@@ -1,91 +1,46 @@
 import json
 
-class AqualungSettings:
+# Settings that are sent to MCU
+
+
+class Settings:
     def __init__(self):
-        self.__mode = False #mode = True -> AC, mode = False -> SIMV
-        self.__peep = 0
-        self.__bpm = 0
-        self.__tv = 0
-        self.__ie = 0
-        self.__fio2 = 0
-        self.__resp_rate = 0
-        self.__peak_press = 0 #value comes from sensor
-        self.__plateau_press = 0 #value comes from sensor
+        self.ac_mode = False #mode = True -> AC, mode = False -> SIMV
+        self.minute_volume = 0
+        self.resp_rate = 0
+        self.resp_rate_increment = 0
+        self.minute_volume_increment = 0
 
-    @property
-    def peep(self):
-        return self.__peep
+        # TODO: validate this assumption
+        # ie ratio is an enumeration of possible ie ratios
+        # ie ratio id is passed from the MCU as an index into the enumeration
+        self.ie_ratio_display = ["1:1", "1:1.5", "1:2", "1:3"]
+        self.ie_ratio_id = 0
 
-    @peep.setter
-    def peep(self, value):
-        self.__peep = value
+    def set_test_settings(self):
+        self.ac_mode = False
+        self.minute_volume = 10
+        self.resp_rate = 14
+        self.ie_ratio_id = 0
+        self.resp_rate_increment = 1
+        self.minute_volume_increment = 1
 
-    @property
-    def mode(self):
-        return self.__mode
+    def get_ie_display(self):
+        if self.ie_ratio_id < len(self.ie_ratio_display):
+            return self.ie_ratio_display[self.ie_ratio_id]
+        else:
+            return "ERROR"
 
-    @mode.setter
-    def mode(self, value):
-        self.__mode = value
+    def get_mode_display(self):
+        if self.ac_mode:
+            return "AC"
+        else:
+            return "SIMV"
 
-    @property
-    def tv(self):
-        return self.__tv
-
-    @tv.setter
-    def tv(self, value):
-        self.__tv = value
-
-    @property
-    def ie(self):
-        return self.__ie
-
-    @ie.setter
-    def ie(self, value):
-        self.__ie = value
-
-    @property
-    def fio2(self):
-        return self.__fio2
-
-    @fio2.setter
-    def fio2(self, value):
-        self.__fio2 = value
-
-    @property
-    def resp_rate(self):
-        return self.__resp_rate
-
-    @resp_rate.setter
-    def resp_rate(self, value):
-        self.__resp_rate = value
-
-    @property
-    def peak_press(self):
-        return self.__peak_press
-
-    @peak_press.setter
-    def peak_press(self, value):
-        self.__peak_press = value
-
-    @property
-    def plateau_press(self):
-        return self.__plateau_press
-
-    @plateau_press.setter
-    def plateau_press(self, value):
-        self.__plateau_press = value
-
-
-    def toJSON(self):
+    def to_JSON(self):
         j = {}
-        j['peep'] = self.__peep
-        j['mode'] = self.__mode
-        j['tv'] = self.__tv
-        j['ie'] = self.__ie
-        j['fio2'] = self.__fio2
-        j['resp_rate'] = self.__resp_rate
-        j['peak_press'] = self.__peak_press
-        j['plateau_press'] = self.__plateau_press
-
+        j['ac_mode'] = self.ac_mode
+        j['minute_volume'] = self.minute_volume
+        j['resp_rate'] = self.resp_rate
+        j['ie_ratio_id'] = self.ie_ratio_id
         return json.dumps(j)
