@@ -2,16 +2,17 @@ import sys
 import os
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtSerialPort, QtCore
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, \
     QHBoxLayout, QStackedWidget, QAbstractButton
 
 import pyqtgraph as pg
-from test_settings import TestSettings
+from settings import Settings
+from params import Params
 
 class DisplayButton(QAbstractButton):
     def __init__(self, label, value, unit, parent=None, size = (200,100)):
-        super(DisplayButton, self).__init__(parent)
+        super().__init__(parent)
         self.label = label
         self.value = value
         self.unit = unit
@@ -41,7 +42,7 @@ class DisplayButton(QAbstractButton):
 
 class ModeButton(QAbstractButton):
     def __init__(self, label, parent=None, size = (200,50)):
-        super(ModeButton, self).__init__(parent)
+        super().__init__(parent)
         self.label = label
         self.size = size
 
@@ -61,7 +62,7 @@ class ModeButton(QAbstractButton):
 
 class DisplayRect(QWidget):
     def __init__(self, label, value, unit, parent = None, size = (200,100)):
-        QWidget.__init__(self, parent)
+        super().__init__(parent)
         self.label = label
         self.value = value
         self.unit = unit
@@ -91,20 +92,16 @@ class DisplayRect(QWidget):
         return QSize(*self.size)
 
 
-class CharlesWindow(QWidget):
+class MainWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-
-        self.initUI()
-
-    def initUI(self):
-        super(CharlesWindow, self).__init__()
+        self.settings = Settings()
+        self.settings.set_test_settings()
+        self.params = Params()
+        self.params.set_test_params()
         self.setFixedSize(800,480)
-        self.localSettings = TestSettings()
-        self.globalSettings = TestSettings()
         self.stack = QStackedWidget(self)
-
 
         self.stack1 = QWidget()
         self.stack2 = QWidget()
@@ -122,8 +119,6 @@ class CharlesWindow(QWidget):
         hbox.addWidget(self.stack)
 
         self.setLayout(hbox)
-        self.show()
-
 
     def stack1UI(self): #home screen
         h_box_1 = QHBoxLayout()
@@ -132,16 +127,16 @@ class CharlesWindow(QWidget):
         v_box_1mid = QVBoxLayout()
         v_box_1right = QVBoxLayout()
 
-        mode_main = ModeButton("MODE", size = (150,25))
-        mode_main.clicked.connect(lambda: self.display(1))
+        self.mode_main = ModeButton("MODE", size = (150,25))
+        self.mode_main.clicked.connect(lambda: self.display(1))
 
-        resp_rate_main = DisplayButton("Resp. Rate", 14, "b/min", size = (150,80))
-        resp_rate_main.clicked.connect(lambda: self.display(2))
+        self.resp_rate_main = DisplayButton("Resp. Rate", self.settings.resp_rate, "b/min", size = (150,80))
+        self.resp_rate_main.clicked.connect(lambda: self.display(2))
 
-        tidal_vol_main = DisplayButton("Minute Volume", 500, "l/min", size = (150,80))
+        self.tidal_vol_main = DisplayButton("Minute Volume", self.settings.minute_volume, "l/min", size = (150,80))
         #TODO: Connect this
 
-        ie_main = DisplayButton("I/E Ratio", "1:1.5", "l/min", size = (150,80))
+        self.ie_main = DisplayButton("I/E Ratio", self.settings.get_ie_display(), "l/min", size = (150,80))
         # TODO: Connect this
 
         indices = [1,2,3,4,5,6,7]
@@ -174,20 +169,25 @@ class CharlesWindow(QWidget):
         left3 = graph3.getAxis('left')
         left3.setLabel('Volume', **axisStyle) #TODO: Add units
 
-        v_box_1left.addWidget(mode_main)
-        v_box_1left.addWidget(resp_rate_main)
-        v_box_1left.addWidget(tidal_vol_main)
-        v_box_1left.addWidget(ie_main)
+        v_box_1left.addWidget(self.mode_main)
+        v_box_1left.addWidget(self.resp_rate_main)
+        v_box_1left.addWidget(self.tidal_vol_main)
+        v_box_1left.addWidget(self.ie_main)
         v_box_1left.addWidget(DisplayRect("PEEP", 5, "cmH2O", size = (150,80)))
 
         v_box_1mid.addWidget(graph1)
         v_box_1mid.addWidget(graph2)
         v_box_1mid.addWidget(graph3)
 
-        v_box_1right.addWidget(DisplayRect("TV Insp", 435, "mL", size = (150,80)))
-        v_box_1right.addWidget(DisplayRect("TV Exp", 340, "mL", size = (150,80)))
-        v_box_1right.addWidget(DisplayRect("Ppeak", 20, "cmH2O", size=(150, 80)))
-        v_box_1right.addWidget(DisplayRect("Pplat", 2.5, "cmH2O", size=(150, 80)))
+        self.tv_insp_rect = DisplayRect("TV Insp", self.params.tv_insp, "mL", size = (150,80))
+        self.tv_exp_rect = DisplayRect("TV Exp", self.params.tv_exp, "mL", size = (150,80))
+        self.ppeak_rect = DisplayRect("Ppeak", self.params.ppeak, "cmH2O", size=(150, 80))
+        self.pplat_rect = DisplayRect("Pplat", self.params.pplat, "cmH2O", size=(150, 80))
+
+        v_box_1right.addWidget(self.tv_insp_rect)
+        v_box_1right.addWidget(self.tv_exp_rect)
+        v_box_1right.addWidget(self.ppeak_rect)
+        v_box_1right.addWidget(self.pplat_rect)
 
         h_box_1.addLayout(v_box_1left)
         h_box_1.addLayout(v_box_1mid)
@@ -245,11 +245,49 @@ class CharlesWindow(QWidget):
         self.display(0)
         #TODO: Add to some sort of change list for commit
 
+
+
+    def update_ui(self):
+        print(self.params.tv_insp)
+        # TODO: Update UI elements from the params
+
+    def open_serial(self):
+        if not self.serial.isOpen():
+            self.serial.open(QtCore.QIODevice.ReadWrite)
+
+    def close_serial(self):
+        if self.serial.isOpen():
+            self.serial.close()
+
+    def start_serial(self, serialport):
+        self.serial = QtSerialPort.QSerialPort(
+            serialport,
+            baudRate=QtSerialPort.QSerialPort.Baud9600,
+            readyRead=self.receive
+        )
+        self.open_serial()
+
+
+    @QtCore.pyqtSlot()
+    def receive(self):
+        while self.serial.canReadLine():
+            text = self.serial.readLine().data().decode()
+            text = text.rstrip('\r\n')
+            try:
+                self.params.tv_insp = int(text)
+            except:
+                pass
+            self.update_ui()
+
 def main():
     app = QApplication(sys.argv)
-    ex = CharlesWindow()
-    sys.exit(app.exec_())
+    window = MainWindow()
 
-
+    #window.start_serial("/dev/cu.usbmodem143101")
+    window.show()
+    app.exec_()
+    #window.close_serial()
+    sys.exit()
+    
 if __name__ == '__main__':
     main()
