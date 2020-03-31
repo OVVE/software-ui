@@ -31,13 +31,13 @@ class FancyDisplayButton(QAbstractButton):
         painter.drawRect(0,0, *self.size)
         painter.setPen(QPen(QColor('#3ed5f0')))
         painter.setFont(labelFont)
-        painter.drawText(self.size[0]/2.0 - 50,self.size[1]/5.0,self.label)
+        painter.drawText(int(self.size[0]/2 - 50),int(self.size[1]/5),self.label)
         painter.setPen(QPen(Qt.black))
         painter.setFont(numberFont)
-        painter.drawText(self.size[0]/2.0 - 50,self.size[1]*3/5.0, str(self.value))
+        painter.drawText(int(self.size[0]/2 - 50),int(self.size[1]*3/5), str(self.value))
         painter.setFont(unitFont)
         painter.setPen(QPen(Qt.gray))
-        painter.drawText(self.size[0]/2.0 - 50,self.size[1]*9/10.0, str(self.unit))
+        painter.drawText(int(self.size[0]/2 - 50),int(self.size[1]*9/10), str(self.unit))
 
     def sizeHint(self):
         return QSize(*self.size)
@@ -61,7 +61,7 @@ class SimpleDisplayButton(QAbstractButton):
         painter.drawRect(0,0, *self.size)
         painter.setPen(QPen(Qt.black))
         painter.setFont(valueFont)
-        painter.drawText(self.size[0]/2.0 - 50,self.size[1]*4/5.0,str(self.value))
+        painter.drawText(int(self.size[0]/2 - 50),int(self.size[1]*4/5),str(self.value))
 
     def sizeHint(self):
         return QSize(*self.size)
@@ -90,13 +90,13 @@ class DisplayRect(QWidget):
         painter.drawRect(0, 0, *self.size)
         painter.setPen(QPen(QColor('#3ed5f0')))
         painter.setFont(labelFont)
-        painter.drawText(self.size[0]/2.0 - 50, self.size[1]/5.0, self.label)
+        painter.drawText(int(self.size[0]/2 - 50), int(self.size[1]/5), self.label)
         painter.setPen(QPen(Qt.black))
         painter.setFont(numberFont)
-        painter.drawText(self.size[0]/2.0 - 50, 3*self.size[1]/5.0, str(self.value))
+        painter.drawText(int(self.size[0]/2 - 50), int(3*self.size[1]/5), str(self.value))
         painter.setFont(unitFont)
         painter.setPen(QPen(Qt.gray))
-        painter.drawText(self.size[0]/2.0 - 50, self.size[1]*9.0/10, str(self.unit))
+        painter.drawText(int(self.size[0]/2 - 50), int(self.size[1]*9/10), str(self.unit))
 
     def sizeHint(self):
         return QSize(*self.size)
