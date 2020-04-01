@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  <head>
+     <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>AquaLung</title>
+  <meta name="description" content="An Open Source Emergency Ventilator">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  </head>
+  <body>
+	<div class="container" >
+		
+	<!-- inputs -->	
+    <div class="row">
+      <div class="twelve columns">
+      <div id="mode" class="input">MODE</div>
+      <div id="bpm" class="input">
+      <ul>
+      <li class="title">Set Respiration Rate</li>
+      <li class="value">14</li>
+      <li class="unit">bpm</li>
+      </ul>
+      </div>
+      <div id="tv" class="input">
+      <ul>
+      <li class="title">Set Minute Volume</li>
+      <li class="value">500</li>
+      <li class="unit">lpm</li>
+      </ul>
+      </div>
+      <div id="ratio" class="input">
+      <ul>
+      <li class="title">Set Insp/Exp Ratio</li>
+      <li class="value">1 : 1.5</li>     
+      </ul>
+      </div>
+      <div id="alarm" class="input">ALARM</div>	
+      </div>
+	</div> 
+	
+	<!-- monitors -->		
+	<div class="row">
+	<div class="three columns" style="height:400px">
+		<div id="rr" class="display">
+		<ul>
+      <li class="title">Respiration Rate</li>
+      <li class="value">14</li>
+      <li class="unit">bpm</li>
+      </ul>
+		</div>
+		<div id="tvi" class="display">
+		<ul>
+      <li class="title">TV Insp</li>
+      <li class="value">430</li>
+      <li class="unit">ml</li>
+      </ul>
+		</div>
+		<div id="tve" class="display">
+		<ul>
+      <li class="title">TV Exp</li>
+      <li class="value">430</li>
+      <li class="unit">ml</li>
+      </ul>
+		</div>				
+	</div>
+	
+		<!-- magic graphs go here -->	
+	  <div id="graphs" class="six columns" style="height:400px">
+		  <img src="images/flow.png"/>
+		  <img src="images/pressure.png"/>
+		  <img src="images/volume.png"	/>	  
+	  </div>
+	  
+	  
+      <div class="three columns" style="height:400px">
+	    <div id="peep" class="display">
+		<ul>
+      <li class="title">PEEP</li>
+      <li class="value">5</li>
+      <li class="unit">cmH2O</li>
+      </ul>
+	    </div>
+		<div id="peak" class="display">		
+		<ul>
+      <li class="title">Ppeak</li>
+      <li class="value">12</li>
+      <li class="unit">cmH2O</li>
+      </ul></div>
+		<div id="plat" class="display">
+		<ul>
+      <li class="title">Pplat</li>
+      <li class="value">2.5</li>
+      <li class="unit">cmH2O</li>
+      </ul>
+		</div>
+      </div>
+	</div>   
+         
+    </div> <!-- container div -- > 
+ 
+ 
+   <!-- JavaScript
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->   
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+  $(function () {
+    var socket = io();
+    
+    // listens to socket here
+      socket.on('mode', function(modedata){
+      $('#mode').text(modedata);
+    });
+    
+    // sends to socket here
+    $('#mode').click(function(e){
+      e.preventDefault(); // prevents page reloading
+      socket.emit('mode', "AC");
+      return false;
+    });
+   
+    });
+    
+
+
+</script>
+
+  </body>
+</html>
