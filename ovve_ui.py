@@ -1,5 +1,8 @@
 import sys
 import os
+import argparse
+import datetime
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5 import QtWidgets, uic, QtSerialPort, QtCore, QtGui
@@ -10,8 +13,8 @@ import pyqtgraph as pg
 from settings import Settings
 from params import Params
 from random import randint
-import datetime
 from copy import deepcopy
+
 
 class FancyDisplayButton(QAbstractButton):
     def __init__(self, label, value, unit, parent=None, size = (200,100)):
@@ -403,12 +406,13 @@ class MainWindow(QWidget):
     def open_serial(self):
         if not self.serial.isOpen():
             self.serial.open(QtCore.QIODevice.ReadWrite)
-
+            
     def close_serial(self):
         if self.serial.isOpen():
             self.serial.close()
 
     def start_serial(self, serialport):
+        #TODO: error checking, retry
         self.serial = QtSerialPort.QSerialPort(
             serialport,
             baudRate=QtSerialPort.QSerialPort.Baud9600,
@@ -501,15 +505,19 @@ class MainWindow(QWidget):
             print(change.display())
         #TODO: Actually log the change in some data structure
 
-def main():
-    app = QApplication(sys.argv)
+def main(port, argv):
+    app = QApplication(argv)
     window = MainWindow()
 
-    window.start_serial("/dev/cu.usbmodem141301")
+    window.start_serial(port)
     window.show()
     app.exec_()
     window.close_serial()
     sys.exit()
     
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Start the OVVE user interface')
+    parser.add_argument('-p', '--port', help='Serial port for communication with Arduino')
+    args = parser.parse_args()
+   
+    main(args.port, sys.argv)
