@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import os
 import sys
@@ -238,7 +239,7 @@ class MainWindow(QWidget):
         self.tv_insp_data = np.linspace(0, 0, graph_width)
         self.flow_graph_ptr = -graph_width
 
-        # TODO: current graph system doesn't associate y values with x values. 
+        # TODO: current graph system doesn't associate y values with x values.
         #       Need to fix?
         self.flow_graph = pg.PlotWidget()
         self.flow_graph.setFixedWidth(graph_width)
@@ -488,6 +489,7 @@ class MainWindow(QWidget):
             self.serial.close()
 
     def start_serial(self, serialport):
+        #TODO: error checking, retry
         self.serial = QtSerialPort.QSerialPort(
             serialport,
             baudRate=QtSerialPort.QSerialPort.Baud9600,
@@ -607,16 +609,23 @@ class MainWindow(QWidget):
         # TODO: Actually log the change in some data structure
 
 
-def main():
-    app = QApplication(sys.argv)
+def main(port, argv):
+    app = QApplication(argv)
     window = MainWindow()
 
-    window.start_serial("/dev/cu.usbmodem141301")
+    window.start_serial(port)
     window.show()
     app.exec_()
     window.close_serial()
     sys.exit()
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Start the OVVE user interface')
+    parser.add_argument('-p',
+                        '--port',
+                        help='Serial port for communication with Arduino')
+    args = parser.parse_args()
+
+    main(args.port, sys.argv)
