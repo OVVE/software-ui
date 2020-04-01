@@ -1,13 +1,14 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
-from mainwindow import Ui_MainWindow
+from mainwindow import UIMainWindow
 from settings import AqualungSettings
 
-class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
+
+class AqualungUi(QtWidgets.QMainWindow, UIMainWindow):
 
     def __init__(self, *args, obj=None, **kwargs):
         super(AqualungUi, self).__init__(*args, **kwargs)
-        self.setupUi(self)
+        self.setup_ui(self)
         self.settings = AqualungSettings()
         self.connect()
 
@@ -41,12 +42,15 @@ class AqualungUi(QtWidgets.QMainWindow, Ui_MainWindow):
         self.settings.resp_rate = self.resp_rate_slider.value()
         self.resp_rate_lcd.display(int(self.settings.resp_rate))
 
-app = QtWidgets.QApplication(sys.argv)
 
-window = AqualungUi()
-screen_size = app.desktop().screenGeometry() #get the current screensize as a PyQt5 QRect
-window.resize(screen_size.width(), screen_size.height()) #resize window to screensize
-window.show()
-app.exec()
+def main():
+    app = QtWidgets.QApplication(sys.argv)
 
+    window = AqualungUi()
+    screen_size = app.desktop().screenGeometry() #get the current screensize as a PyQt5 QRect
+    window.resize(screen_size.width(), screen_size.height()) #resize window to screensize
+    window.show()
+    app.exec()
 
+if __name__ == "__main__":
+    main()

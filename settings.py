@@ -1,5 +1,6 @@
 import json
 
+
 class AqualungSettings():
     def __init__(self):
         self.__mode = False #mode = True -> AC, mode = False -> SIMV
@@ -75,7 +76,6 @@ class AqualungSettings():
     @plateau_press.setter
     def plateau_press(self, value):
         self.__plateau_press = value
-
 
     def toJSON(self):
         j = {}
