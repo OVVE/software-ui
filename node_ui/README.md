@@ -1,3 +1,40 @@
+This project is an HTML interface communicating to a Rpi or Arduino through node.js and serial port. 
+
+Install NODE.JS, Express, Serialport
+
+npn install node
+Npn install express
+Npn install serialport
+
+In a terminal window in this folder, run: node index.js
+ A server will start and listen for traffic on localhost:3000
+
+Starts a serial connection with whichever serial port you spec. in index.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # [Skeleton](http://getskeleton.com)
 Skeleton is a simple, responsive boilerplate to kickstart any responsive project.
 
