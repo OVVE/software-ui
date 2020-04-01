@@ -1,6 +1,6 @@
 import json
 
-class AqualungSettings:
+class AqualungSettings():
     def __init__(self):
         self.__mode = False #mode = True -> AC, mode = False -> SIMV
         self.__peep = 0
