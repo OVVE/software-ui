@@ -1,20 +1,15 @@
 """
 
 """
-from typing import Any
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from typing import Any, Optional, Tuple, Union
 
-from PyQt5.QtCore import Qt
 from PyQt5.Qt import QSize
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QBrush, QColor, QFont, QPainter, QPen
 from PyQt5.QtWidgets import QAbstractButton
-from PyQt5.QtGui import QPainter
-from PyQt5.QtGui import QFont
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QPen
+
 from display.ui_settings import FancyButtonSettings, SimpleButtonSettings
+
 
 class FancyDisplayButton(QAbstractButton):
     def __init__(self,
@@ -42,8 +37,7 @@ class FancyDisplayButton(QAbstractButton):
         painter.drawRect(0, 0, *self.size)
         painter.setPen(self.button_settings.getLabelPen())
         painter.setFont(label_font)
-        painter.drawText(*self.button_settings.getLabelCoords(),
-                         self.label)
+        painter.drawText(*self.button_settings.getLabelCoords(), self.label)
         painter.setPen(self.button_settings.getValuePen())
         painter.setFont(value_font)
         painter.drawText(*self.button_settings.getValueCoords(),

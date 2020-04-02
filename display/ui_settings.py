@@ -1,6 +1,7 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
+
 class TextSetting:
     def __init__(self, fontName, fontSize, bold):
         if bold:
@@ -8,17 +9,18 @@ class TextSetting:
         else:
             self.font = QFont(fontName, fontSize)
 
+
 #TODO: Abstract text placement
 class FancyButtonSettings:
-    def __init__(self, labelSetting = TextSetting("Times", 20, True),
-                 valueSetting = TextSetting("Times", 36, True),
-                 unitSetting = TextSetting("Times", 18, False),
-                 fillColor = '#d2fcdc',
-                 labelColor = '#3ed5f0',
-                 valueColor = Qt.black,
-                 unitColor = Qt.gray,
-                 default_size = (150,80)
-                 ):
+    def __init__(self,
+                 labelSetting=TextSetting("Times", 20, True),
+                 valueSetting=TextSetting("Times", 36, True),
+                 unitSetting=TextSetting("Times", 18, False),
+                 fillColor='#d2fcdc',
+                 labelColor='#3ed5f0',
+                 valueColor=Qt.black,
+                 unitColor=Qt.gray,
+                 default_size=(150, 80)):
 
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
@@ -41,27 +43,28 @@ class FancyButtonSettings:
     def getUnitPen(self):
         return QPen(QColor(self.unitColor))
 
-    def getLabelCoords(self, size = None):
+    def getLabelCoords(self, size=None):
         use_size = self.default_size if size is None else size
         return int(use_size[0] / 4), \
                int(use_size[1] * 1 / 5)
 
-    def getValueCoords(self, size = None):
+    def getValueCoords(self, size=None):
         use_size = self.default_size if size is None else size
         return int(use_size[0] / 4), \
                int(use_size[1] * 3 / 5)
 
-    def getUnitCoords(self, size = None):
+    def getUnitCoords(self, size=None):
         use_size = self.default_size if size is None else size
         return int(use_size[0] / 4), \
                int(use_size[1] * 9 / 10)
 
+
 class SimpleButtonSettings:
-    def __init__(self, valueSetting = TextSetting("Times", 20, True),
-                 fillColor = '#d2fcdc',
-                 valueColor = Qt.black,
-                 default_size = (150,25)
-                 ):
+    def __init__(self,
+                 valueSetting=TextSetting("Times", 20, True),
+                 fillColor='#d2fcdc',
+                 valueColor=Qt.black,
+                 default_size=(150, 25)):
 
         self.valueFont = valueSetting.font
         self.fillColor = fillColor
@@ -79,16 +82,17 @@ class SimpleButtonSettings:
         return int(use_size[0] / 4), \
                int(use_size[1] * 4 / 5)
 
+
 class DisplayRectSettings:
-    def __init__(self, labelSetting = TextSetting("Times", 20, True),
-                 valueSetting = TextSetting("Times", 36, True),
-                 unitSetting = TextSetting("Times", 18, False),
-                 fillColor = '#c4dbff',
-                 labelColor = '#3ed5f0',
-                 valueColor = Qt.black,
-                 unitColor = Qt.gray,
-                 default_size = (150,80)
-                 ):
+    def __init__(self,
+                 labelSetting=TextSetting("Times", 20, True),
+                 valueSetting=TextSetting("Times", 36, True),
+                 unitSetting=TextSetting("Times", 18, False),
+                 fillColor='#c4dbff',
+                 labelColor='#3ed5f0',
+                 valueColor=Qt.black,
+                 unitColor=Qt.gray,
+                 default_size=(150, 80)):
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
         self.unitFont = unitSetting.font
@@ -110,23 +114,25 @@ class DisplayRectSettings:
     def getUnitPen(self):
         return QPen(QColor(self.unitColor))
 
-    def getLabelCoords(self, size = None):
+    def getLabelCoords(self, size=None):
         use_size = self.default_size if size is None else size
         return int(use_size[0] / 4), \
                int(use_size[1] * 1 / 5)
 
-    def getValueCoords(self, size = None):
+    def getValueCoords(self, size=None):
         use_size = self.default_size if size is None else size
         return int(use_size[0] / 4), \
                int(use_size[1] * 3 / 5)
 
-    def getUnitCoords(self, size = None):
+    def getUnitCoords(self, size=None):
         use_size = self.default_size if size is None else size
         return int(use_size[0] / 4),\
                int(use_size[1] * 9 / 10)
 
+
 class UISettings:
-    def __init__(self, fancy_button_settings=FancyButtonSettings(),
+    def __init__(self,
+                 fancy_button_settings=FancyButtonSettings(),
                  simple_button_settings=SimpleButtonSettings(),
                  display_rect_settings=DisplayRectSettings()):
 

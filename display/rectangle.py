@@ -1,21 +1,15 @@
 """
 
 """
-from typing import Any
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from typing import Any, Optional, Tuple, Union
 
+from PyQt5.Qt import QSize, QWidget
 from PyQt5.QtCore import Qt
-from PyQt5.Qt import QWidget
-from PyQt5.Qt import QSize
+from PyQt5.QtGui import QBrush, QColor, QFont, QPainter, QPen
 from PyQt5.QtWidgets import QAbstractButton
-from PyQt5.QtGui import QPainter
-from PyQt5.QtGui import QFont
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QBrush
-from PyQt5.QtGui import QPen
+
 from display.ui_settings import DisplayRectSettings
+
 
 class DisplayRect(QWidget):
     def __init__(self,
@@ -43,12 +37,10 @@ class DisplayRect(QWidget):
         painter.drawRect(0, 0, *self.size)
         painter.setPen(self.rect_settings.getLabelPen())
         painter.setFont(label_font)
-        painter.drawText(*self.rect_settings.getLabelCoords(),
-                         self.label)
+        painter.drawText(*self.rect_settings.getLabelCoords(), self.label)
         painter.setPen(self.rect_settings.getValuePen())
         painter.setFont(value_font)
-        painter.drawText(*self.rect_settings.getValueCoords(),
-                         str(self.value))
+        painter.drawText(*self.rect_settings.getValueCoords(), str(self.value))
         painter.setFont(unit_font)
         painter.setPen(self.rect_settings.getUnitPen())
         painter.drawText(*self.rect_settings.getUnitCoords(), str(self.unit))
