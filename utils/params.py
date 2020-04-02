@@ -19,7 +19,7 @@ class Params():
         self.tv_exp = 340
         self.ppeak = 20
         self.pplat = 2.5
-        
+
     def to_JSON(self) -> str:
         j = {}
         j['peep'] = self.peep
