@@ -48,6 +48,7 @@ class MainWindow(QWidget):
         self.ptr = 0
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
+
         self.stack = QStackedWidget(self)
 
         self.page1 = QWidget()
@@ -59,32 +60,40 @@ class MainWindow(QWidget):
         self.initalizeAndAddStackWidgets()
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.stack)
+        hbox.setContentsMargins(0,0,0,0)
         self.setLayout(hbox)
+        palette = QtGui.QPalette()
+        palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
+        palette.setColor(QtGui.QPalette.Background, Qt.white)
+        self.setPalette(palette)
 
-    def makeFancyDisplayButton(self, label, value, unit, size=None):
+    def makeFancyDisplayButton(self, label, value, unit, size=None, button_settings = None):
         return FancyDisplayButton(
             label,
             value,
             unit,
             parent=None,
             size=size,
-            button_settings=self.ui_settings.fancy_button_settings)
+            button_settings=self.ui_settings.fancy_button_settings
+            if button_settings is None else button_settings)
 
-    def makeSimpleDisplayButton(self, value, size=None):
+    def makeSimpleDisplayButton(self, value, size=None, button_settings = None):
         return SimpleDisplayButton(
             value,
             parent=None,
             size=size,
-            button_settings=self.ui_settings.simple_button_settings)
+            button_settings= self.ui_settings.simple_button_settings
+            if button_settings is None else button_settings)
 
-    def makeDisplayRect(self, label, value, unit, size=None):
+    def makeDisplayRect(self, label, value, unit, size=None, rect_settings = None):
         return DisplayRect(
             label,
             value,
             unit,
             parent=None,
             size=size,
-            rect_settings=self.ui_settings.display_rect_settings)
+            rect_settings= self.ui_settings.display_rect_settings
+            if rect_settings is None else rect_settings)
 
     def initalizeAndAddStackWidgets(self):
         self.initializeWidget1()
@@ -99,58 +108,97 @@ class MainWindow(QWidget):
         self.stack.addWidget(self.page5)
 
     def initializeWidget1(self):  # home screen
-        h_box_1 = QHBoxLayout()
+        v_box_1_main = QVBoxLayout()
 
-        v_box_1left = QVBoxLayout()
-        v_box_1mid = QVBoxLayout()
-        v_box_1right = QVBoxLayout()
+        h_box_11 = QHBoxLayout()
+        h_box_12 = QHBoxLayout()
+
+        v_box_11left = QVBoxLayout()
+        v_box_11mid = QVBoxLayout()
+        v_box_11right = QVBoxLayout()
 
         self.mode_button_main = self.makeSimpleDisplayButton(
-            self.settings.get_mode_display())
+            self.settings.get_mode_display(),
+            size = (115,65),
+        )
         self.mode_button_main.clicked.connect(lambda: self.display(1))
 
-        self.resp_rate_button_main = self.makeFancyDisplayButton(
-            "Resp. Rate", self.settings.resp_rate, "b/min")
-        self.resp_rate_button_main.clicked.connect(lambda: self.display(2))
+        self.set_resp_rate_button_main = self.makeFancyDisplayButton(
+            "Set Resp. Rate",
+            self.settings.resp_rate,
+            "b/min",
+            size = (115,65),
+        )
 
-        self.minute_vol_button_main = self.makeFancyDisplayButton(
-            "Minute Volume",
+        self.set_resp_rate_button_main.clicked.connect(lambda: self.display(2))
+
+        self.set_minute_vol_button_main = self.makeFancyDisplayButton(
+            "Set Minute Volume",
             self.settings.minute_volume,
             "l/min",
+            size = (115,65),
         )
-        self.minute_vol_button_main.clicked.connect(lambda: self.display(3))
+        self.set_minute_vol_button_main.clicked.connect(lambda: self.display(3))
 
         self.ie_button_main = self.makeFancyDisplayButton(
-            "I/E Ratio",
+            "Set I/E Ratio",
             self.settings.get_ie_display(),
             "l/min",
+            size = (115,65),
         )
         self.ie_button_main.clicked.connect(lambda: self.display(4))
+
+        self.alarm_button_main = self.makeSimpleDisplayButton(
+            "ALARM",
+            size = (115,65),
+            button_settings=SimpleButtonSettings(borderColor="#FF0000",
+                                                 fillColor='#FFFFFF',
+                                                 valueColor='#FF0000'),
+        )
+        #TODO: Connect
+
+        self.start_button_main = self.makeSimpleDisplayButton(
+            "START",
+            size = (115,65),
+        )
+        #TODO: Connect
+
+        self.resp_rate_display_main = self.makeDisplayRect(
+            "Resp. Rate",
+            14,
+            "bpm",
+            size = (175, 115),
+        )
 
         self.peep_display_main = self.makeDisplayRect(
             "PEEP",
             5,
             "cmH2O",
+            size=(175, 115),
         )
         self.tv_insp_display_main = self.makeDisplayRect(
             "TV Insp",
             self.params.tv_insp,
             "mL",
+            size=(175, 115),
         )
         self.tv_exp_display_main = self.makeDisplayRect(
             "TV Exp",
             self.params.tv_exp,
             "mL",
+            size=(175, 115),
         )
         self.ppeak_display_main = self.makeDisplayRect(
             "Ppeak",
             self.params.ppeak,
             "cmH2O",
+            size=(175, 115),
         )
         self.pplat_display_main = self.makeDisplayRect(
             "Pplat",
             self.params.pplat,
             "cmH2O",
+            size=(175, 115),
         )
 
         axisStyle = {'color': 'black', 'font-size': '20pt'}
@@ -197,25 +245,32 @@ class MainWindow(QWidget):
         self.pressure_graph_left_axis.setLabel("Volume",
                                                **axisStyle)  # TODO: Add units
 
-        v_box_1left.addWidget(self.mode_button_main)
-        v_box_1left.addWidget(self.resp_rate_button_main)
-        v_box_1left.addWidget(self.minute_vol_button_main)
-        v_box_1left.addWidget(self.ie_button_main)
-        v_box_1left.addWidget(self.peep_display_main)
+        h_box_11.addWidget(self.mode_button_main)
+        h_box_11.addWidget(self.set_resp_rate_button_main)
+        h_box_11.addWidget(self.set_minute_vol_button_main)
+        h_box_11.addWidget(self.ie_button_main)
+        h_box_11.addWidget(self.alarm_button_main)
+        h_box_11.addWidget(self.start_button_main)
 
-        v_box_1mid.addWidget(self.flow_graph)
-        v_box_1mid.addWidget(self.pressure_graph)
-        v_box_1mid.addWidget(self.volume_graph)
+        v_box_11left.addWidget(self.resp_rate_display_main)
+        v_box_11left.addWidget(self.tv_insp_display_main)
+        v_box_11left.addWidget(self.tv_exp_display_main)
 
-        v_box_1right.addWidget(self.tv_insp_display_main)
-        v_box_1right.addWidget(self.tv_exp_display_main)
-        v_box_1right.addWidget(self.ppeak_display_main)
-        v_box_1right.addWidget(self.pplat_display_main)
+        v_box_11mid.addWidget(self.flow_graph)
+        v_box_11mid.addWidget(self.pressure_graph)
+        v_box_11mid.addWidget(self.volume_graph)
 
-        h_box_1.addLayout(v_box_1left)
-        h_box_1.addLayout(v_box_1mid)
-        h_box_1.addLayout(v_box_1right)
-        self.page1.setLayout(h_box_1)
+        v_box_11right.addWidget(self.peep_display_main)
+        v_box_11right.addWidget(self.ppeak_display_main)
+        v_box_11right.addWidget(self.pplat_display_main)
+
+        h_box_12.addLayout(v_box_11left)
+        h_box_12.addLayout(v_box_11mid)
+        h_box_12.addLayout(v_box_11right)
+
+        v_box_1_main.addLayout(h_box_11)
+        v_box_1_main.addLayout(h_box_12)
+        self.page1.setLayout(v_box_1_main)
 
     def initializeWidget2(self):  # Mode
         v_box_2 = QVBoxLayout()
@@ -376,8 +431,8 @@ class MainWindow(QWidget):
 
     def updateMainDisplays(self):
         self.mode_button_main.updateValue(self.settings.get_mode_display())
-        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
-        self.minute_vol_button_main.updateValue(self.settings.minute_volume)
+        self.set_resp_rate_button_main.updateValue(self.settings.resp_rate)
+        self.set_minute_vol_button_main.updateValue(self.settings.minute_volume)
         self.ie_button_main.updateValue(self.settings.get_ie_display())
         self.peep_display_main.updateValue(self.params.peep)
         self.tv_insp_display_main.updateValue(self.params.tv_insp)
@@ -485,7 +540,7 @@ class MainWindow(QWidget):
                 self.local_settings.resp_rate,
             ))
         self.settings.resp_rate = self.local_settings.resp_rate
-        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
+        self.set_resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.stack.setCurrentIndex(0)
 
     def commitMinuteVol(self):
@@ -497,7 +552,7 @@ class MainWindow(QWidget):
                 self.local_settings.minute_volume,
             ))
         self.settings.minute_volume = self.local_settings.minute_volume
-        self.minute_vol_button_main.updateValue(self.settings.minute_volume)
+        self.set_minute_vol_button_main.updateValue(self.settings.minute_volume)
         self.stack.setCurrentIndex(0)
 
     def commitIERatio(self):
