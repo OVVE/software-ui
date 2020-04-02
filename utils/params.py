@@ -1,8 +1,8 @@
 """
 Read-only parameters from the MCU
 """
+import json
 from typing import Union
-import json 
 
 
 class Params():

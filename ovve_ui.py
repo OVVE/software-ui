@@ -10,23 +10,17 @@ import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtSerialPort, QtWidgets, uic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import (
-    QAbstractButton,
-    QApplication,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QStackedWidget,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
+                             QLabel, QPushButton, QStackedWidget, QVBoxLayout,
+                             QWidget)
 
-from utils.params import Params
-from utils.settings import Settings
+from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
 from display.rectangle import DisplayRect
-from display.button import FancyDisplayButton
-from display.button import SimpleDisplayButton
+from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
+                                 SimpleButtonSettings, TextSetting, UISettings)
+from utils.params import Params
+from utils.settings import Settings
 
 
 class MainWindow(QWidget):
@@ -40,6 +34,16 @@ class MainWindow(QWidget):
 
         self.params = Params()
         self.params.set_test_params()
+
+        # you can pass new settings for different object classes here
+        self.ui_settings = UISettings()
+        # Example 1 (changes color of Fancy numbers to red)
+        # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
+        # Example 2 (changes color of Simple numbers to red)
+        # self.ui_settings.set_simple_button_settings(SimpleButtonSettings(valueColor=Qt.red))
+
+        # Example 3 (sets display rect label font to Comic Sans MS)
+        # self.ui_settings.set_display_rect_settings(DisplayRectSettings(labelSetting = TextSetting("Comic Sans MS", 20, True)))
 
         self.ptr = 0
 
@@ -57,7 +61,30 @@ class MainWindow(QWidget):
         hbox.addWidget(self.stack)
         self.setLayout(hbox)
 
-    # TODO: Add all other pages
+    def makeFancyDisplayButton(self, label, value, unit, size=None):
+        return FancyDisplayButton(
+            label,
+            value,
+            unit,
+            parent=None,
+            size=size,
+            button_settings=self.ui_settings.fancy_button_settings)
+
+    def makeSimpleDisplayButton(self, value, size=None):
+        return SimpleDisplayButton(
+            value,
+            parent=None,
+            size=size,
+            button_settings=self.ui_settings.simple_button_settings)
+
+    def makeDisplayRect(self, label, value, unit, size=None):
+        return DisplayRect(
+            label,
+            value,
+            unit,
+            parent=None,
+            size=size,
+            rect_settings=self.ui_settings.display_rect_settings)
 
     def initalizeAndAddStackWidgets(self):
         self.initializeWidget1()
@@ -78,50 +105,55 @@ class MainWindow(QWidget):
         v_box_1mid = QVBoxLayout()
         v_box_1right = QVBoxLayout()
 
-        self.mode_button_main = SimpleDisplayButton(
-            self.settings.get_mode_display(), size=(150, 25))
+        self.mode_button_main = self.makeSimpleDisplayButton(
+            self.settings.get_mode_display())
         self.mode_button_main.clicked.connect(lambda: self.display(1))
 
-        self.resp_rate_button_main = FancyDisplayButton(
-            "Resp. Rate", self.settings.resp_rate, "b/min", size=(150, 80))
+        self.resp_rate_button_main = self.makeFancyDisplayButton(
+            "Resp. Rate", self.settings.resp_rate, "b/min")
         self.resp_rate_button_main.clicked.connect(lambda: self.display(2))
 
-        self.minute_vol_button_main = FancyDisplayButton(
+        self.minute_vol_button_main = self.makeFancyDisplayButton(
             "Minute Volume",
             self.settings.minute_volume,
             "l/min",
-            size=(150, 80))
+        )
         self.minute_vol_button_main.clicked.connect(lambda: self.display(3))
 
-        self.ie_button_main = FancyDisplayButton(
+        self.ie_button_main = self.makeFancyDisplayButton(
             "I/E Ratio",
             self.settings.get_ie_display(),
             "l/min",
-            size=(150, 80))
+        )
         self.ie_button_main.clicked.connect(lambda: self.display(4))
 
-        self.peep_display_main = DisplayRect("PEEP",
-                                             5,
-                                             "cmH2O",
-                                             size=(150, 80))
-        self.tv_insp_display_main = DisplayRect("TV Insp",
-                                                self.params.tv_insp,
-                                                "mL",
-                                                size=(150, 80))
-        self.tv_exp_display_main = DisplayRect("TV Exp",
-                                               self.params.tv_exp,
-                                               "mL",
-                                               size=(150, 80))
-        self.ppeak_display_main = DisplayRect("Ppeak",
-                                              self.params.ppeak,
-                                              "cmH2O",
-                                              size=(150, 80))
-        self.pplat_display_main = DisplayRect("Pplat",
-                                              self.params.pplat,
-                                              "cmH2O",
-                                              size=(150, 80))
+        self.peep_display_main = self.makeDisplayRect(
+            "PEEP",
+            5,
+            "cmH2O",
+        )
+        self.tv_insp_display_main = self.makeDisplayRect(
+            "TV Insp",
+            self.params.tv_insp,
+            "mL",
+        )
+        self.tv_exp_display_main = self.makeDisplayRect(
+            "TV Exp",
+            self.params.tv_exp,
+            "mL",
+        )
+        self.ppeak_display_main = self.makeDisplayRect(
+            "Ppeak",
+            self.params.ppeak,
+            "cmH2O",
+        )
+        self.pplat_display_main = self.makeDisplayRect(
+            "Pplat",
+            self.params.pplat,
+            "cmH2O",
+        )
 
-        axisStyle = {"color": "black", "font-size": "20pt"}
+        axisStyle = {'color': 'black', 'font-size': '20pt'}
         graph_pen = pg.mkPen(width=5, color="b")
 
         graph_width = 400
@@ -191,16 +223,16 @@ class MainWindow(QWidget):
         h_box_2middle = QHBoxLayout()
         h_box_2bottom = QHBoxLayout()
 
-        mode_change = SimpleDisplayButton("CHANGE MODE")
-        mode_apply = SimpleDisplayButton("APPLY")
-        mode_cancel = SimpleDisplayButton("Cancel")
+        mode_change = self.makeSimpleDisplayButton("CHANGE MODE")
+        mode_apply = self.makeSimpleDisplayButton("APPLY")
+        mode_cancel = self.makeSimpleDisplayButton("CANCEL")
 
         mode_change.clicked.connect(
             lambda: self.changeMode(not self.local_settings.ac_mode))
         mode_apply.clicked.connect(lambda: self.commitMode())
         mode_cancel.clicked.connect(self.cancelChange)
 
-        self.mode_page_rect = DisplayRect(
+        self.mode_page_rect = self.makeDisplayRect(
             "Mode",
             self.local_settings.get_mode_display(),
             "",
@@ -223,17 +255,18 @@ class MainWindow(QWidget):
         h_box_3mid = QHBoxLayout()
         h_box_3bottom = QHBoxLayout()
 
-        self.resp_rate_page_rect = DisplayRect("Resp. Rate",
-                                               self.local_settings.resp_rate,
-                                               "b/min",
-                                               size=(500, 200))
+        self.resp_rate_page_rect = self.makeDisplayRect(
+            "Resp. Rate",
+            self.local_settings.resp_rate,
+            "b/min",
+            size=(500, 200))
 
-        resp_rate_increment_button = SimpleDisplayButton(
+        resp_rate_increment_button = self.makeSimpleDisplayButton(
             "+ " + str(self.settings.resp_rate_increment))
-        resp_rate_decrement_button = SimpleDisplayButton(
+        resp_rate_decrement_button = self.makeSimpleDisplayButton(
             "- " + str(self.settings.resp_rate_increment))
-        resp_rate_apply = SimpleDisplayButton("APPLY")
-        resp_rate_cancel = SimpleDisplayButton("CANCEL")
+        resp_rate_apply = self.makeSimpleDisplayButton("APPLY")
+        resp_rate_cancel = self.makeSimpleDisplayButton("CANCEL")
 
         resp_rate_increment_button.clicked.connect(self.incrementRespRate)
         resp_rate_decrement_button.clicked.connect(self.decrementRespRate)
@@ -258,18 +291,18 @@ class MainWindow(QWidget):
         h_box_4mid = QHBoxLayout()
         h_box_4bottom = QHBoxLayout()
 
-        self.minute_vol_page_rect = DisplayRect(
+        self.minute_vol_page_rect = self.makeDisplayRect(
             "Minute Volume",
             self.local_settings.minute_volume,
             "l/min",
             size=(500, 200))
 
-        minute_vol_increment_button = SimpleDisplayButton(
+        minute_vol_increment_button = self.makeSimpleDisplayButton(
             "+ " + str(self.settings.minute_volume_increment))
-        minute_vol_decrement_button = SimpleDisplayButton(
+        minute_vol_decrement_button = self.makeSimpleDisplayButton(
             "- " + str(self.settings.minute_volume_increment))
-        minute_vol_apply = SimpleDisplayButton("APPLY")
-        minute_vol_cancel = SimpleDisplayButton("CANCEL")
+        minute_vol_apply = self.makeSimpleDisplayButton("APPLY")
+        minute_vol_cancel = self.makeSimpleDisplayButton("CANCEL")
 
         minute_vol_increment_button.clicked.connect(self.incrementMinuteVol)
         minute_vol_decrement_button.clicked.connect(self.decrementMinuteVol)
@@ -294,24 +327,22 @@ class MainWindow(QWidget):
         h_box_5mid = QHBoxLayout()
         h_box_5bottom = QHBoxLayout()
 
-        self.ie_page_rect = DisplayRect("I/E Ratio",
-                                        self.settings.get_ie_display(),
-                                        "",
-                                        size=(500, 200))
+        self.ie_page_rect = self.makeDisplayRect(
+            "I/E Ratio", self.settings.get_ie_display(), "", size=(500, 200))
 
         ie_change_size = (150, 50)
 
-        ie_change_0 = SimpleDisplayButton(self.settings.ie_ratio_display[0],
-                                          size=ie_change_size)
-        ie_change_1 = SimpleDisplayButton(self.settings.ie_ratio_display[1],
-                                          size=ie_change_size)
-        ie_change_2 = SimpleDisplayButton(self.settings.ie_ratio_display[2],
-                                          size=ie_change_size)
-        ie_change_3 = SimpleDisplayButton(self.settings.ie_ratio_display[3],
-                                          size=ie_change_size)
+        ie_change_0 = self.makeSimpleDisplayButton(
+            self.settings.ie_ratio_display[0], size=ie_change_size)
+        ie_change_1 = self.makeSimpleDisplayButton(
+            self.settings.ie_ratio_display[1], size=ie_change_size)
+        ie_change_2 = self.makeSimpleDisplayButton(
+            self.settings.ie_ratio_display[2], size=ie_change_size)
+        ie_change_3 = self.makeSimpleDisplayButton(
+            self.settings.ie_ratio_display[3], size=ie_change_size)
 
-        ie_apply = SimpleDisplayButton("APPLY")
-        ie_cancel = SimpleDisplayButton("CANCEL")
+        ie_apply = self.makeSimpleDisplayButton("APPLY")
+        ie_cancel = self.makeSimpleDisplayButton("CANCEL")
 
         ie_change_0.clicked.connect(lambda: self.changeIERatio(0))
         ie_change_1.clicked.connect(lambda: self.changeIERatio(1))

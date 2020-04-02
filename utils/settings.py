@@ -1,8 +1,8 @@
 """
 Settings that are sent to MCU
 """
-from typing import List
 import json
+from typing import List
 
 
 class Settings():
