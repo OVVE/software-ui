@@ -21,123 +21,12 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from params import Params
-from settings import Settings
-
-
-class FancyDisplayButton(QAbstractButton):
-    def __init__(self, label, value, unit, parent=None, size=(200, 100)):
-        super().__init__(parent)
-        self.label = label
-        self.value = value
-        self.unit = unit
-        self.size = size
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        labelFont = QFont("Times", 20, QFont.Bold)
-        numberFont = QFont("Times", 36, QFont.Bold)
-        unitFont = QFont("Times", 18)
-
-        painter.setBrush(QBrush(QColor("#d2fcdc")))
-        painter.drawRect(0, 0, *self.size)
-        painter.setPen(QPen(QColor("#3ed5f0")))
-        painter.setFont(labelFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] / 5),
-                         self.label)
-        painter.setPen(QPen(Qt.black))
-        painter.setFont(numberFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 3 / 5),
-                         str(self.value))
-        painter.setFont(unitFont)
-        painter.setPen(QPen(Qt.gray))
-        painter.drawText(int(self.size[0] / 2 - 50),
-                         int(self.size[1] * 9 / 10), str(self.unit))
-
-    def sizeHint(self):
-        return QSize(*self.size)
-
-    def updateValue(self, value):
-        self.value = value
-        self.update()
-
-
-class SimpleDisplayButton(QAbstractButton):
-    def __init__(self, value, parent=None, size=(200, 50)):
-        super().__init__(parent)
-        self.value = value
-        self.size = size
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        valueFont = QFont("Times", 20, QFont.Bold)
-
-        painter.setBrush(QBrush(QColor("#d2fcdc")))
-        painter.drawRect(0, 0, *self.size)
-        painter.setPen(QPen(Qt.black))
-        painter.setFont(valueFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 4 / 5),
-                         str(self.value))
-
-    def sizeHint(self):
-        return QSize(*self.size)
-
-    def updateValue(self, value):
-        self.value = value
-        self.update()
-
-
-class DisplayRect(QWidget):
-    def __init__(self, label, value, unit, parent=None, size=(200, 100)):
-        super().__init__(parent)
-        self.label = label
-        self.value = value
-        self.unit = unit
-        self.size = size
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        labelFont = QFont("Times", 20, QFont.Bold)
-        numberFont = QFont("Times", 36, QFont.Bold)
-        unitFont = QFont("Times", 18)
-
-        painter.setBrush(QBrush(QColor("#c4dbff")))
-        painter.drawRect(0, 0, *self.size)
-        painter.setPen(QPen(QColor("#3ed5f0")))
-        painter.setFont(labelFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] / 5),
-                         self.label)
-        painter.setPen(QPen(Qt.black))
-        painter.setFont(numberFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(3 * self.size[1] / 5),
-                         str(self.value))
-        painter.setFont(unitFont)
-        painter.setPen(QPen(Qt.gray))
-        painter.drawText(int(self.size[0] / 2 - 50),
-                         int(self.size[1] * 9 / 10), str(self.unit))
-
-    def sizeHint(self):
-        return QSize(*self.size)
-
-    def updateValue(self, value):
-        self.value = value
-        self.update()
-
-
-class Change:
-    def __init__(self, time, setting, old_val, new_val):
-        self.time = time
-        self.setting = setting
-        self.old_val = old_val
-        self.new_val = new_val
-
-    def display(self):
-        return "{}: {} changed from {} to {}".format(self.time, self.setting,
-                                                     self.old_val,
-                                                     self.new_val)
+from utils.params import Params
+from utils.settings import Settings
+from display.change import Change
+from display.rectangle import DisplayRect
+from display.button import FancyDisplayButton
+from display.button import SimpleDisplayButton
 
 
 class MainWindow(QWidget):
