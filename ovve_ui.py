@@ -118,11 +118,21 @@ class DisplayRect(QWidget):
         painter.setBrush(self.rect_settings.getFillBrush())
         painter.drawRect(0, 0, *self.size)
         painter.setPen(self.rect_settings.getLabelPen())
+        painter.setFont(labelFont)
         painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] / 5),
                          self.label)
+        painter.setPen(self.rect_settings.getNumberPen())
+        painter.setFont(numberFont)
+        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 3 / 5),
+                         str(self.value))
         painter.setPen(self.rect_settings.getUnitPen())
+        painter.setFont(unitFont)
         painter.drawText(int(self.size[0] / 2 - 50),
                          int(self.size[1] * 9 / 10), str(self.unit))
+
+    def updateValue(self, value):
+        self.value = value
+        self.update()
 
 
 class Change:
