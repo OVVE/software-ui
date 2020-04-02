@@ -6,7 +6,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-from PyQt5 import Qt
+from PyQt5.QtCore import Qt
 from PyQt5.Qt import QSize
 from PyQt5.QtWidgets import QAbstractButton
 from PyQt5.QtGui import QPainter
