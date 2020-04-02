@@ -27,36 +27,39 @@ class FancyDisplayButton(QAbstractButton):
                  value,
                  unit,
                  button_settings,
+                 size = None,
                  parent=None,
-                 size=(200, 100)):
+                 ):
         super().__init__(parent)
         self.label = label
         self.value = value
         self.unit = unit
-        self.size = size
         self.button_settings = button_settings
+        self.size = self.button_settings.default_size
+        if size is not None:
+            self.size = size
 
     def paintEvent(self, event):
         painter = QPainter(self)
 
         labelFont = self.button_settings.labelFont
-        numberFont = self.button_settings.numberFont
+        valueFont = self.button_settings.valueFont
         unitFont = self.button_settings.unitFont
 
         painter.setBrush(self.button_settings.getFillBrush())
         painter.drawRect(0, 0, *self.size)
         painter.setPen(self.button_settings.getLabelPen())
         painter.setFont(labelFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] / 5),
+        painter.drawText(*self.button_settings.getLabelCoords(self.size),
                          self.label)
-        painter.setPen(self.button_settings.getNumberPen())
-        painter.setFont(numberFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 3 / 5),
+        painter.setPen(self.button_settings.getValuePen())
+        painter.setFont(valueFont)
+        painter.drawText(*self.button_settings.getValueCoords(self.size),
                          str(self.value))
         painter.setFont(unitFont)
         painter.setPen(self.button_settings.getUnitPen())
-        painter.drawText(int(self.size[0] / 2 - 50),
-                         int(self.size[1] * 9 / 10), str(self.unit))
+        painter.drawText(*self.button_settings.getUnitCoords(self.size)
+                         , str(self.unit))
 
     def sizeHint(self):
         return QSize(*self.size)
@@ -67,11 +70,13 @@ class FancyDisplayButton(QAbstractButton):
 
 
 class SimpleDisplayButton(QAbstractButton):
-    def __init__(self, value, button_settings, parent=None, size=(200, 50)):
+    def __init__(self, value, button_settings, parent=None, size= None):
         super().__init__(parent)
         self.value = value
-        self.size = size
         self.button_settings = button_settings
+        self.size = self.button_settings.default_size
+        if size is not None:
+            self.size = size
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -82,8 +87,8 @@ class SimpleDisplayButton(QAbstractButton):
         painter.drawRect(0, 0, *self.size)
         painter.setPen(self.button_settings.getValuePen())
         painter.setFont(valueFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 4 / 5),
-                         str(self.value))
+        painter.drawText(*self.button_settings.getValueCoords(self.size),
+                         self.value)
 
     def sizeHint(self):
         return QSize(*self.size)
@@ -99,36 +104,39 @@ class DisplayRect(QWidget):
                  value,
                  unit,
                  rect_settings,
-                 parent=None,
-                 size=(200, 100)):
+                 size = None,
+                 parent=None):
         super().__init__(parent)
         self.label = label
         self.value = value
         self.unit = unit
-        self.size = size
         self.rect_settings = rect_settings
+        if size is not None:
+            self.size = size
+        else:
+            self.size = rect_settings.default_size
 
     def paintEvent(self, event):
         painter = QPainter(self)
 
         labelFont = self.rect_settings.labelFont
-        numberFont = self.rect_settings.numberFont
+        valueFont = self.rect_settings.valueFont
         unitFont = self.rect_settings.unitFont
 
         painter.setBrush(self.rect_settings.getFillBrush())
         painter.drawRect(0, 0, *self.size)
         painter.setPen(self.rect_settings.getLabelPen())
         painter.setFont(labelFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] / 5),
+        painter.drawText(*self.rect_settings.getLabelCoords(self.size),
                          self.label)
-        painter.setPen(self.rect_settings.getNumberPen())
-        painter.setFont(numberFont)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 3 / 5),
+        painter.setPen(self.rect_settings.getValuePen())
+        painter.setFont(valueFont)
+        painter.drawText(*self.rect_settings.getValueCoords(self.size),
                          str(self.value))
         painter.setPen(self.rect_settings.getUnitPen())
         painter.setFont(unitFont)
-        painter.drawText(int(self.size[0] / 2 - 50),
-                         int(self.size[1] * 9 / 10), str(self.unit))
+        painter.drawText(*self.rect_settings.getUnitCoords(self.size),
+                         str(self.unit))
 
     def updateValue(self, value):
         self.value = value
@@ -147,7 +155,6 @@ class Change:
                                                      self.old_val,
                                                      self.new_val)
 
-
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -163,12 +170,12 @@ class MainWindow(QWidget):
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
         # Example 1 (changes color of Fancy numbers to red)
-        # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(numberColor=Qt.red))
+        # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
         # Example 2 (changes color of Simple numbers to red)
         # self.ui_settings.set_simple_button_settings(SimpleButtonSettings(valueColor=Qt.red))
 
         # Example 3 (sets display rect label font to Comic Sans MS)
-        #self.ui_settings.set_display_rect_settings(DisplayRectSettings(labelSetting = TextSetting("Comic Sans MS", 20, True)))
+        # self.ui_settings.set_display_rect_settings(DisplayRectSettings(labelSetting = TextSetting("Comic Sans MS", 20, True)))
 
         self.ptr = 0
 
@@ -187,37 +194,22 @@ class MainWindow(QWidget):
         self.setLayout(hbox)
 
     def makeFancyDisplayButton(self, label, value, unit, size=None):
-        if size is None:
-            s = self.ui_settings.fancy_button_default_size
-        else:
-            s = size
-
         return FancyDisplayButton(
             label,
             value,
             unit,
             parent=None,
-            size=s,
+            size=size,
             button_settings=self.ui_settings.fancy_button_settings)
 
     def makeSimpleDisplayButton(self, value, size=None):
-        if size is None:
-            s = self.ui_settings.simple_button_default_size
-        else:
-            s = size
-
         return SimpleDisplayButton(
             value,
             parent=None,
-            size=s,
+            size=size,
             button_settings=self.ui_settings.simple_button_settings)
 
     def makeDisplayRect(self, label, value, unit, size=None):
-        if size is None:
-            s = self.ui_settings.display_rect_default_size
-        else:
-            s = size
-
         return DisplayRect(
             label,
             value,
@@ -246,47 +238,47 @@ class MainWindow(QWidget):
         v_box_1right = QVBoxLayout()
 
         self.mode_button_main = self.makeSimpleDisplayButton(
-            self.settings.get_mode_display(), size=(150, 25))
+            self.settings.get_mode_display())
         self.mode_button_main.clicked.connect(lambda: self.display(1))
 
         self.resp_rate_button_main = self.makeFancyDisplayButton(
-            "Resp. Rate", self.settings.resp_rate, "b/min", size=(150, 80))
+            "Resp. Rate", self.settings.resp_rate, "b/min")
         self.resp_rate_button_main.clicked.connect(lambda: self.display(2))
 
         self.minute_vol_button_main = self.makeFancyDisplayButton(
             "Minute Volume",
             self.settings.minute_volume,
             "l/min",
-            size=(150, 80))
+            )
         self.minute_vol_button_main.clicked.connect(lambda: self.display(3))
 
         self.ie_button_main = self.makeFancyDisplayButton(
             "I/E Ratio",
             self.settings.get_ie_display(),
             "l/min",
-            size=(150, 80))
+            )
         self.ie_button_main.clicked.connect(lambda: self.display(4))
 
         self.peep_display_main = self.makeDisplayRect("PEEP",
                                                       5,
                                                       "cmH2O",
-                                                      size=(150, 80))
+                                                      )
         self.tv_insp_display_main = self.makeDisplayRect("TV Insp",
                                                          self.params.tv_insp,
                                                          "mL",
-                                                         size=(150, 80))
+                                                         )
         self.tv_exp_display_main = self.makeDisplayRect("TV Exp",
                                                         self.params.tv_exp,
                                                         "mL",
-                                                        size=(150, 80))
+                                                        )
         self.ppeak_display_main = self.makeDisplayRect("Ppeak",
                                                        self.params.ppeak,
                                                        "cmH2O",
-                                                       size=(150, 80))
+                                                       )
         self.pplat_display_main = self.makeDisplayRect("Pplat",
                                                        self.params.pplat,
                                                        "cmH2O",
-                                                       size=(150, 80))
+                                                       )
 
         axisStyle = {'color': 'black', 'font-size': '20pt'}
         graph_pen = pg.mkPen(width=5, color="b")
@@ -360,7 +352,7 @@ class MainWindow(QWidget):
 
         mode_change = self.makeSimpleDisplayButton("CHANGE MODE")
         mode_apply = self.makeSimpleDisplayButton("APPLY")
-        mode_cancel = self.makeSimpleDisplayButton("Cancel")
+        mode_cancel = self.makeSimpleDisplayButton("CANCEL")
 
         mode_change.clicked.connect(
             lambda: self.changeMode(not self.local_settings.ac_mode))
