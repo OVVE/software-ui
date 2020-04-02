@@ -1,4 +1,5 @@
 from typing import Tuple, Optional
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
@@ -56,7 +57,7 @@ class FancyButtonSettings:
                int(use_size[1] * 3 / 5)
 
     def getUnitCoords(
-        self, size: Optional[Tuple[int, int]] = None) -> Tuple[int, int]:
+            self, size: Optional[Tuple[int, int]] = None) -> Tuple[int, int]:
         use_size = self.default_size if size is None else size
         return int(use_size[0] / 4), \
                int(use_size[1] * 9 / 10)
@@ -156,5 +157,5 @@ class UISettings:
         self.simple_button_settings = new_settings
 
     def set_display_rect_settings(
-            self, new_settings: DisplayRectSettings) -> None: 
+            self, new_settings: DisplayRectSettings) -> None:
         self.display_rect_settings = new_settings
