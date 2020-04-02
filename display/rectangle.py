@@ -30,7 +30,7 @@ class DisplayRect(QWidget):
         self.unit = unit
         self.size = size
 
-    def paintEvent(self, event):
+    def paintEvent(self, event) -> None:
         painter = QPainter(self)
 
         label_font = QFont("Times", 20, QFont.Bold)
@@ -55,6 +55,6 @@ class DisplayRect(QWidget):
     def sizeHint(self) -> QSize:
         return QSize(*self.size)
 
-    def updateValue(self, value):
+    def updateValue(self, value: Union[int, float]) -> None:
         self.value = value
         self.update()
