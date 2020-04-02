@@ -6,9 +6,11 @@ from typing import Union
 
 
 class Change():
-    def __init__(self, time: datetime.datetime, setting: str,
-                 old_val: Union[int, float], new_val: Union[int,
-                                                            float]) -> None:
+    def __init__(self,
+                 time: datetime.datetime,
+                 setting: str,
+                 old_val: Union[int, float],
+                 new_val: Union[int, float]) -> None:
         self.time = time
         self.setting = setting
         self.old_val = old_val
