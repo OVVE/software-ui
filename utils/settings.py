@@ -5,8 +5,8 @@ from typing import List
 import json
 
 
-class Settings:
-    def __init__(self):
+class Settings():
+    def __init__(self) -> None:
         self.ac_mode: bool = False  # mode = True -> AC, mode = False -> SIMV
         self.minute_volume: int = 0
         self.resp_rate: int = 0
@@ -19,7 +19,7 @@ class Settings:
         self.ie_ratio_display: List[str] = ["1:1", "1:1.5", "1:2", "1:3"]
         self.ie_ratio_id: int = 0
 
-    def set_test_settings(self):
+    def set_test_settings(self) -> None:
         self.ac_mode = False
         self.minute_volume = 10
         self.resp_rate = 14
