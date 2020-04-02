@@ -9,7 +9,8 @@ class TextSetting:
         if bold:
             self.font = QFont(fontName, fontSize, QFont.Bold)
 
-        self.font = QFont(fontName, fontSize)
+        else:
+            self.font = QFont(fontName, fontSize)
 
 
 #TODO: Abstract text placement
