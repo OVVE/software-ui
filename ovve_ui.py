@@ -10,24 +10,18 @@ import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtSerialPort, QtWidgets, uic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import (
-    QAbstractButton,
-    QApplication,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QStackedWidget,
-    QVBoxLayout,
-    QWidget,
-)
+from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
+                             QLabel, QPushButton, QStackedWidget, QVBoxLayout,
+                             QWidget)
 
-from utils.params import Params
-from utils.settings import Settings
+from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
 from display.rectangle import DisplayRect
-from display.button import FancyDisplayButton
-from display.button import SimpleDisplayButton
-from display.ui_settings import UISettings, FancyButtonSettings, SimpleButtonSettings, DisplayRectSettings, TextSetting
+from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
+                                 SimpleButtonSettings, TextSetting, UISettings)
+from utils.params import Params
+from utils.settings import Settings
+
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -74,14 +68,14 @@ class MainWindow(QWidget):
             unit,
             parent=None,
             size=size,
-            button_settings = self.ui_settings.fancy_button_settings)
+            button_settings=self.ui_settings.fancy_button_settings)
 
     def makeSimpleDisplayButton(self, value, size=None):
         return SimpleDisplayButton(
             value,
             parent=None,
             size=size,
-            button_settings = self.ui_settings.simple_button_settings)
+            button_settings=self.ui_settings.simple_button_settings)
 
     def makeDisplayRect(self, label, value, unit, size=None):
         return DisplayRect(
@@ -123,36 +117,41 @@ class MainWindow(QWidget):
             "Minute Volume",
             self.settings.minute_volume,
             "l/min",
-            )
+        )
         self.minute_vol_button_main.clicked.connect(lambda: self.display(3))
 
         self.ie_button_main = self.makeFancyDisplayButton(
             "I/E Ratio",
             self.settings.get_ie_display(),
             "l/min",
-            )
+        )
         self.ie_button_main.clicked.connect(lambda: self.display(4))
 
-        self.peep_display_main = self.makeDisplayRect("PEEP",
-                                                      5,
-                                                      "cmH2O",
-                                                      )
-        self.tv_insp_display_main = self.makeDisplayRect("TV Insp",
-                                                         self.params.tv_insp,
-                                                         "mL",
-                                                         )
-        self.tv_exp_display_main = self.makeDisplayRect("TV Exp",
-                                                        self.params.tv_exp,
-                                                        "mL",
-                                                        )
-        self.ppeak_display_main = self.makeDisplayRect("Ppeak",
-                                                       self.params.ppeak,
-                                                       "cmH2O",
-                                                       )
-        self.pplat_display_main = self.makeDisplayRect("Pplat",
-                                                       self.params.pplat,
-                                                       "cmH2O",
-                                                       )
+        self.peep_display_main = self.makeDisplayRect(
+            "PEEP",
+            5,
+            "cmH2O",
+        )
+        self.tv_insp_display_main = self.makeDisplayRect(
+            "TV Insp",
+            self.params.tv_insp,
+            "mL",
+        )
+        self.tv_exp_display_main = self.makeDisplayRect(
+            "TV Exp",
+            self.params.tv_exp,
+            "mL",
+        )
+        self.ppeak_display_main = self.makeDisplayRect(
+            "Ppeak",
+            self.params.ppeak,
+            "cmH2O",
+        )
+        self.pplat_display_main = self.makeDisplayRect(
+            "Pplat",
+            self.params.pplat,
+            "cmH2O",
+        )
 
         axisStyle = {'color': 'black', 'font-size': '20pt'}
         graph_pen = pg.mkPen(width=5, color="b")
