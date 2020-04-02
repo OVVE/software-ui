@@ -1,6 +1,6 @@
 """
 Read-only parameters from the MCU
-""""
+"""
 from typing import Union
 import json 
 
