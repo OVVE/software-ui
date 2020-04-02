@@ -14,42 +14,43 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QBrush
 from PyQt5.QtGui import QPen
-
+from display.ui_settings import FancyButtonSettings, SimpleButtonSettings
 
 class FancyDisplayButton(QAbstractButton):
     def __init__(self,
                  label: str,
                  value: Union[int, float],
                  unit: str,
+                 button_settings: FancyButtonSettings,
                  parent: Optional[Any] = None,
-                 size: Tuple[int, int] = (200, 100)) -> None:
+                 size: Optional[Tuple[int, int]] = None):
         super().__init__(parent)
         self.label = label
         self.value = value
         self.unit = unit
-        self.size = size
+        self.button_settings = button_settings
+        self.size = size if size is not None else button_settings.default_size
 
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
 
-        label_font = QFont("Times", 20, QFont.Bold)
-        number_font = QFont("Times", 36, QFont.Bold)
-        unit_font = QFont("Times", 18)
+        label_font = self.button_settings.labelFont
+        value_font = self.button_settings.valueFont
+        unit_font = self.button_settings.unitFont
 
-        painter.setBrush(QBrush(QColor("#d2fcdc")))
+        painter.setBrush(self.button_settings.getFillBrush())
         painter.drawRect(0, 0, *self.size)
-        painter.setPen(QPen(QColor("#3ed5f0")))
+        painter.setPen(self.button_settings.getLabelPen())
         painter.setFont(label_font)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] / 5),
+        painter.drawText(*self.button_settings.getLabelCoords(),
                          self.label)
-        painter.setPen(QPen(Qt.black))
-        painter.setFont(number_font)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 3 / 5),
+        painter.setPen(self.button_settings.getValuePen())
+        painter.setFont(value_font)
+        painter.drawText(*self.button_settings.getValueCoords(),
                          str(self.value))
         painter.setFont(unit_font)
-        painter.setPen(QPen(Qt.gray))
-        painter.drawText(int(self.size[0] / 2 - 50),
-                         int(self.size[1] * 9 / 10), str(self.unit))
+        painter.setPen(self.button_settings.getUnitPen())
+        painter.drawText(*self.button_settings.getUnitCoords(), str(self.unit))
 
     def sizeHint(self) -> QSize:
         return QSize(*self.size)
@@ -62,22 +63,24 @@ class FancyDisplayButton(QAbstractButton):
 class SimpleDisplayButton(QAbstractButton):
     def __init__(self,
                  value: Union[int, float],
+                 button_settings: SimpleButtonSettings,
                  parent: Optional[Any] = None,
-                 size: Tuple[int, int] = (200, 50)) -> None:
+                 size: Optional[Tuple[int, int]] = None):
         super().__init__(parent)
         self.value = value
-        self.size = size
+        self.button_settings = button_settings
+        self.size = size if size is not None else button_settings.default_size
 
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
 
-        value_font = QFont("Times", 20, QFont.Bold)
+        value_font = self.button_settings.valueFont
 
-        painter.setBrush(QBrush(QColor("#d2fcdc")))
+        painter.setBrush(self.button_settings.getFillBrush())
         painter.drawRect(0, 0, *self.size)
-        painter.setPen(QPen(Qt.black))
+        painter.setPen(self.button_settings.getValuePen())
         painter.setFont(value_font)
-        painter.drawText(int(self.size[0] / 2 - 50), int(self.size[1] * 4 / 5),
+        painter.drawText(*self.button_settings.getValueCoords(),
                          str(self.value))
 
     def sizeHint(self) -> QSize:

@@ -27,6 +27,7 @@ from display.change import Change
 from display.rectangle import DisplayRect
 from display.button import FancyDisplayButton
 from display.button import SimpleDisplayButton
+from display.ui_settings import UISettings, FancyButtonSettings, SimpleButtonSettings, DisplayRectSettings, TextSetting
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -73,14 +74,14 @@ class MainWindow(QWidget):
             unit,
             parent=None,
             size=size,
-            button_settings=self.ui_settings.fancy_button_settings)
+            button_settings = self.ui_settings.fancy_button_settings)
 
     def makeSimpleDisplayButton(self, value, size=None):
         return SimpleDisplayButton(
             value,
             parent=None,
             size=size,
-            button_settings=self.ui_settings.simple_button_settings)
+            button_settings = self.ui_settings.simple_button_settings)
 
     def makeDisplayRect(self, label, value, unit, size=None):
         return DisplayRect(
