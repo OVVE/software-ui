@@ -10,150 +10,23 @@ import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtSerialPort, QtWidgets, uic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
-                             QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget)
+from PyQt5.QtWidgets import (
+    QAbstractButton,
+    QApplication,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
-from params import Params
-from settings import Settings
-from ui_settings import (DisplayRectSettings, FancyButtonSettings,
-                         SimpleButtonSettings, TextSetting, UISettings)
-
-
-# TODO: Abstract text placement
-class FancyDisplayButton(QAbstractButton):
-    def __init__(self,
-                 label,
-                 value,
-                 unit,
-                 button_settings,
-                 size = None,
-                 parent=None,
-                 ):
-        super().__init__(parent)
-        self.label = label
-        self.value = value
-        self.unit = unit
-        self.button_settings = button_settings
-        self.size = self.button_settings.default_size
-        if size is not None:
-            self.size = size
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        labelFont = self.button_settings.labelFont
-        valueFont = self.button_settings.valueFont
-        unitFont = self.button_settings.unitFont
-
-        painter.setBrush(self.button_settings.getFillBrush())
-        painter.drawRect(0, 0, *self.size)
-        painter.setPen(self.button_settings.getLabelPen())
-        painter.setFont(labelFont)
-        painter.drawText(*self.button_settings.getLabelCoords(self.size),
-                         self.label)
-        painter.setPen(self.button_settings.getValuePen())
-        painter.setFont(valueFont)
-        painter.drawText(*self.button_settings.getValueCoords(self.size),
-                         str(self.value))
-        painter.setFont(unitFont)
-        painter.setPen(self.button_settings.getUnitPen())
-        painter.drawText(*self.button_settings.getUnitCoords(self.size)
-                         , str(self.unit))
-
-    def sizeHint(self):
-        return QSize(*self.size)
-
-    def updateValue(self, value):
-        self.value = value
-        self.update()
-
-
-class SimpleDisplayButton(QAbstractButton):
-    def __init__(self, value, button_settings, parent=None, size= None):
-        super().__init__(parent)
-        self.value = value
-        self.button_settings = button_settings
-        self.size = self.button_settings.default_size
-        if size is not None:
-            self.size = size
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        valueFont = self.button_settings.valueFont
-
-        painter.setBrush(self.button_settings.getFillBrush())
-        painter.drawRect(0, 0, *self.size)
-        painter.setPen(self.button_settings.getValuePen())
-        painter.setFont(valueFont)
-        painter.drawText(*self.button_settings.getValueCoords(self.size),
-                         self.value)
-
-    def sizeHint(self):
-        return QSize(*self.size)
-
-    def updateValue(self, value):
-        self.value = value
-        self.update()
-
-
-class DisplayRect(QWidget):
-    def __init__(self,
-                 label,
-                 value,
-                 unit,
-                 rect_settings,
-                 size = None,
-                 parent=None):
-        super().__init__(parent)
-        self.label = label
-        self.value = value
-        self.unit = unit
-        self.rect_settings = rect_settings
-        if size is not None:
-            self.size = size
-        else:
-            self.size = rect_settings.default_size
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-
-        labelFont = self.rect_settings.labelFont
-        valueFont = self.rect_settings.valueFont
-        unitFont = self.rect_settings.unitFont
-
-        painter.setBrush(self.rect_settings.getFillBrush())
-        painter.drawRect(0, 0, *self.size)
-        painter.setPen(self.rect_settings.getLabelPen())
-        painter.setFont(labelFont)
-        painter.drawText(*self.rect_settings.getLabelCoords(self.size),
-                         self.label)
-        painter.setPen(self.rect_settings.getValuePen())
-        painter.setFont(valueFont)
-        painter.drawText(*self.rect_settings.getValueCoords(self.size),
-                         str(self.value))
-        painter.setPen(self.rect_settings.getUnitPen())
-        painter.setFont(unitFont)
-        painter.drawText(*self.rect_settings.getUnitCoords(self.size),
-                         str(self.unit))
-
-    def updateValue(self, value):
-        self.value = value
-        self.update()
-
-
-class Change:
-    def __init__(self, time, setting, old_val, new_val):
-        self.time = time
-        self.setting = setting
-        self.old_val = old_val
-        self.new_val = new_val
-
-    def display(self):
-        return "{}: {} changed from {} to {}".format(self.time, self.setting,
-                                                     self.old_val,
-                                                     self.new_val)
+from utils.params import Params
+from utils.settings import Settings
+from display.change import Change
+from display.rectangle import DisplayRect
+from display.button import FancyDisplayButton
+from display.button import SimpleDisplayButton
 
 class MainWindow(QWidget):
     def __init__(self):
