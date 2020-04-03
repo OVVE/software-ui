@@ -28,7 +28,9 @@ from display.widgets import (initializeHomeScreenWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget,
-                             initializeAlarmWidget)
+                             initializeAlarmWidget,
+                             initializeGraphWidget
+                             )
 from utils.params import Params
 from utils.settings import Settings
 from utils.comms_adapter import CommsAdapter
@@ -59,8 +61,9 @@ class MainWindow(QWidget):
         self.ptr = 0
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
-        self.stack = QStackedWidget(self)
+        (layout, stack) = initializeHomeScreenWidget(self)
 
+        self.stack = stack
         self.page = {
             "1": QWidget(),
             "2": QWidget(),
@@ -71,10 +74,9 @@ class MainWindow(QWidget):
         }
 
         self.initalizeAndAddStackWidgets()
-        hbox = QHBoxLayout(self)
-        hbox.addWidget(self.stack)
-        hbox.setContentsMargins(0,0,0,0)
-        self.setLayout(hbox)
+
+        layout.setContentsMargins(0,0,0,0)
+        self.setLayout(layout)
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
         palette.setColor(QtGui.QPalette.Background, Qt.white)
@@ -160,7 +162,7 @@ class MainWindow(QWidget):
             if rect_settings is None else rect_settings)
 
     def initalizeAndAddStackWidgets(self) -> None:
-        initializeHomeScreenWidget(self)
+        initializeGraphWidget(self)
         initializeModeWidget(self)
         initializeRespiratoryRateWidget(self)
         initializeTidalVolumeWidget(self)

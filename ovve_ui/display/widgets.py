@@ -7,7 +7,7 @@ from typing import TypeVar
 import numpy as np
 import pyqtgraph as pg
 
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QStackedWidget
 from display.ui_settings import SimpleButtonSettings, FancyButtonSettings, DisplayRectSettings
 
 
@@ -15,10 +15,9 @@ from display.ui_settings import SimpleButtonSettings, FancyButtonSettings, Displ
 MainWindow = TypeVar('MainWindow')
 
 
-def initializeHomeScreenWidget(window: MainWindow) -> None:
+def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidget):
     """ Creates Home Screen for Widgets """
-    v_box_1_main = QVBoxLayout()
-
+    layout = QVBoxLayout()
     h_box_11 = QHBoxLayout()
     h_box_12 = QHBoxLayout()
 
@@ -112,6 +111,35 @@ def initializeHomeScreenWidget(window: MainWindow) -> None:
         size=(175, 115),
     )
 
+    h_box_11.addWidget(window.mode_button_main)
+    h_box_11.addWidget(window.resp_rate_button_main)
+    h_box_11.addWidget(window.tv_button_main)
+    h_box_11.addWidget(window.ie_button_main)
+    h_box_11.addWidget(window.alarm_button_main)
+    h_box_11.addWidget(window.start_button_main)
+
+    v_box_11left.addWidget(window.resp_rate_display_main)
+    v_box_11left.addWidget(window.tv_insp_display_main)
+    v_box_11left.addWidget(window.tv_exp_display_main)
+
+    stack = QStackedWidget()
+
+    v_box_11mid.addWidget(stack)
+
+    v_box_11right.addWidget(window.peep_display_main)
+    v_box_11right.addWidget(window.ppeak_display_main)
+    v_box_11right.addWidget(window.pplat_display_main)
+
+    h_box_12.addLayout(v_box_11left)
+    h_box_12.addLayout(v_box_11mid)
+    h_box_12.addLayout(v_box_11right)
+
+    layout.addLayout(h_box_11)
+    layout.addLayout(h_box_12)
+    return (layout, stack)
+
+def initializeGraphWidget(window: MainWindow) -> None:
+    v_box = QVBoxLayout()
     axisStyle = {'color': 'black', 'font-size': '20pt'}
     graph_pen = pg.mkPen(width=5, color="b")
 
@@ -137,8 +165,8 @@ def initializeHomeScreenWidget(window: MainWindow) -> None:
     window.pressure_graph = pg.PlotWidget()
     window.pressure_graph.setFixedWidth(graph_width)
     window.pressure_graph_line = window.pressure_graph.plot(indices,
-                                                        data,
-                                                        pen=graph_pen)
+                                                            data,
+                                                            pen=graph_pen)
     window.pressure_graph.setBackground("w")
     window.pressure_graph.setMouseEnabled(False, False)
     pressure_graph_left_axis = window.pressure_graph.getAxis("left")
@@ -148,40 +176,18 @@ def initializeHomeScreenWidget(window: MainWindow) -> None:
     window.volume_graph = pg.PlotWidget()
     window.volume_graph.setFixedWidth(graph_width)
     window.pressure_graph_line = window.volume_graph.plot(indices,
-                                                      data,
-                                                      pen=graph_pen)
+                                                          data,
+                                                          pen=graph_pen)
     window.volume_graph.setBackground("w")
     window.volume_graph.setMouseEnabled(False, False)
     window.pressure_graph_left_axis = window.volume_graph.getAxis("left")
     window.pressure_graph_left_axis.setLabel("Volume",
-                                           **axisStyle)  # TODO: Add units
+                                             **axisStyle)  # TODO: Add units
 
-    h_box_11.addWidget(window.mode_button_main)
-    h_box_11.addWidget(window.resp_rate_button_main)
-    h_box_11.addWidget(window.tv_button_main)
-    h_box_11.addWidget(window.ie_button_main)
-    h_box_11.addWidget(window.alarm_button_main)
-    h_box_11.addWidget(window.start_button_main)
-
-    v_box_11left.addWidget(window.resp_rate_display_main)
-    v_box_11left.addWidget(window.tv_insp_display_main)
-    v_box_11left.addWidget(window.tv_exp_display_main)
-
-    v_box_11mid.addWidget(window.flow_graph)
-    v_box_11mid.addWidget(window.pressure_graph)
-    v_box_11mid.addWidget(window.volume_graph)
-
-    v_box_11right.addWidget(window.peep_display_main)
-    v_box_11right.addWidget(window.ppeak_display_main)
-    v_box_11right.addWidget(window.pplat_display_main)
-
-    h_box_12.addLayout(v_box_11left)
-    h_box_12.addLayout(v_box_11mid)
-    h_box_12.addLayout(v_box_11right)
-
-    v_box_1_main.addLayout(h_box_11)
-    v_box_1_main.addLayout(h_box_12)
-    window.page["1"].setLayout(v_box_1_main)
+    v_box.addWidget(window.flow_graph)
+    v_box.addWidget(window.pressure_graph)
+    v_box.addWidget(window.volume_graph)
+    window.page["1"].setLayout(v_box)
 
 def initializeModeWidget(window: MainWindow) -> None:
     """ Creates Mode Widget """
@@ -200,7 +206,7 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_cancel.clicked.connect(window.cancelChange)
 
     window.mode_page_rect = window.makeDisplayRect(
-        "Mode", window.get_mode_display(window.settings.mode), "", size=(500, 200))
+        "Mode", window.get_mode_display(window.settings.mode), "", size=(400, 200))
 
     h_box_top.addWidget(window.mode_page_rect)
     h_box_mid.addWidget(mode_change)
@@ -225,7 +231,7 @@ def initializeRespiratoryRateWidget(window) -> None:
         "Resp. Rate",
         window.local_settings.resp_rate,
         "b/min",
-        size=(500, 200))
+        size=(400, 200))
 
     resp_rate_increment_button = window.makeSimpleDisplayButton(
         "+ " + str(window.resp_rate_increment))
@@ -262,7 +268,7 @@ def initializeTidalVolumeWidget(window: MainWindow):
         "Tidal Volume",
         window.settings.tv,
         "l/min",
-        size=(500, 200))
+        size=(400, 200))
 
     tv_increment_button = window.makeSimpleDisplayButton(
         "+ " + str(window.tv_increment))
@@ -297,9 +303,12 @@ def initializeIERatioWidget(window: MainWindow):
     h_box_bot = QHBoxLayout()
 
     window.ie_page_rect = window.makeDisplayRect(
-        "I/E Ratio", window.get_ie_display(window.settings.ie_ratio), "", size=(500, 200))
+        "I/E Ratio",
+        window.get_ie_display(window.settings.ie_ratio),
+        "",
+        size=(400, 200))
 
-    ie_change_size = (150, 50)
+    ie_change_size = (100, 50)
 
     ie_change_0 = window.makeSimpleDisplayButton(
         window.get_ie_display(0), size=ie_change_size)
@@ -351,7 +360,7 @@ def initializeAlarmWidget(window: MainWindow): #Alarm
 
     window.alarm_page_rect = window.makeDisplayRect("Alarm",
                                                     window.settings.get_alarm_display(),
-                                                    "", size = (500,200))
+                                                    "", size = (400,200))
 
     h_box_6top.addWidget(window.alarm_page_rect)
     #h_box_6middle.addWidget(alarm_toggle)
