@@ -24,16 +24,16 @@ from utils.settings import Settings
 
 
 class MainWindow(QWidget):
-    def __init__(self):
+    def __init__(self, debug: bool = True):
         super().__init__()
         self.settings = Settings()
-        self.settings.set_test_settings()
-        self.local_settings = Settings()
-        # local settings are just changed with the UI
-        self.local_settings.set_test_settings()
-
+        self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
-        self.params.set_test_params()
+
+        if debug:
+            self.settings.set_test_settings()
+            self.local_settings.set_test_settings()
+            self.params.set_test_params()
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
