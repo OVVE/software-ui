@@ -53,20 +53,13 @@ class MainWindow(QWidget):
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         self.stack = QStackedWidget(self)
 
-
-        self.page1 = QWidget()
-        self.page2 = QWidget()
-        self.page3 = QWidget()
-        self.page4 = QWidget()
-        self.page5 = QWidget()
-        self.page6 = QWidget()
         self.page = {
             "1": QWidget(),
             "2": QWidget(),
             "3": QWidget(),
             "4": QWidget(),
             "5": QWidget(),
-            #"6": QWidget(),
+            "6": QWidget(),
         }
 
         self.initalizeAndAddStackWidgets()
@@ -126,13 +119,6 @@ class MainWindow(QWidget):
         self.initializeWidget4()
         self.initializeWidget5()
         self.initializeWidget6()
-        
-        self.stack.addWidget(self.page1)
-        self.stack.addWidget(self.page2)
-        self.stack.addWidget(self.page3)
-        self.stack.addWidget(self.page4)
-        self.stack.addWidget(self.page5)
-        self.stack.addWidget(self.page6) 
         
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -479,7 +465,7 @@ class MainWindow(QWidget):
         #v_box_6.addLayout(h_box_6middle)
         v_box_6.addLayout(h_box_6bottom)
 
-        self.page6.setLayout(v_box_6)
+        self.page["6"].setLayout(v_box_6)
 
     def display(self, i):
         self.stack.setCurrentIndex(i)
