@@ -35,7 +35,7 @@ class Params():
         j['seq_num'] = self.seq_num
         j['packet_version'] = self.packet_version
         j['mode'] = self.mode
-        j['rep_rate_meas'] = self.resp_rate_meas
+        j['resp_rate_meas'] = self.resp_rate_meas
         j['resp_rate_set'] = self.resp_rate_set
         j['tv_meas'] = self.tv_meas
         j['tv_set'] = self.tv_set
