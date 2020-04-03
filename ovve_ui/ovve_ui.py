@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import os
 import sys
@@ -251,15 +250,29 @@ class MainWindow(QWidget):
         settings_callback: Callable[[Settings], None]) -> None:
         self.settings_callback = settings_callback
 
-def main(port, argv) -> None:
-    app = QApplication(argv)
+def main() -> None:
+    app = QApplication(sys.argv)
     window = MainWindow()
     
+    # CommsAdapter adapts settings and params to and from the comms handler
     comms_adapter = CommsAdapter()
+
+    # Set a callback in the adapter that is called whenever new
+    # params arrive from the comms handler
     comms_adapter.set_ui_callback(window.update_ui)
+
+    # Set the adapter function that is called whenever settings are
+    # udpated in the UI
     window.set_settings_callback(comms_adapter.update_settings)
 
+    # The comms handler is a simulator for now.  It will send
+    # random values for the parameters that are updated periodically from
+    # the MCU.  It will accept settings updates from the UI.
+    #
+    # When the real comms handler is available, substitute it here.
     comms_handler = CommsSimulator(comms_adapter)
+    
+    #TODO: How to handle start / stop events from UI?
     comms_handler.start()
 
     window.show()
@@ -268,11 +281,4 @@ def main(port, argv) -> None:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Start the OVVE user interface')
-    parser.add_argument('-p',
-                        '--port',
-                        help='Serial port for communication with Arduino')
-    args = parser.parse_args()
-
-    main(args.port, sys.argv)
+    main()
