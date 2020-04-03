@@ -100,7 +100,9 @@ def initializeHomeScreenWidget(window) -> None:
     h_box.addLayout(v_box_left)
     h_box.addLayout(v_box_mid)
     h_box.addLayout(v_box_right)
+    
     window.page["1"].setLayout(h_box)
+
 
 def initializeModeWidget(window) -> None:
     """ Creates Mode Widget """
@@ -131,6 +133,7 @@ def initializeModeWidget(window) -> None:
     v_box.addLayout(h_box_bot)
 
     window.page["2"].setLayout(v_box)
+
 
 def initializeRespitoryRateWidget(window) -> None:
     """ Creates Respitory Rate Widget """
@@ -205,6 +208,7 @@ def initializeMinuteVolumeWidget(window):
     v_box.addLayout(h_box_bot)
 
     window.page["4"].setLayout(v_box)
+
 
 def initializeIERatioWidget(window):
     """ Creates i/e Ratio Widget """
