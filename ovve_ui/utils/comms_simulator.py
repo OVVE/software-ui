@@ -28,6 +28,7 @@ class CommsSimulator():
         params_dict = json.loads(params_str)
 
         while not self.done:
+            params_dict['run_state'] = self.settings.run_state
             params_dict['seq_num'] = self.seqnum
             params_dict['packet_version'] = self.packet_version
             params_dict['mode'] = self.settings.mode

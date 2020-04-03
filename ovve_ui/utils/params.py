@@ -8,6 +8,7 @@ from typing import Union
 # Params defined in serialpacketv0.26.pptx
 class Params():
     def __init__(self) -> None:
+        self.run_state: int = 0
         self.seq_num: int = 0
         self.packet_version: int = 0
         self.mode: int = 0
@@ -32,6 +33,7 @@ class Params():
    
     def to_JSON(self) -> str:
         j = {}
+        j['run_state'] = self.run_state
         j['seq_num'] = self.seq_num
         j['packet_version'] = self.packet_version
         j['mode'] = self.mode
@@ -55,6 +57,7 @@ class Params():
 
     #TODO: add error handling for bad dict keys
     def from_dict(self, j: dict) -> None:
+        self.run_state = j['run_state']
         self.seq_num = j['seq_num']
         self.packet_version = j['packet_version']
         self.mode = j['mode']

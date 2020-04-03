@@ -7,6 +7,7 @@ from typing import List
 
 class Settings():
     def __init__(self) -> None:
+        self.run_state: int = 0
         self.mode: int = 0
         self.resp_rate: int = 0
         self.tv: int = 0
@@ -15,6 +16,7 @@ class Settings():
         
     def to_JSON(self) -> str:
         j = {}
+        j['run_state'] = self.run_state
         j['mode'] = self.mode
         j['tv'] = self.tv
         j['resp_rate'] = self.resp_rate
@@ -23,6 +25,7 @@ class Settings():
 
     #TODO: add error handling for bad dict keys
     def from_dict(self, settings_dict: dict) -> None:
+        self.run_state = settings_dict['run_state']
         self.mode = settings_dict['mode']
         self.tv = settings_dict['tv']
         self.resp_rate = settings_dict['resp_rate']
