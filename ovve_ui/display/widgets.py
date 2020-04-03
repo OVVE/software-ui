@@ -2,6 +2,7 @@
 Widgets used to initialze the the OVVE UI
 """
 from random import randint
+from typing import TypeVar
 
 import numpy as np
 import pyqtgraph as pg
@@ -9,7 +10,11 @@ import pyqtgraph as pg
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
 
 
-def initializeHomeScreenWidget(window) -> None:
+# Used for documentation purposes only
+MainWindow = TypeVar('MainWindow')
+
+
+def initializeHomeScreenWidget(window: MainWindow) -> None:
     """ Creates Home Screen for Widgets """
     h_box = QHBoxLayout()
     v_box_left = QVBoxLayout()
@@ -104,7 +109,7 @@ def initializeHomeScreenWidget(window) -> None:
     window.page["1"].setLayout(h_box)
 
 
-def initializeModeWidget(window) -> None:
+def initializeModeWidget(window: MainWindow) -> None:
     """ Creates Mode Widget """
     v_box = QVBoxLayout()
     h_box_top = QHBoxLayout()
@@ -172,7 +177,7 @@ def initializeRespitoryRateWidget(window) -> None:
 
     window.page["3"].setLayout(v_box)
 
-def initializeMinuteVolumeWidget(window):
+def initializeMinuteVolumeWidget(window: MainWindow):
     """ Creates Minute Volume Widget """
     v_box = QVBoxLayout()
     h_box_top = QHBoxLayout()
@@ -210,7 +215,7 @@ def initializeMinuteVolumeWidget(window):
     window.page["4"].setLayout(v_box)
 
 
-def initializeIERatioWidget(window):
+def initializeIERatioWidget(window: MainWindow):
     """ Creates i/e Ratio Widget """
     v_box = QVBoxLayout()
     h_box_top = QHBoxLayout()
