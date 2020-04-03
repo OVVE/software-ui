@@ -430,26 +430,25 @@ class MainWindow(QWidget):
     def initializeWidget6(self): #Alarm
         v_box_6 = QVBoxLayout()
         h_box_6top = QHBoxLayout()
-        h_box_6middle = QHBoxLayout()
+        #h_box_6middle = QHBoxLayout()
         h_box_6bottom = QHBoxLayout()
 
-        #alarm_toggle = self.makeSimpleDisplayButton("Toggle Alarm")
-        alarm_apply = self.makeSimpleDisplayButton("Confirm")
+        alarm_ack = self.makeSimpleDisplayButton("Acknowledge")
         alarm_cancel= self.makeSimpleDisplayButton("Cancel")
 
-        #alarm_toggle.clicked.connect(lambda: self.changeAlarm(not self.local_settings.alarm_mode))
-        alarm_apply.clicked.connect(lambda: self.commitAlarm())
+        # Acknowledge alarm stops the alarms
+        alarm_ack.clicked.connect(lambda: self.commitAlarm())
         alarm_cancel.clicked.connect(self.cancelChange)
 
         self.alarm_page_rect = self.makeDisplayRect("Alarm", self.local_settings.get_alarm_display(), "", size = (500,200))
 
         h_box_6top.addWidget(self.alarm_page_rect)
         #h_box_6middle.addWidget(alarm_toggle)
-        h_box_6bottom.addWidget(alarm_apply)
+        h_box_6bottom.addWidget(alarm_ack)
         h_box_6bottom.addWidget(alarm_cancel)
 
         v_box_6.addLayout(h_box_6top)
-        v_box_6.addLayout(h_box_6middle)
+        #v_box_6.addLayout(h_box_6middle)
         v_box_6.addLayout(h_box_6bottom)
 
         self.page6.setLayout(v_box_6)
@@ -606,8 +605,8 @@ class MainWindow(QWidget):
         self.stack.setCurrentIndex(0)
 
     def commitAlarm(self):
-        self.logChange(Change(datetime.datetime.now(),"Alarm", self.settings.get_alarm_display(), self.local_settings.get_alarm_display()))
-        self.settings.ac_mode = self.local_settings.alarm_mode
+        self.logChange(Change(datetime.datetime.now(),"Alarm acknowledged", self.settings.get_alarm_display(), self.local_settings.get_alarm_display()))
+        self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.stack.setCurrentIndex(0)
 
