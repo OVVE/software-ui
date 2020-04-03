@@ -24,7 +24,7 @@ from utils.settings import Settings
 
 
 class MainWindow(QWidget):
-    def __init__(self, debug: bool = True):
+    def __init__(self, debug: bool = True) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
@@ -70,9 +70,9 @@ class MainWindow(QWidget):
             size=size,
             button_settings=self.ui_settings.fancy_button_settings)
 
-    def makeSimpleDisplayButton(self, value, size=None):
+    def makeSimpleDisplayButton(self, label, size=None):
         return SimpleDisplayButton(
-            value,
+            label,
             parent=None,
             size=size,
             button_settings=self.ui_settings.simple_button_settings)
