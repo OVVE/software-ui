@@ -21,7 +21,6 @@ class CommsSimulator():
 
     def simulate_params(self) -> None:
         params = Params()
-        params.set_test_params()
         params_str = params.to_JSON()
         params_dict = json.loads(params_str)
 

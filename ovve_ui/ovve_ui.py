@@ -34,19 +34,18 @@ from utils.comms_adapter import CommsAdapter
 from utils.comms_simulator import CommsSimulator
 
 class MainWindow(QWidget):
-    def __init__(self, debug: bool = True) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
 
-        if debug:
-            self.settings.set_test_settings()
-            self.local_settings.set_test_settings()
-            self.params.set_test_params()
-
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
+
+        self.resp_rate_increment = 5
+        self.minute_volume_increment = 5
+
         # Example 1 (changes color of Fancy numbers to red)
         # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
         # Example 2 (changes color of Simple numbers to red)
@@ -72,6 +71,23 @@ class MainWindow(QWidget):
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.stack)
         self.setLayout(hbox)
+
+    def get_mode_display(self, mode):
+        switcher = {
+            0: "AC",
+            1: "SIMV",
+        }
+        return switcher.get(mode, "invalid")
+
+    def get_ie_display(self, ie_ratio):
+        switcher = {
+            0: "1:1",
+            1: "1:1.5",
+            2: "1:2",
+            3: "1:3",
+        }
+        return switcher.get(ie_ratio, "invalid")
+
 
     def makeFancyDisplayButton(
             self, label: str, value: Union[int, float], unit: str,
@@ -126,10 +142,10 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def updateMainDisplays(self) -> None:
-        self.mode_button_main.updateValue(self.settings.get_mode_display())
+        self.mode_button_main.updateValue(self.get_mode_display(self.settings.mode))
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
-        self.minute_vol_button_main.updateValue(self.settings.minute_volume)
-        self.ie_button_main.updateValue(self.settings.get_ie_display())
+        self.minute_vol_button_main.updateValue(self.settings.tv)
+        self.ie_button_main.updateValue(self.get_ie_display(self.settings.ie_ratio))
         self.peep_display_main.updateValue(self.params.peep)
         self.tv_insp_display_main.updateValue(self.params.tv_insp)
         self.tv_exp_display_main.updateValue(self.params.tv_exp)
@@ -137,10 +153,10 @@ class MainWindow(QWidget):
         self.pplat_display_main.updateValue(self.params.pplat)
 
     def updatePageDisplays(self) -> None:
-        self.mode_page_rect.updateValue(self.settings.get_mode_display())
+        self.mode_page_rect.updateValue(self.get_mode_display(self.settings.mode))
         self.resp_rate_page_rect.updateValue(self.settings.resp_rate)
-        self.minute_vol_page_rect.updateValue(self.settings.minute_volume)
-        self.ie_page_rect.updateValue(self.settings.get_ie_display())
+        self.minute_vol_page_rect.updateValue(self.settings.tv)
+        self.ie_page_rect.updateValue(self.get_ie_display(self.settings.ie_ratio))
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
@@ -154,42 +170,42 @@ class MainWindow(QWidget):
     # TODO: Finish all of these for each var
     def changeMode(self, new_val: bool) -> None:
         self.local_settings.ac_mode = new_val
-        self.mode_page_rect.updateValue(self.local_settings.get_mode_display())
+        self.mode_page_rect.updateValue(self.get_mode_display(self.local_settings.mode))
 
     # TODO: Figure out how to handle increment properly
     # (right now it's not in the settings)
     def incrementRespRate(self) -> None:
-        self.local_settings.resp_rate += self.settings.resp_rate_increment
+        self.local_settings.resp_rate += self.resp_rate_increment
         self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
 
     def decrementRespRate(self) -> None:
-        self.local_settings.resp_rate -= self.settings.resp_rate_increment
+        self.local_settings.resp_rate -= self.resp_rate_increment
         self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
 
     def incrementMinuteVol(self) -> None:
-        self.local_settings.minute_volume += self.settings.minute_volume_increment
+        self.local_settings.tv += self.minute_volume_increment
         self.minute_vol_page_rect.updateValue(
-            self.local_settings.minute_volume)
+            self.local_settings.tv)
 
     def decrementMinuteVol(self) -> None:
-        self.local_settings.minute_volume -= self.settings.minute_volume_increment
+        self.local_settings.tv -= self.minute_volume_increment
         self.minute_vol_page_rect.updateValue(
-            self.local_settings.minute_volume)
+            self.local_settings.tv)
 
     def changeIERatio(self, new_val: int) -> None:
-        self.local_settings.ie_ratio_id = new_val
-        self.ie_page_rect.updateValue(self.local_settings.get_ie_display())
+        self.local_settings.ie_ratio = new_val
+        self.ie_page_rect.updateValue(self.get_ie_display(self.local_settings.ie_ratio))
 
     def commitMode(self):
         self.logChange(
             Change(
                 datetime.datetime.now(),
                 "Mode",
-                self.settings.get_mode_display(),
-                self.local_settings.get_mode_display(),
+                self.get_mode_display(self.settings.mode),
+                self.get_mode_display(self.local_settings.mode),
             ))
-        self.settings.ac_mode = self.local_settings.ac_mode
-        self.mode_button_main.updateValue(self.settings.get_mode_display())
+        self.settings.mode = self.local_settings.mode
+        self.mode_button_main.updateValue(self.get_mode_display(self.settings.mode))
         self.stack.setCurrentIndex(0)
         self.passChanges()
 
@@ -211,11 +227,11 @@ class MainWindow(QWidget):
             Change(
                 datetime.datetime.now(),
                 "Minute Vol",
-                self.settings.minute_volume,
-                self.local_settings.minute_volume,
+                self.settings.tv,
+                self.local_settings.tv,
             ))
-        self.settings.minute_volume = self.local_settings.minute_volume
-        self.minute_vol_button_main.updateValue(self.settings.minute_volume)
+        self.settings.tv = self.local_settings.tv
+        self.minute_vol_button_main.updateValue(self.settings.tv)
         self.stack.setCurrentIndex(0)
         self.passChanges()
 
@@ -224,11 +240,11 @@ class MainWindow(QWidget):
             Change(
                 datetime.datetime.now(),
                 "I/E Ratio",
-                self.settings.get_ie_display(),
-                self.local_settings.get_ie_display(),
+                self.get_ie_display(self.settings.ie_ratio),
+                self.get_ie_display(self.local_settings.ie_ratio),
             ))
-        self.settings.ie_ratio_id = self.local_settings.ie_ratio_id
-        self.ie_button_main.updateValue(self.settings.get_ie_display())
+        self.settings.ie_ratio = self.local_settings.ie_ratio
+        self.ie_button_main.updateValue(self.get_ie_display(self.settings.ie_ratio))
         self.stack.setCurrentIndex(0)
         self.passChanges()
 

@@ -34,7 +34,7 @@ class CommsAdapter():
             self.comms_callback(j)
         else:
             print("No comms callback!")
-            
+
     def update_params(self, params_from_comms: dict) -> None:
         params = Params()
         params.from_dict(params_from_comms)
