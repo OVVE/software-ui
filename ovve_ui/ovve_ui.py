@@ -64,6 +64,7 @@ class MainWindow(QWidget):
         self.initalizeAndAddStackWidgets()
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.stack)
+        hbox.setContentsMargins(0,0,0,0)
         self.setLayout(hbox)
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
@@ -72,7 +73,8 @@ class MainWindow(QWidget):
 
     def makeFancyDisplayButton(
             self, label: str, value: Union[int, float], unit: str,
-            size: Optional[Tuple[int, int]] = None) -> FancyDisplayButton:
+            size: Optional[Tuple[int, int]] = None,
+    button_settings: FancyButtonSettings = None )-> FancyDisplayButton:
         """ Creates Fancy Display Button """
         return FancyDisplayButton(
             label,
@@ -85,7 +87,8 @@ class MainWindow(QWidget):
 
     def makeSimpleDisplayButton(
             self, label: str,
-            size: Optional[Tuple[int, int]] = None) -> SimpleDisplayButton:
+            size: Optional[Tuple[int, int]] = None,
+    button_settings: SimpleButtonSettings = None) -> SimpleDisplayButton:
         """ Creates Simple Display Button """
         return SimpleDisplayButton(
             label,
@@ -96,7 +99,8 @@ class MainWindow(QWidget):
 
     def makeDisplayRect(
             self, label: str, value: Union[int, float], unit: str,
-            size: Optional[Tuple[int, int]] = None) -> DisplayRect:
+            size: Optional[Tuple[int, int]] = None,
+    rect_settings: DisplayRectSettings = None) -> DisplayRect:
         """ Creates the Display Rectangle """
         return DisplayRect(
             label,
@@ -279,7 +283,7 @@ class MainWindow(QWidget):
 
         v_box_1_main.addLayout(h_box_11)
         v_box_1_main.addLayout(h_box_12)
-        self.page1.setLayout(v_box_1_main)
+        self.page["1"].setLayout(v_box_1_main)
 
     def initializeWidget2(self):  # Mode
         v_box_2 = QVBoxLayout()
