@@ -20,18 +20,18 @@ class CommsHelper():
     # Sets the function in the comms handler that gets called
     # whenever settings are updated
     def set_comms_handler_callback(self,
-        comms_handler_callback : Callable[[str], None]) -> None:
+        comms_handler_callback : Callable[[dict], None]) -> None:
+        print("Set comms handler callback")
         self.comms_handler_callback = comms_handler_callback
 
     def settings_handler(self, settings: Settings) -> None:
-        print("Got new settings from the UI")
-        print(settings.to_JSON)
-
         # Serialize or convert settings into form usable by 
         # comms handler
         # Call comms handler callback with new settings
-        if self.settings_callback:
-            self.settings_callback(settings.to_JSON())
+        if self.comms_handler_callback:
+            settings_str = settings.to_JSON()
+            j = json.loads(settings_str)
+            self.comms_handler_callback(j)
         else:
             print("Got new settings but no comms handler callback!")
 

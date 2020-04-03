@@ -3,12 +3,20 @@ import time
 from threading import Thread
 from utils.comms_helper import CommsHelper
 from utils.params import Params
+from utils.settings import Settings
 
 
 class SimulateCommsHandler():
     def __init__(self, comms_helper: CommsHelper) -> None:
         self.comms_helper = comms_helper
-        #comms_helper.set_settings_callback(self.setings_handler)
+        self.comms_helper.set_comms_handler_callback(self.settings_handler)
+
+    def settings_handler(self, settings_dict: dict) -> None:
+        settings = Settings()
+        settings.from_dict(settings_dict)
+        print("Simulator got new settings from the UI")
+        print(settings.to_JSON())
+
 
     def simulate_params(self) -> None:
         params = Params()
@@ -24,3 +32,5 @@ class SimulateCommsHandler():
     def start(self) -> None:
             t = Thread(target=self.simulate_params, args=())
             t.start()
+
+

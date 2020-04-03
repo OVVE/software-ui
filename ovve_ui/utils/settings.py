@@ -46,3 +46,9 @@ class Settings():
         j['resp_rate'] = self.resp_rate
         j['ie_ratio_id'] = self.ie_ratio_id
         return json.dumps(j)
+
+    def from_dict(self, settings_dict: dict) -> None:
+        self.ac_mode = settings_dict['ac_mode']
+        self.minute_volume = settings_dict['minute_volume']
+        self.resp_rate = settings_dict['resp_rate']
+        self.ie_ratio_id = settings_dict['ie_ratio_id']
