@@ -4,6 +4,7 @@ import os
 import sys
 from copy import deepcopy
 from random import randint
+from typing import Union, Optional, Tuple
 
 import numpy as np
 import pyqtgraph as pg
@@ -61,7 +62,10 @@ class MainWindow(QWidget):
         hbox.addWidget(self.stack)
         self.setLayout(hbox)
 
-    def makeFancyDisplayButton(self, label, value, unit, size=None):
+    def makeFancyDisplayButton(
+            self, label: str, value: Union[int, float], unit: str,
+            size: Optional[Tuple[int, int]] = None) -> FancyDisplayButton:
+        """ Creates Fancy Display Button """
         return FancyDisplayButton(
             label,
             value,
@@ -70,14 +74,20 @@ class MainWindow(QWidget):
             size=size,
             button_settings=self.ui_settings.fancy_button_settings)
 
-    def makeSimpleDisplayButton(self, label, size=None):
+    def makeSimpleDisplayButton(
+            self, label: str,
+            size: Optional[Tuple[int, int]] = None) -> SimpleDisplayButton:
+        """ Creates Simple Display Button """
         return SimpleDisplayButton(
             label,
             parent=None,
             size=size,
             button_settings=self.ui_settings.simple_button_settings)
 
-    def makeDisplayRect(self, label, value, unit, size=None):
+    def makeDisplayRect(
+            self, label: str, value: Union[int, float], unit: str,
+            size: Optional[Tuple[int, int]] = None) -> DisplayRect:
+        """ Creates the Display Rectangle """
         return DisplayRect(
             label,
             value,
@@ -86,7 +96,7 @@ class MainWindow(QWidget):
             size=size,
             rect_settings=self.ui_settings.display_rect_settings)
 
-    def initalizeAndAddStackWidgets(self):
+    def initalizeAndAddStackWidgets(self) -> None:
         self.initializeWidget1()
         self.initializeWidget2()
         self.initializeWidget3()
