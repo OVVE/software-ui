@@ -46,7 +46,7 @@ class Settings():
         # Available alarm codes 0-31
         alarmcodes = [[0, "Power loss (from ECU)"], 
                      [1, "Low battery (from ECU)"],
-                     [2, "Loss of breathing circuit integrity (from ECU)"],
+                     [2, "Loss of breathing circuit integrity (from ECU)"]
                      [3, "High airway pressure (from ECU)"],
                      [4, "Low airway pressure (from ECU)"],
                      [5, "Low delivered Tidal Volume (from ECU)"],
