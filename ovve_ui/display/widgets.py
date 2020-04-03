@@ -191,9 +191,9 @@ def initializeMinuteVolumeWidget(window: MainWindow):
         size=(500, 200))
 
     minute_vol_increment_button = window.makeSimpleDisplayButton(
-        "+ " + str(window.minute_volume_increment))
+        "+ " + str(window.tv_increment))
     minute_vol_decrement_button = window.makeSimpleDisplayButton(
-        "- " + str(window.minute_volume_increment))
+        "- " + str(window.tv_increment))
     minute_vol_apply = window.makeSimpleDisplayButton("APPLY")
     minute_vol_cancel = window.makeSimpleDisplayButton("CANCEL")
 

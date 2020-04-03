@@ -44,7 +44,7 @@ class MainWindow(QWidget):
         self.ui_settings = UISettings()
 
         self.resp_rate_increment = 5
-        self.minute_volume_increment = 5
+        self.tv_increment = 5
 
         # Example 1 (changes color of Fancy numbers to red)
         # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
@@ -183,12 +183,12 @@ class MainWindow(QWidget):
         self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
 
     def incrementMinuteVol(self) -> None:
-        self.local_settings.tv += self.minute_volume_increment
+        self.local_settings.tv += self.tv_increment
         self.minute_vol_page_rect.updateValue(
             self.local_settings.tv)
 
     def decrementMinuteVol(self) -> None:
-        self.local_settings.tv -= self.minute_volume_increment
+        self.local_settings.tv -= self.tv_increment
         self.minute_vol_page_rect.updateValue(
             self.local_settings.tv)
 
