@@ -53,6 +53,7 @@ class Params():
         j['battery_level'] = self.battery_level
         return json.dumps(j)
 
+    #TODO: add error handling for bad dict keys
     def from_dict(self, j: dict) -> None:
         self.seq_num = j['seq_num']
         self.packet_version = j['packet_version']

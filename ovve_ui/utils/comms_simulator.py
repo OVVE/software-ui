@@ -30,7 +30,7 @@ class CommsSimulator():
         while not self.done:
             params_dict['seq_num'] = self.seqnum
             params_dict['packet_version'] = self.packet_version
-            params_dict['mode'] = 0
+            params_dict['mode'] = self.settings.mode
             params_dict['resp_rate_meas'] = self.settings.resp_rate
             params_dict['resp_rate_set'] = self.settings.resp_rate
             params_dict['tv_meas'] = self.settings.tv

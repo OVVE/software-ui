@@ -21,6 +21,7 @@ class Settings():
         j['ie_ratio'] = self.ie_ratio
         return json.dumps(j)
 
+    #TODO: add error handling for bad dict keys
     def from_dict(self, settings_dict: dict) -> None:
         self.mode = settings_dict['mode']
         self.tv = settings_dict['tv']
