@@ -4,6 +4,7 @@ import os
 import sys
 from copy import deepcopy
 from random import randint
+from typing import Union, Optional, Tuple
 
 import numpy as np
 import pyqtgraph as pg
@@ -17,23 +18,25 @@ from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
 from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
 from display.rectangle import DisplayRect
-from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
-                                 SimpleButtonSettings, TextSetting, UISettings)
+from display.ui_settings import (DisplayRectSettings,
+                                 FancyButtonSettings,
+                                 SimpleButtonSettings, TextSetting,
+                                 UISettings)
 from utils.params import Params
 from utils.settings import Settings
 
 
 class MainWindow(QWidget):
-    def __init__(self):
+    def __init__(self, debug: bool = True) -> None:
         super().__init__()
         self.settings = Settings()
-        self.settings.set_test_settings()
-        self.local_settings = Settings()
-        # local settings are just changed with the UI
-        self.local_settings.set_test_settings()
-
+        self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
-        self.params.set_test_params()
+
+        if debug:
+            self.settings.set_test_settings()
+            self.local_settings.set_test_settings()
+            self.params.set_test_params()
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -50,18 +53,23 @@ class MainWindow(QWidget):
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         self.stack = QStackedWidget(self)
 
-        self.page1 = QWidget()
-        self.page2 = QWidget()
-        self.page3 = QWidget()
-        self.page4 = QWidget()
-        self.page5 = QWidget()
+        self.page = {
+            "1": QWidget(),
+            "2": QWidget(),
+            "3": QWidget(),
+            "4": QWidget(),
+            "5": QWidget(),
+        }
 
         self.initalizeAndAddStackWidgets()
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.stack)
         self.setLayout(hbox)
 
-    def makeFancyDisplayButton(self, label, value, unit, size=None):
+    def makeFancyDisplayButton(
+            self, label: str, value: Union[int, float], unit: str,
+            size: Optional[Tuple[int, int]] = None) -> FancyDisplayButton:
+        """ Creates Fancy Display Button """
         return FancyDisplayButton(
             label,
             value,
@@ -70,14 +78,20 @@ class MainWindow(QWidget):
             size=size,
             button_settings=self.ui_settings.fancy_button_settings)
 
-    def makeSimpleDisplayButton(self, value, size=None):
+    def makeSimpleDisplayButton(
+            self, label: str,
+            size: Optional[Tuple[int, int]] = None) -> SimpleDisplayButton:
+        """ Creates Simple Display Button """
         return SimpleDisplayButton(
-            value,
+            label,
             parent=None,
             size=size,
             button_settings=self.ui_settings.simple_button_settings)
 
-    def makeDisplayRect(self, label, value, unit, size=None):
+    def makeDisplayRect(
+            self, label: str, value: Union[int, float], unit: str,
+            size: Optional[Tuple[int, int]] = None) -> DisplayRect:
+        """ Creates the Display Rectangle """
         return DisplayRect(
             label,
             value,
@@ -86,17 +100,14 @@ class MainWindow(QWidget):
             size=size,
             rect_settings=self.ui_settings.display_rect_settings)
 
-    def initalizeAndAddStackWidgets(self):
+    def initalizeAndAddStackWidgets(self) -> None:
         self.initializeWidget1()
         self.initializeWidget2()
         self.initializeWidget3()
         self.initializeWidget4()
         self.initializeWidget5()
-        self.stack.addWidget(self.page1)
-        self.stack.addWidget(self.page2)
-        self.stack.addWidget(self.page3)
-        self.stack.addWidget(self.page4)
-        self.stack.addWidget(self.page5)
+        for i in self.page:
+            self.stack.addWidget(self.page[i])
 
     def initializeWidget1(self):  # home screen
         h_box_1 = QHBoxLayout()
@@ -215,7 +226,7 @@ class MainWindow(QWidget):
         h_box_1.addLayout(v_box_1left)
         h_box_1.addLayout(v_box_1mid)
         h_box_1.addLayout(v_box_1right)
-        self.page1.setLayout(h_box_1)
+        self.page["1"].setLayout(h_box_1)
 
     def initializeWidget2(self):  # Mode
         v_box_2 = QVBoxLayout()
@@ -247,7 +258,7 @@ class MainWindow(QWidget):
         v_box_2.addLayout(h_box_2middle)
         v_box_2.addLayout(h_box_2bottom)
 
-        self.page2.setLayout(v_box_2)
+        self.page["2"].setLayout(v_box_2)
 
     def initializeWidget3(self):  # Resp_rate
         v_box_3 = QVBoxLayout()
@@ -283,7 +294,7 @@ class MainWindow(QWidget):
         v_box_3.addLayout(h_box_3mid)
         v_box_3.addLayout(h_box_3bottom)
 
-        self.page3.setLayout(v_box_3)
+        self.page["3"].setLayout(v_box_3)
 
     def initializeWidget4(self):  # Minute volume
         v_box_4 = QVBoxLayout()
@@ -319,7 +330,7 @@ class MainWindow(QWidget):
         v_box_4.addLayout(h_box_4mid)
         v_box_4.addLayout(h_box_4bottom)
 
-        self.page4.setLayout(v_box_4)
+        self.page["4"].setLayout(v_box_4)
 
     def initializeWidget5(self):  # ie ratio
         v_box_5 = QVBoxLayout()
@@ -365,7 +376,7 @@ class MainWindow(QWidget):
         v_box_5.addLayout(h_box_5mid)
         v_box_5.addLayout(h_box_5bottom)
 
-        self.page5.setLayout(v_box_5)
+        self.page["5"].setLayout(v_box_5)
 
     def display(self, i):
         self.stack.setCurrentIndex(i)
