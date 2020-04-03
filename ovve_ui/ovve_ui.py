@@ -18,8 +18,10 @@ from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
 from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
 from display.rectangle import DisplayRect
-from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
-                                 SimpleButtonSettings, TextSetting, UISettings)
+from display.ui_settings import (DisplayRectSettings,
+                                 FancyButtonSettings,
+                                 SimpleButtonSettings, TextSetting,
+                                 UISettings)
 from utils.params import Params
 from utils.settings import Settings
 
