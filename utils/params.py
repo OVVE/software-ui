@@ -28,3 +28,11 @@ class Params():
         j['ppeak'] = self.ppeak
         j['pplat'] = self.pplat
         return json.dumps(j)
+
+    def from_dict(self, params_dict: dict) -> None:
+        self.peep = params_dict['peep']
+        self.tv_insp = params_dict['tv_insp']
+        self.tv_exp = params_dict['tv_exp']
+        self.ppeak = params_dict['ppeak']
+        self.pplat = params_dict['pplat']
+        

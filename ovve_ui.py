@@ -19,9 +19,12 @@ from display.change import Change
 from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
                                  SimpleButtonSettings, TextSetting, UISettings)
+
+from typing import Callable
 from utils.params import Params
 from utils.settings import Settings
-
+from utils.comms_helper import CommsHelper
+from utils.simulate_comms_handler import SimulateCommsHandler
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -31,6 +34,7 @@ class MainWindow(QWidget):
         self.local_settings = Settings()
         # local settings are just changed with the UI
         self.local_settings.set_test_settings()
+        self.settings_callback = None
 
         self.params = Params()
         self.params.set_test_params()
@@ -370,7 +374,8 @@ class MainWindow(QWidget):
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
-    def update_main_page_ui(self):
+    def update_main_page_ui(self, params: Params):
+        self.params = params
         self.updateMainDisplays()
         self.updateGraphs()
 
@@ -399,40 +404,6 @@ class MainWindow(QWidget):
         self.ptr += 1
         self.flow_graph_line.setPos(self.ptr, 0)
         QtGui.QApplication.processEvents()
-
-    def open_serial(self):
-        if not self.serial.isOpen():
-            self.serial.open(QtCore.QIODevice.ReadWrite)
-
-    def close_serial(self):
-        if self.serial.isOpen():
-            self.serial.close()
-
-    def start_serial(self, serialport):
-        #TODO: error checking, retry
-        self.serial = QtSerialPort.QSerialPort(
-            serialport,
-            baudRate=QtSerialPort.QSerialPort.Baud9600,
-            readyRead=self.receive,
-        )
-        self.open_serial()
-
-    @QtCore.pyqtSlot()
-    def receive(self):
-        while self.serial.canReadLine():
-            text = self.serial.readLine().data().decode()
-            text = text.rstrip("\r\n")
-            try:
-                self.parseInputAndUpdate(text)
-            except:
-                pass
-
-    # TODO: Map add all other input data to proper settings
-
-    def parseInputAndUpdate(self, text):
-        self.params.tv_insp = int(text)
-        # print(text)
-        self.update_main_page_ui()
 
     # TODO: Finish all of these for each var
     def changeMode(self, new_val):
@@ -528,15 +499,23 @@ class MainWindow(QWidget):
             print(change.display())
         # TODO: Actually log the change in some data structure
 
+    def set_settings_callback(self, 
+        settings_callback: Callable[[Settings], None]) -> None:
+        self.settings_callback = settings_callback
 
 def main(port, argv):
-    app = QApplication(argv)
+    app = QApplication(argv) 
     window = MainWindow()
+    
+    comms_helper = CommsHelper()
+    comms_helper.set_ui_callback(window.update_main_page_ui)
+    window.set_settings_callback(comms_helper.settings_handler)
 
-    window.start_serial(port)
+    comms_handler = SimulateCommsHandler(comms_helper)
+    comms_handler.start()
+
     window.show()
     app.exec_()
-    window.close_serial()
     sys.exit()
 
 
