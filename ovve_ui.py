@@ -374,10 +374,11 @@ class MainWindow(QWidget):
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
-    def update_main_page_ui(self, params: Params):
+    def update_ui(self, params: Params):
         self.params = params
         self.updateMainDisplays()
         self.updateGraphs()
+        self.updatePageDisplays()
 
     def updateMainDisplays(self):
         self.mode_button_main.updateValue(self.settings.get_mode_display())
@@ -508,7 +509,7 @@ def main(port, argv):
     window = MainWindow()
     
     comms_helper = CommsHelper()
-    comms_helper.set_ui_callback(window.update_main_page_ui)
+    comms_helper.set_ui_callback(window.update_ui)
     window.set_settings_callback(comms_helper.settings_handler)
 
     comms_handler = SimulateCommsHandler(comms_helper)

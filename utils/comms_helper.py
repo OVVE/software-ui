@@ -30,8 +30,8 @@ class CommsHelper():
         # Serialize or convert settings into form usable by 
         # comms handler
         # Call comms handler callback with new settings
-        if settings_callback:
-            settings_callback(settings.to_JSON())
+        if self.settings_callback:
+            self.settings_callback(settings.to_JSON())
         else:
             print("Got new settings but no comms handler callback!")
 
