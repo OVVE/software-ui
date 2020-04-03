@@ -4,8 +4,11 @@
 from typing import Any, Optional, Tuple, Union
 
 from PyQt5.Qt import QSize
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QBrush, QColor, QFont, QPainter, QPen
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import QAbstractButton, QLabel, QHBoxLayout, QVBoxLayout, QWidget
 from display.ui_settings import FancyButtonSettings, SimpleButtonSettings
 
@@ -81,11 +84,17 @@ class SimpleDisplayButton(QAbstractButton):
 
         self.value_label = QLabel(value)
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setSpacing(0)
+        self.layout.setGeometry(QRect(0,0, *self.size))
 
         self.value_label.setFont(self.button_settings.valueFont)
-        self.value_label.setAlignment(Qt.AlignCenter)
+        #self.value_label.setStyleSheet("QLabel {color: " + self.button_settings.valueColor + "; background-color: red;}")
         self.value_label.setStyleSheet("QLabel {color: " + self.button_settings.valueColor + ";}")
+        self.value_label.setIndent(0)
+
         self.layout.addWidget(self.value_label)
+        self.value_label.setAlignment(Qt.AlignCenter)
 
         self.setLayout(self.layout)
 

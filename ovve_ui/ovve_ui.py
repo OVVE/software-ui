@@ -194,18 +194,31 @@ class MainWindow(QWidget):
 
     def updatePageDisplays(self) -> None:
         self.mode_page_rect.updateValue(self.get_mode_display(self.settings.mode))
-        self.resp_rate_page_rect.updateValue(self.settings.resp_rate)
+        self.resp_rate_page_value_label.setText(str(self.settings.resp_rate))
         self.tv_page_rect.updateValue(self.settings.tv)
         self.ie_page_rect.updateValue(self.get_ie_display(self.settings.ie_ratio))
         self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
-        self.tv_insp_data[:-1] = self.tv_insp_data[1:]
-        self.tv_insp_data[-1] = self.params.tv_insp
-        self.flow_graph_line.setData(self.tv_insp_data)
+        self.flow_data[:-1] = self.flow_data[1:]
+        self.flow_data[-1] = self.params.flow
+        self.flow_graph_line.setData(self.flow_data)
+
+        self.pressure_data[:-1] = self.pressure_data[1:]
+        self.pressure_data[-1] = self.params.pressure
+        self.pressure_graph_line.setData(self.pressure_data)
+
+        self.volume_data[:-1] = self.volume_data[1:]
+        self.volume_data[-1] = self.params.tv_meas
+        self.volume_graph_line.setData(self.volume_data)
+
         self.ptr += 1
         self.flow_graph_line.setPos(self.ptr, 0)
+        self.pressure_graph_line.setPos(self.ptr, 0)
+        self.volume_graph_line.setPos(self.ptr, 0)
+
+
         QtGui.QApplication.processEvents()
 
     # TODO: Finish all of these for each var
@@ -217,11 +230,11 @@ class MainWindow(QWidget):
     # (right now it's not in the settings)
     def incrementRespRate(self) -> None:
         self.local_settings.resp_rate += self.resp_rate_increment
-        self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
+        self.resp_rate_page_value_label.setText(str(self.local_settings.resp_rate))
 
     def decrementRespRate(self) -> None:
         self.local_settings.resp_rate -= self.resp_rate_increment
-        self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
+        self.resp_rate_page_value_label.setText(str(self.local_settings.resp_rate))
 
     def incrementTidalVol(self) -> None:
         self.local_settings.tv += self.tv_increment
