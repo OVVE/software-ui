@@ -26,6 +26,7 @@ class Settings():
         self.ie_ratio_id = 0
         self.resp_rate_increment = 1
         self.minute_volume_increment = 1
+        self.alarm_mode = False # False -> Off, True -> On
 
     def get_ie_display(self) -> str:
         if self.ie_ratio_id < len(self.ie_ratio_display):
@@ -38,6 +39,12 @@ class Settings():
             return "AC"
 
         return "SIMV"
+
+    def get_alarm_display(self):
+        if self.alarm_mode:
+            return "Alarm ON"
+        else:
+            return "Alarm OFF"
 
     def to_JSON(self) -> str:
         j = {}

@@ -56,6 +56,7 @@ class MainWindow(QWidget):
         self.page3 = QWidget()
         self.page4 = QWidget()
         self.page5 = QWidget()
+        self.page6 = QWidget()
 
         self.initalizeAndAddStackWidgets()
         hbox = QHBoxLayout(self)
@@ -101,11 +102,13 @@ class MainWindow(QWidget):
         self.initializeWidget3()
         self.initializeWidget4()
         self.initializeWidget5()
+        self.initializeWidget6() # alarm
         self.stack.addWidget(self.page1)
         self.stack.addWidget(self.page2)
         self.stack.addWidget(self.page3)
         self.stack.addWidget(self.page4)
         self.stack.addWidget(self.page5)
+        self.stack.addWidget(self.page6) # alarm
 
     def initializeWidget1(self):  # home screen
         v_box_1_main = QVBoxLayout()
@@ -155,6 +158,8 @@ class MainWindow(QWidget):
                                                  fillColor='#FFFFFF',
                                                  valueColor='#FF0000'),
         )
+        self.alarm_button_main.clicked.connect(lambda: self.display(5))
+
         #TODO: Connect
 
         self.start_button_main = self.makeSimpleDisplayButton(
@@ -422,6 +427,33 @@ class MainWindow(QWidget):
 
         self.page5.setLayout(v_box_5)
 
+    def initializeWidget6(self): #Alarm
+        v_box_6 = QVBoxLayout()
+        h_box_6top = QHBoxLayout()
+        h_box_6middle = QHBoxLayout()
+        h_box_6bottom = QHBoxLayout()
+
+        #alarm_toggle = self.makeSimpleDisplayButton("Toggle Alarm")
+        alarm_apply = self.makeSimpleDisplayButton("Confirm")
+        alarm_cancel= self.makeSimpleDisplayButton("Cancel")
+
+        #alarm_toggle.clicked.connect(lambda: self.changeAlarm(not self.local_settings.alarm_mode))
+        alarm_apply.clicked.connect(lambda: self.commitAlarm())
+        alarm_cancel.clicked.connect(self.cancelChange)
+
+        self.alarm_page_rect = self.makeDisplayRect("Alarm", self.local_settings.get_alarm_display(), "", size = (500,200))
+
+        h_box_6top.addWidget(self.alarm_page_rect)
+        #h_box_6middle.addWidget(alarm_toggle)
+        h_box_6bottom.addWidget(alarm_apply)
+        h_box_6bottom.addWidget(alarm_cancel)
+
+        v_box_6.addLayout(h_box_6top)
+        v_box_6.addLayout(h_box_6middle)
+        v_box_6.addLayout(h_box_6bottom)
+
+        self.page6.setLayout(v_box_6)
+
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
@@ -434,6 +466,7 @@ class MainWindow(QWidget):
         self.set_resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.set_minute_vol_button_main.updateValue(self.settings.minute_volume)
         self.ie_button_main.updateValue(self.settings.get_ie_display())
+        self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.peep_display_main.updateValue(self.params.peep)
         self.tv_insp_display_main.updateValue(self.params.tv_insp)
         self.tv_exp_display_main.updateValue(self.params.tv_exp)
@@ -445,6 +478,7 @@ class MainWindow(QWidget):
         self.resp_rate_page_rect.updateValue(self.settings.resp_rate)
         self.minute_vol_page_rect.updateValue(self.settings.minute_volume)
         self.ie_page_rect.updateValue(self.settings.get_ie_display())
+        self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
 
     # TODO: Polish up and process data properly
     def updateGraphs(self):
@@ -518,6 +552,10 @@ class MainWindow(QWidget):
         self.local_settings.ie_ratio_id = new_val
         self.ie_page_rect.updateValue(self.local_settings.get_ie_display())
 
+    def changeAlarm(self, new_val):
+        self.local_settings.alarm_mode = new_val
+        self.alarm_page_rect.updateValue(self.local_settings.get_alarm_display())
+
     # TODO: Finish all of these for each var
     def commitMode(self):
         self.logChange(
@@ -565,6 +603,12 @@ class MainWindow(QWidget):
             ))
         self.settings.ie_ratio_id = self.local_settings.ie_ratio_id
         self.ie_button_main.updateValue(self.settings.get_ie_display())
+        self.stack.setCurrentIndex(0)
+
+    def commitAlarm(self):
+        self.logChange(Change(datetime.datetime.now(),"Alarm", self.settings.get_alarm_display(), self.local_settings.get_alarm_display()))
+        self.settings.ac_mode = self.local_settings.alarm_mode
+        self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.stack.setCurrentIndex(0)
 
     def cancelChange(self):
