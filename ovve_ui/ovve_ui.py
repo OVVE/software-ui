@@ -444,7 +444,6 @@ class MainWindow(QWidget):
         self.local_settings.ie_ratio_id = new_val
         self.ie_page_rect.updateValue(self.local_settings.get_ie_display())
 
-    # TODO: Finish all of these for each var
     def commitMode(self):
         self.logChange(
             Change(
@@ -456,6 +455,7 @@ class MainWindow(QWidget):
         self.settings.ac_mode = self.local_settings.ac_mode
         self.mode_button_main.updateValue(self.settings.get_mode_display())
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
     def commitRespRate(self):
         self.logChange(
@@ -468,6 +468,7 @@ class MainWindow(QWidget):
         self.settings.resp_rate = self.local_settings.resp_rate
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
     def commitMinuteVol(self):
         self.logChange(
@@ -480,6 +481,7 @@ class MainWindow(QWidget):
         self.settings.minute_volume = self.local_settings.minute_volume
         self.minute_vol_button_main.updateValue(self.settings.minute_volume)
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
     def commitIERatio(self):
         self.logChange(
@@ -492,6 +494,7 @@ class MainWindow(QWidget):
         self.settings.ie_ratio_id = self.local_settings.ie_ratio_id
         self.ie_button_main.updateValue(self.settings.get_ie_display())
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
     def cancelChange(self):
         self.local_settings = deepcopy(self.settings)
@@ -499,9 +502,8 @@ class MainWindow(QWidget):
         self.stack.setCurrentIndex(0)
         self.updatePageDisplays()
 
-    def passChanges(self, param, new_val):
-        pass
-        # TODO: pass settings to the Arduino
+    def passChanges(self):
+        self.settings_callback(self.settings)
 
     # change is a Change object
     def logChange(self, change):
