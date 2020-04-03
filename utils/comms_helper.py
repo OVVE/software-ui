@@ -9,7 +9,7 @@ import json
 class CommsHelper():
     def __init__(self) -> None: 
         self.ui_callback = None
-        self.settings_callback = None
+        self.comms_handler_callback = None
 
     # Sets the function in the UI that gets called whenever 
     # params are updated.
@@ -19,9 +19,9 @@ class CommsHelper():
 
     # Sets the function in the comms handler that gets called
     # whenever settings are updated
-    def set_settings_callback(self,
-        settings_callback : Callable[[str], None]) -> None:
-        self.settings_callback = settings_callback
+    def set_comms_handler_callback(self,
+        comms_handler_callback : Callable[[str], None]) -> None:
+        self.comms_handler_callback = comms_handler_callback
 
     def settings_handler(self, settings: Settings) -> None:
         print("Got new settings from the UI")
