@@ -1,4 +1,3 @@
-import argparse
 import datetime
 import os
 import sys
@@ -20,26 +19,34 @@ from display.change import Change
 from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings,
                                  FancyButtonSettings,
-                                 SimpleButtonSettings, TextSetting,
+                                 SimpleButtonSettings,
+                                 TextSetting,
                                  UISettings)
+from typing import Callable
+from display.widgets import (initializeHomeScreenWidget,
+                             initializeModeWidget,
+                             initializeRespitoryRateWidget,
+                             initializeMinuteVolumeWidget,
+                             initializeIERatioWidget)
 from utils.params import Params
 from utils.settings import Settings
-
+from utils.comms_adapter import CommsAdapter
+from utils.comms_simulator import CommsSimulator
 
 class MainWindow(QWidget):
-    def __init__(self, debug: bool = True) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
 
-        if debug:
-            self.settings.set_test_settings()
-            self.local_settings.set_test_settings()
-            self.params.set_test_params()
-
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
+
+        self.resp_rate_increment = 5
+        self.tv_increment = 5
+
+
         # Example 1 (changes color of Fancy numbers to red)
         # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
         # Example 2 (changes color of Simple numbers to red)
@@ -71,6 +78,45 @@ class MainWindow(QWidget):
         palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
+
+        # CommsAdapter adapts settings and params to and from the comms handler
+        self.comms_adapter = CommsAdapter()
+
+        # Set a callback in the adapter that is called whenever new
+        # params arrive from the comms handler
+        self.comms_adapter.set_ui_callback(self.update_ui)
+
+        # Set the adapter function that is called whenever settings are
+        # udpated in the UI
+        self.set_settings_callback(self.comms_adapter.update_settings)
+
+        # The comms handler is a simulator for now.  It will send
+        # random values for the parameters that are updated periodically from
+        # the MCU.  It will accept settings updates from the UI.
+        #
+        # When the real comms handler is available, substitute it here.
+        self.comms_handler = CommsSimulator(self.comms_adapter)
+
+        #TODO: How to handle start / stop events from UI?
+        self.comms_handler.start()
+
+
+    def get_mode_display(self, mode):
+        switcher = {
+            0: "AC",
+            1: "SIMV",
+        }
+        return switcher.get(mode, "invalid")
+
+    def get_ie_display(self, ie_ratio):
+        switcher = {
+            0: "1:1",
+            1: "1:1.5",
+            2: "1:2",
+            3: "1:3",
+        }
+        return switcher.get(ie_ratio, "invalid")
+
 
     def makeFancyDisplayButton(
             self, label: str, value: Union[int, float], unit: str,
@@ -119,10 +165,16 @@ class MainWindow(QWidget):
         self.initializeWidget4()
         self.initializeWidget5()
         self.initializeWidget6()
-        
+
+        initializeHomeScreenWidget(self)
+        initializeModeWidget(self)
+        initializeRespitoryRateWidget(self)
+        initializeMinuteVolumeWidget(self)
+        initializeIERatioWidget(self)
         for i in self.page:
             self.stack.addWidget(self.page[i])
 
+    def display(self, i: int) -> None:
 
     def initializeWidget1(self):  # home screen
         v_box_1_main = QVBoxLayout()
@@ -470,10 +522,17 @@ class MainWindow(QWidget):
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
-    def update_main_page_ui(self):
+    def update_ui(self, params: Params) -> None:
+        self.params = params
         self.updateMainDisplays()
         self.updateGraphs()
+        self.updatePageDisplays()
 
+    def updateMainDisplays(self) -> None:
+        self.mode_button_main.updateValue(self.get_mode_display(self.settings.mode))
+        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
+        self.minute_vol_button_main.updateValue(self.settings.tv)
+        self.ie_button_main.updateValue(self.get_ie_display(self.settings.ie_ratio))
     def updateMainDisplays(self):
         self.mode_button_main.updateValue(self.settings.get_mode_display())
         self.set_resp_rate_button_main.updateValue(self.settings.resp_rate)
@@ -486,15 +545,17 @@ class MainWindow(QWidget):
         self.ppeak_display_main.updateValue(self.params.ppeak)
         self.pplat_display_main.updateValue(self.params.pplat)
 
-    def updatePageDisplays(self):
-        self.mode_page_rect.updateValue(self.settings.get_mode_display())
+    def updatePageDisplays(self) -> None:
+        self.mode_page_rect.updateValue(self.get_mode_display(self.settings.mode))
         self.resp_rate_page_rect.updateValue(self.settings.resp_rate)
         self.minute_vol_page_rect.updateValue(self.settings.minute_volume)
         self.ie_page_rect.updateValue(self.settings.get_ie_display())
         self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
+        self.minute_vol_page_rect.updateValue(self.settings.tv)
+        self.ie_page_rect.updateValue(self.get_ie_display(self.settings.ie_ratio))
 
     # TODO: Polish up and process data properly
-    def updateGraphs(self):
+    def updateGraphs(self) -> None:
         self.tv_insp_data[:-1] = self.tv_insp_data[1:]
         self.tv_insp_data[-1] = self.params.tv_insp
         self.flow_graph_line.setData(self.tv_insp_data)
@@ -502,68 +563,34 @@ class MainWindow(QWidget):
         self.flow_graph_line.setPos(self.ptr, 0)
         QtGui.QApplication.processEvents()
 
-    def open_serial(self):
-        if not self.serial.isOpen():
-            self.serial.open(QtCore.QIODevice.ReadWrite)
-
-    def close_serial(self):
-        if self.serial.isOpen():
-            self.serial.close()
-
-    def start_serial(self, serialport):
-        #TODO: error checking, retry
-        self.serial = QtSerialPort.QSerialPort(
-            serialport,
-            baudRate=QtSerialPort.QSerialPort.Baud9600,
-            readyRead=self.receive,
-        )
-        self.open_serial()
-
-    @QtCore.pyqtSlot()
-    def receive(self):
-        while self.serial.canReadLine():
-            text = self.serial.readLine().data().decode()
-            text = text.rstrip("\r\n")
-            try:
-                self.parseInputAndUpdate(text)
-            except:
-                pass
-
-    # TODO: Map add all other input data to proper settings
-
-    def parseInputAndUpdate(self, text):
-        self.params.tv_insp = int(text)
-        # print(text)
-        self.update_main_page_ui()
-
     # TODO: Finish all of these for each var
-    def changeMode(self, new_val):
+    def changeMode(self, new_val: bool) -> None:
         self.local_settings.ac_mode = new_val
-        self.mode_page_rect.updateValue(self.local_settings.get_mode_display())
+        self.mode_page_rect.updateValue(self.get_mode_display(self.local_settings.mode))
 
     # TODO: Figure out how to handle increment properly
     # (right now it's not in the settings)
-    def incrementRespRate(self):
-        self.local_settings.resp_rate += self.settings.resp_rate_increment
+    def incrementRespRate(self) -> None:
+        self.local_settings.resp_rate += self.resp_rate_increment
         self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
 
-    def decrementRespRate(self):
-        self.local_settings.resp_rate -= self.settings.resp_rate_increment
+    def decrementRespRate(self) -> None:
+        self.local_settings.resp_rate -= self.resp_rate_increment
         self.resp_rate_page_rect.updateValue(self.local_settings.resp_rate)
 
-    def incrementMinuteVol(self):
-        self.local_settings.minute_volume += self.settings.minute_volume_increment
+    def incrementMinuteVol(self) -> None:
+        self.local_settings.tv += self.tv_increment
         self.minute_vol_page_rect.updateValue(
-            self.local_settings.minute_volume)
+            self.local_settings.tv)
 
-    def decrementMinuteVol(self):
-        self.local_settings.minute_volume -= self.settings.minute_volume_increment
+    def decrementMinuteVol(self) -> None:
+        self.local_settings.tv -= self.tv_increment
         self.minute_vol_page_rect.updateValue(
-            self.local_settings.minute_volume)
+            self.local_settings.tv)
 
-    def changeIERatio(self, new_val):
-        self.local_settings.ie_ratio_id = new_val
-        self.ie_page_rect.updateValue(self.local_settings.get_ie_display())
+    def changeIERatio(self, new_val: int) -> None:
+        self.local_settings.ie_ratio = new_val
+        self.ie_page_rect.updateValue(self.get_ie_display(self.local_settings.ie_ratio))
 
     def changeAlarm(self, new_val):
         self.local_settings.alarm_mode = new_val
@@ -575,14 +602,15 @@ class MainWindow(QWidget):
             Change(
                 datetime.datetime.now(),
                 "Mode",
-                self.settings.get_mode_display(),
-                self.local_settings.get_mode_display(),
+                self.get_mode_display(self.settings.mode),
+                self.get_mode_display(self.local_settings.mode),
             ))
-        self.settings.ac_mode = self.local_settings.ac_mode
-        self.mode_button_main.updateValue(self.settings.get_mode_display())
+        self.settings.mode = self.local_settings.mode
+        self.mode_button_main.updateValue(self.get_mode_display(self.settings.mode))
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
-    def commitRespRate(self):
+    def commitRespRate(self) -> None:
         self.logChange(
             Change(
                 datetime.datetime.now(),
@@ -591,73 +619,74 @@ class MainWindow(QWidget):
                 self.local_settings.resp_rate,
             ))
         self.settings.resp_rate = self.local_settings.resp_rate
-        self.set_resp_rate_button_main.updateValue(self.settings.resp_rate)
+        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
-    def commitMinuteVol(self):
+    def commitMinuteVol(self) -> None:
         self.logChange(
             Change(
                 datetime.datetime.now(),
                 "Minute Vol",
-                self.settings.minute_volume,
-                self.local_settings.minute_volume,
+                self.settings.tv,
+                self.local_settings.tv,
             ))
+        self.settings.tv = self.local_settings.tv
+        self.minute_vol_button_main.updateValue(self.settings.tv)
         self.settings.minute_volume = self.local_settings.minute_volume
         self.set_minute_vol_button_main.updateValue(self.settings.minute_volume)
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
-    def commitIERatio(self):
+    def commitIERatio(self) -> None:
         self.logChange(
             Change(
                 datetime.datetime.now(),
                 "I/E Ratio",
-                self.settings.get_ie_display(),
-                self.local_settings.get_ie_display(),
+                self.get_ie_display(self.settings.ie_ratio),
+                self.get_ie_display(self.local_settings.ie_ratio),
             ))
-        self.settings.ie_ratio_id = self.local_settings.ie_ratio_id
-        self.ie_button_main.updateValue(self.settings.get_ie_display())
+        self.settings.ie_ratio = self.local_settings.ie_ratio
+        self.ie_button_main.updateValue(self.get_ie_display(self.settings.ie_ratio))
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
     def commitAlarm(self):
         self.logChange(Change(datetime.datetime.now(),"Alarm acknowledged", self.settings.get_alarm_display(), self.local_settings.get_alarm_display()))
         self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.stack.setCurrentIndex(0)
+        self.passChanges()
 
-    def cancelChange(self):
+    def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
         self.updateMainDisplays()
         self.stack.setCurrentIndex(0)
         self.updatePageDisplays()
 
-    def passChanges(self, param, new_val):
-        pass
-        # TODO: pass settings to the Arduino
+    def passChanges(self) -> None:
+        self.settings_callback(self.settings)
 
-    # change is a Change object
-    def logChange(self, change):
+    def logChange(self, change: Change) -> None:
         if change.old_val != change.new_val:
             print(change.display())
         # TODO: Actually log the change in some data structure
 
+    def set_settings_callback(self,
+        settings_callback: Callable[[Settings], None]) -> None:
+        self.settings_callback = settings_callback
 
-def main(port, argv):
-    app = QApplication(argv)
+    def closeEvent(self, *args, **kwargs):
+        self.comms_handler.stop()
+
+
+def main() -> None:
+    app = QApplication(sys.argv)
     window = MainWindow()
-
-    window.start_serial(port)
     window.show()
     app.exec_()
-    window.close_serial()
     sys.exit()
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='Start the OVVE user interface')
-    parser.add_argument('-p',
-                        '--port',
-                        help='Serial port for communication with Arduino')
-    args = parser.parse_args()
-
-    main(args.port, sys.argv)
+    main()
