@@ -46,6 +46,7 @@ class MainWindow(QWidget):
         self.resp_rate_increment = 5
         self.tv_increment = 5
 
+
         # Example 1 (changes color of Fancy numbers to red)
         # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
         # Example 2 (changes color of Simple numbers to red)
@@ -71,6 +72,28 @@ class MainWindow(QWidget):
         hbox = QHBoxLayout(self)
         hbox.addWidget(self.stack)
         self.setLayout(hbox)
+
+        # CommsAdapter adapts settings and params to and from the comms handler
+        self.comms_adapter = CommsAdapter()
+
+        # Set a callback in the adapter that is called whenever new
+        # params arrive from the comms handler
+        self.comms_adapter.set_ui_callback(self.update_ui)
+
+        # Set the adapter function that is called whenever settings are
+        # udpated in the UI
+        self.set_settings_callback(self.comms_adapter.update_settings)
+
+        # The comms handler is a simulator for now.  It will send
+        # random values for the parameters that are updated periodically from
+        # the MCU.  It will accept settings updates from the UI.
+        #
+        # When the real comms handler is available, substitute it here.
+        self.comms_handler = CommsSimulator(self.comms_adapter)
+
+        #TODO: How to handle start / stop events from UI?
+        self.comms_handler.start()
+
 
     def get_mode_display(self, mode):
         switcher = {
@@ -266,31 +289,13 @@ class MainWindow(QWidget):
         settings_callback: Callable[[Settings], None]) -> None:
         self.settings_callback = settings_callback
 
+    def closeEvent(self, *args, **kwargs):
+        self.comms_handler.stop()
+
+
 def main() -> None:
     app = QApplication(sys.argv)
     window = MainWindow()
-    
-    # CommsAdapter adapts settings and params to and from the comms handler
-    comms_adapter = CommsAdapter()
-
-    # Set a callback in the adapter that is called whenever new
-    # params arrive from the comms handler
-    comms_adapter.set_ui_callback(window.update_ui)
-
-    # Set the adapter function that is called whenever settings are
-    # udpated in the UI
-    window.set_settings_callback(comms_adapter.update_settings)
-
-    # The comms handler is a simulator for now.  It will send
-    # random values for the parameters that are updated periodically from
-    # the MCU.  It will accept settings updates from the UI.
-    #
-    # When the real comms handler is available, substitute it here.
-    comms_handler = CommsSimulator(comms_adapter)
-    
-    #TODO: How to handle start / stop events from UI?
-    comms_handler.start()
-
     window.show()
     app.exec_()
     sys.exit()

@@ -12,6 +12,7 @@ class CommsSimulator():
     def __init__(self, comms_adapter: CommsAdapter) -> None:
         self.comms_adapter = comms_adapter
         self.comms_adapter.set_comms_callback(self.update_settings)
+        self.done = False
 
     def update_settings(self, settings_dict: dict) -> None:
         settings = Settings()
@@ -24,7 +25,7 @@ class CommsSimulator():
         params_str = params.to_JSON()
         params_dict = json.loads(params_str)
 
-        while True:
+        while not self.done:
             params_dict["peep"] = random.randrange(3, 6)
             params_dict["tv_insp"] = random.randrange(475, 575)
             params_dict["tv_exp"] = random.randrange(475, 575)
@@ -36,3 +37,6 @@ class CommsSimulator():
     def start(self) -> None:
         t = Thread(target=self.simulate_params, args=())
         t.start()
+
+    def stop(self) -> None:
+        self.done = True
