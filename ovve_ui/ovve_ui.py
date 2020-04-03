@@ -31,8 +31,8 @@ from display.widgets import (initializeHomeScreenWidget,
                              initializeIERatioWidget)
 from utils.params import Params
 from utils.settings import Settings
-from utils.comms_helper import CommsHelper
-from utils.simulate_comms_handler import SimulateCommsHandler
+from utils.comms_adapter import CommsAdapter
+from utils.comms_simulator import CommsSimulator
 
 class MainWindow(QWidget):
     def __init__(self, debug: bool = True) -> None:
@@ -255,11 +255,11 @@ def main(port, argv) -> None:
     app = QApplication(argv)
     window = MainWindow()
     
-    comms_helper = CommsHelper()
-    comms_helper.set_ui_callback(window.update_ui)
-    window.set_settings_callback(comms_helper.settings_handler)
+    comms_adapter = CommsAdapter()
+    comms_adapter.set_ui_callback(window.update_ui)
+    window.set_settings_callback(comms_adapter.update_settings)
 
-    comms_handler = SimulateCommsHandler(comms_helper)
+    comms_handler = CommsSimulator(comms_adapter)
     comms_handler.start()
 
     window.show()
