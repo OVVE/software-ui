@@ -51,11 +51,13 @@ class MainWindow(QWidget):
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         self.stack = QStackedWidget(self)
 
-        self.page1 = QWidget()
-        self.page2 = QWidget()
-        self.page3 = QWidget()
-        self.page4 = QWidget()
-        self.page5 = QWidget()
+        self.page = {
+            "1": QWidget(),
+            "2": QWidget(),
+            "3": QWidget(),
+            "4": QWidget(),
+            "5": QWidget(),
+        }
 
         self.initalizeAndAddStackWidgets()
         hbox = QHBoxLayout(self)
@@ -102,11 +104,8 @@ class MainWindow(QWidget):
         self.initializeWidget3()
         self.initializeWidget4()
         self.initializeWidget5()
-        self.stack.addWidget(self.page1)
-        self.stack.addWidget(self.page2)
-        self.stack.addWidget(self.page3)
-        self.stack.addWidget(self.page4)
-        self.stack.addWidget(self.page5)
+        for i in self.page:
+            self.stack.addWidget(self.page[i])
 
     def initializeWidget1(self):  # home screen
         h_box_1 = QHBoxLayout()
@@ -225,7 +224,7 @@ class MainWindow(QWidget):
         h_box_1.addLayout(v_box_1left)
         h_box_1.addLayout(v_box_1mid)
         h_box_1.addLayout(v_box_1right)
-        self.page1.setLayout(h_box_1)
+        self.page["1"].setLayout(h_box_1)
 
     def initializeWidget2(self):  # Mode
         v_box_2 = QVBoxLayout()
@@ -257,7 +256,7 @@ class MainWindow(QWidget):
         v_box_2.addLayout(h_box_2middle)
         v_box_2.addLayout(h_box_2bottom)
 
-        self.page2.setLayout(v_box_2)
+        self.page["2"].setLayout(v_box_2)
 
     def initializeWidget3(self):  # Resp_rate
         v_box_3 = QVBoxLayout()
@@ -293,7 +292,7 @@ class MainWindow(QWidget):
         v_box_3.addLayout(h_box_3mid)
         v_box_3.addLayout(h_box_3bottom)
 
-        self.page3.setLayout(v_box_3)
+        self.page["3"].setLayout(v_box_3)
 
     def initializeWidget4(self):  # Minute volume
         v_box_4 = QVBoxLayout()
@@ -329,7 +328,7 @@ class MainWindow(QWidget):
         v_box_4.addLayout(h_box_4mid)
         v_box_4.addLayout(h_box_4bottom)
 
-        self.page4.setLayout(v_box_4)
+        self.page["4"].setLayout(v_box_4)
 
     def initializeWidget5(self):  # ie ratio
         v_box_5 = QVBoxLayout()
@@ -375,7 +374,7 @@ class MainWindow(QWidget):
         v_box_5.addLayout(h_box_5mid)
         v_box_5.addLayout(h_box_5bottom)
 
-        self.page5.setLayout(v_box_5)
+        self.page["5"].setLayout(v_box_5)
 
     def display(self, i):
         self.stack.setCurrentIndex(i)
