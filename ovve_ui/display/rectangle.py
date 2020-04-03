@@ -59,10 +59,10 @@ class DisplayRect(QWidget):
         painter.setPen(self.rect_settings.getBorderPen())
         painter.drawRect(0, 0, *self.size)
 
-
     def sizeHint(self) -> QSize:
         return QSize(*self.size)
 
-    def updateValue(self, value: Union[int, float]) -> None:
+    def updateValue(self, value: Union[int, float, str]) -> None:
         self.value = value
+        self.value_label.setText(str(value))
         self.update()
