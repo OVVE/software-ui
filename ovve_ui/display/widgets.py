@@ -22,7 +22,7 @@ def initializeHomeScreenWidget(window: MainWindow) -> None:
     v_box_right = QVBoxLayout()
 
     window.mode_button_main = window.makeSimpleDisplayButton(
-        window.settings.get_mode_display())
+        window.get_mode_display(window.settings.mode))
     window.mode_button_main.clicked.connect(lambda: window.display(1))
 
     window.resp_rate_button_main = window.makeFancyDisplayButton(
@@ -30,11 +30,11 @@ def initializeHomeScreenWidget(window: MainWindow) -> None:
     window.resp_rate_button_main.clicked.connect(lambda: window.display(2))
 
     window.minute_vol_button_main = window.makeFancyDisplayButton(
-        "Minute Volume", window.settings.minute_volume, "l/min")
+        "Minute Volume", window.settings.tv, "l/min")
     window.minute_vol_button_main.clicked.connect(lambda: window.display(3))
 
     window.ie_button_main = window.makeFancyDisplayButton(
-        "I/E Ratio", window.settings.get_ie_display(), "l/min")
+        "I/E Ratio", window.get_ie_display(window.settings.ie_ratio), "l/min")
     window.ie_button_main.clicked.connect(lambda: window.display(4))
 
     window.peep_display_main = window.makeDisplayRect(
@@ -121,12 +121,12 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_cancel = window.makeSimpleDisplayButton("CANCEL")
 
     mode_change.clicked.connect(
-        lambda: window.changeMode(not window.local_settings.ac_mode))
+        lambda: window.changeMode(not window.local_settings.mode))
     mode_apply.clicked.connect(lambda: window.commitMode())
     mode_cancel.clicked.connect(window.cancelChange)
 
     window.mode_page_rect = window.makeDisplayRect(
-        "Mode", window.local_settings.get_mode_display(), "", size=(500, 200))
+        "Mode", window.get_mode_display(window.settings.mode), "", size=(500, 200))
 
     h_box_top.addWidget(window.mode_page_rect)
     h_box_mid.addWidget(mode_change)
@@ -154,9 +154,9 @@ def initializeRespitoryRateWidget(window) -> None:
         size=(500, 200))
 
     resp_rate_increment_button = window.makeSimpleDisplayButton(
-        "+ " + str(window.settings.resp_rate_increment))
+        "+ " + str(window.resp_rate_increment))
     resp_rate_decrement_button = window.makeSimpleDisplayButton(
-        "- " + str(window.settings.resp_rate_increment))
+        "- " + str(window.resp_rate_increment))
     resp_rate_apply = window.makeSimpleDisplayButton("APPLY")
     resp_rate_cancel = window.makeSimpleDisplayButton("CANCEL")
 
@@ -186,14 +186,14 @@ def initializeMinuteVolumeWidget(window: MainWindow):
 
     window.minute_vol_page_rect = window.makeDisplayRect(
         "Minute Volume",
-        window.local_settings.minute_volume,
+        window.local_settings.tv,
         "l/min",
         size=(500, 200))
 
     minute_vol_increment_button = window.makeSimpleDisplayButton(
-        "+ " + str(window.settings.minute_volume_increment))
+        "+ " + str(window.tv_increment))
     minute_vol_decrement_button = window.makeSimpleDisplayButton(
-        "- " + str(window.settings.minute_volume_increment))
+        "- " + str(window.tv_increment))
     minute_vol_apply = window.makeSimpleDisplayButton("APPLY")
     minute_vol_cancel = window.makeSimpleDisplayButton("CANCEL")
 
@@ -223,18 +223,18 @@ def initializeIERatioWidget(window: MainWindow):
     h_box_bot = QHBoxLayout()
 
     window.ie_page_rect = window.makeDisplayRect(
-        "I/E Ratio", window.settings.get_ie_display(), "", size=(500, 200))
+        "I/E Ratio", window.get_ie_display(window.settings.ie_ratio), "", size=(500, 200))
 
     ie_change_size = (150, 50)
 
     ie_change_0 = window.makeSimpleDisplayButton(
-        window.settings.ie_ratio_display[0], size=ie_change_size)
+        window.get_ie_display(0), size=ie_change_size)
     ie_change_1 = window.makeSimpleDisplayButton(
-        window.settings.ie_ratio_display[1], size=ie_change_size)
+        window.get_ie_display(1), size=ie_change_size)
     ie_change_2 = window.makeSimpleDisplayButton(
-        window.settings.ie_ratio_display[2], size=ie_change_size)
+        window.get_ie_display(2), size=ie_change_size)
     ie_change_3 = window.makeSimpleDisplayButton(
-        window.settings.ie_ratio_display[3], size=ie_change_size)
+        window.get_ie_display(3), size=ie_change_size)
 
     ie_apply = window.makeSimpleDisplayButton("APPLY")
     ie_cancel = window.makeSimpleDisplayButton("CANCEL")
