@@ -6,17 +6,24 @@ from typing import Callable
 
 from utils.params import Params
 from utils.settings import Settings
+from utils.alarms import Alarms
 
 
 class CommsAdapter():
     def __init__(self) -> None:
-        self.ui_callback = None
+        self.ui_params_callback = None
+        self.ui_alarms_callback = None
         self.comms_callback = None
 
     # Sets the function in the UI that gets called whenever
     # params are updated.
-    def set_ui_callback(self, ui_callback: Callable[[Params], None]) -> None:
-        self.ui_callback = ui_callback
+    def set_ui_params_callback(self, ui_params_callback: Callable[[Params], None]) -> None:
+        self.ui_params_callback = ui_params_callback
+
+    # Sets the function in the UI that gets called whenever
+    # alarms are updated.
+    def set_ui_alarms_callback(self, ui_alarms_callback: Callable[[Alarms], None]) -> None:
+        self.ui_alarms_callback = ui_alarms_callback
 
     # Sets the function in the comms handler that gets called
     # whenever settings are updated
@@ -45,7 +52,23 @@ class CommsAdapter():
         print(params.to_JSON())
 
         # Call the callback provided by the UI
-        if self.ui_callback:
-            self.ui_callback(params)
+        if self.ui_params_callback:
+            self.ui_params_callback(params)
         else:
-            print("No UI callback!")
+            print("No UI params callback!")
+
+
+    def update_alarms(self, alarms_from_comms: dict) -> None:
+        alarms = Alarms()
+        alarms.from_dict(alarms_from_comms)
+
+        # Deserialize or otherwise handle params
+        # coming in from the comms handler
+        print("Got updated alarms from comms")
+        print(alarms.to_JSON())
+
+        # Call the callback provided by the UI
+        if self.ui_alarms_callback:
+            self.ui_alarms_callback(alarms)
+        else:
+            print("No UI alarms callback!")

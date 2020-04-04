@@ -30,6 +30,7 @@ from display.widgets import (initializeHomeScreenWidget,
                              initializeIERatioWidget)
 from utils.params import Params
 from utils.settings import Settings
+from utils.alarms import Alarms
 from utils.comms_adapter import CommsAdapter
 from utils.comms_simulator import CommsSimulator
 
@@ -78,7 +79,11 @@ class MainWindow(QWidget):
 
         # Set a callback in the adapter that is called whenever new
         # params arrive from the comms handler
-        self.comms_adapter.set_ui_callback(self.update_ui)
+        self.comms_adapter.set_ui_params_callback(self.update_ui_params)
+
+        # Set a callback in the adapter that is called whenever new
+        # params arrive from the comms handler
+        self.comms_adapter.set_ui_alarms_callback(self.update_ui_alarms)
 
         # Set the adapter function that is called whenever settings are
         # udpated in the UI
@@ -158,11 +163,16 @@ class MainWindow(QWidget):
     def display(self, i: int) -> None:
         self.stack.setCurrentIndex(i)
 
-    def update_ui(self, params: Params) -> None:
+    def update_ui_params(self, params: Params) -> None:
         self.params = params
         self.updateMainDisplays()
         self.updateGraphs()
         self.updatePageDisplays()
+    
+    def update_ui_alarms(self, alarms: Alarms) -> None:
+        self.alarms = alarms
+        print("UI received alarms from comms adapter")
+        #TODO: Implement UI alarm handling
 
     def updateMainDisplays(self) -> None:
         self.mode_button_main.updateValue(self.get_mode_display(self.settings.mode))
