@@ -36,7 +36,7 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
     window.resp_rate_button_main = window.makeFancyDisplayButton(
         "Set Resp. Rate",
         window.settings.resp_rate,
-        "b/min",
+        "bpm",
     )
 
     window.resp_rate_button_main.clicked.connect(lambda: window.display(2))
@@ -236,6 +236,9 @@ def initializeRespiratoryRateWidget(window) -> None:
     window.resp_rate_page_value_label = QLabel(str(window.local_settings.resp_rate))
     window.resp_rate_page_value_label.setFont(page_settings.valueFont)
     window.resp_rate_page_value_label.setAlignment(Qt.AlignCenter)
+    window.resp_rate_page_value_label.setStyleSheet(
+        "QLabel {color: " + page_settings.valueColor + ";}")
+
 
     resp_rate_unit_label = QLabel("bpm")
     resp_rate_unit_label.setFont(page_settings.unitFont)

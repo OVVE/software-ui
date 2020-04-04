@@ -115,6 +115,7 @@ class PageSettings:
                  mainLabelSetting: TextSetting = TextSetting("Arial", 40, True),
                  valueSetting: TextSetting = TextSetting("Arial Black", 128, True),
                  unitSetting: TextSetting = TextSetting("Arial", 40, False),
+                 valueColor: str = '#000000',
                  unitColor: str = '#C5C5C5',
                  changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
                  changeButtonValueColor: str = '#C5C5C5',
@@ -129,6 +130,7 @@ class PageSettings:
 
         self.mainLabelFont = mainLabelSetting.font
         self.valueFont = valueSetting.font
+        self.valueColor = valueColor
         self.unitFont = unitSetting.font
         self.unitColor = unitColor
         self.changeButtonTextSetting = changeButtonTextSetting
