@@ -314,11 +314,14 @@ def initializeTidalVolumeWidget(window: MainWindow):
 
     window.tv_page_value_label = QLabel(str(window.local_settings.resp_rate))
     window.tv_page_value_label.setFont(page_settings.valueFont)
+    window.resp_rate_page_value_label.setStyleSheet(
+        "QLabel {color: " + page_settings.valueColor + ";}")
     window.tv_page_value_label.setAlignment(Qt.AlignCenter)
 
     tv_unit_label = QLabel("l/min")
     tv_unit_label.setFont(page_settings.unitFont)
-    tv_unit_label.setStyleSheet("QLabel {color: " + page_settings.unitColor + ";}")
+    tv_unit_label.setStyleSheet(
+        "QLabel {color: " + page_settings.unitColor + ";}")
     tv_unit_label.setAlignment(Qt.AlignCenter)
 
     tv_increment_button = window.makeSimpleDisplayButton(
