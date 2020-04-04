@@ -4,11 +4,10 @@ Widgets used to initialze the the OVVE UI
 from random import randint
 from typing import TypeVar
 
+from PySide2.QtWidgets import QHBoxLayout, QVBoxLayout
+
 import numpy as np
 import pyqtgraph as pg
-
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
-
 
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')

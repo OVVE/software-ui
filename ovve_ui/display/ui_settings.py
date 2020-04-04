@@ -1,7 +1,7 @@
 from typing import Tuple, Optional
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide2.QtCore import *
+from PySide2.QtGui import *
 
 
 class TextSetting:

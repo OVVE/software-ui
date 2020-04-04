@@ -5,14 +5,15 @@ from copy import deepcopy
 from random import randint
 from typing import Union, Optional, Tuple
 
-import numpy as np
-import pyqtgraph as pg
-from PyQt5 import QtCore, QtGui, QtSerialPort, QtWidgets, uic
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
+from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
                              QWidget)
+
+import numpy as np
+import pyqtgraph as pg
 
 from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
@@ -188,7 +189,7 @@ class MainWindow(QWidget):
         self.flow_graph_line.setData(self.tv_insp_data)
         self.ptr += 1
         self.flow_graph_line.setPos(self.ptr, 0)
-        QtGui.QApplication.processEvents()
+        QtCore.QCoreApplication.processEvents()
 
     # TODO: Finish all of these for each var
     def changeMode(self, new_val: bool) -> None:

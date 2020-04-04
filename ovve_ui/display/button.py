@@ -3,10 +3,16 @@
 """
 from typing import Any, Optional, Tuple, Union
 
-from PyQt5.Qt import QSize
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QBrush, QColor, QFont, QPainter, QPen
-from PyQt5.QtWidgets import QAbstractButton
+#from PySide2.Qt import QSize
+#from PySide2.QtCore import Qt
+#from PySide2.QtGui import QBrush, QColor, QFont, QPainter, QPen
+#from PySide2.QtWidgets import QAbstractButton
+
+from PySide2.QtCore import QSize
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QBrush, QColor, QFont, QPainter, QPen
+from PySide2.QtWidgets import QAbstractButton
+
 
 from display.ui_settings import FancyButtonSettings, SimpleButtonSettings
 
