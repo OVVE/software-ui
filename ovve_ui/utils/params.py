@@ -29,6 +29,7 @@ class Params():
             "tv_exp": 0,
             "tv_min": 0,
             "control_state": 0,
+            "run_state": 0,
             "battery_level": 0,
         }
         #TODO: handle alarms
@@ -177,6 +178,14 @@ class Params():
     @control_state.setter
     def control_state(self, value: int) -> None:
         self._param["control_state"] = value
+
+    @property
+    def run_state(self) -> int:
+        return self._param["run_state"]
+
+    @run_state.setter
+    def run_state(self, value: int) -> None:
+        self._param["run_state"] = value
 
     @property
     def battery_level(self) -> int:
