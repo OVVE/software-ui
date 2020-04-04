@@ -30,6 +30,8 @@ class FancyDisplayButton(QAbstractButton):
         self.size = size if size is not None else button_settings.default_size
 
         self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0,0,0,0)
 
         self.label_label = QLabel(self.label)
         self.value_label = QLabel(str(self.value))
@@ -37,22 +39,22 @@ class FancyDisplayButton(QAbstractButton):
 
         self.label_label.setFont(self.button_settings.labelFont)
         self.label_label.setAlignment(Qt.AlignCenter)
-        self.label_label.setStyleSheet("QLabel {color: " + self.button_settings.labelColor + "; margin-top: 6px;}")
+        self.label_label.setStyleSheet("QLabel {color: " + self.button_settings.labelColor + ";}")
+        self.label_label.setMargin(0)
         self.layout.addWidget(self.label_label)
 
         self.value_label.setFont(self.button_settings.valueFont)
         self.value_label.setAlignment(Qt.AlignCenter)
-        self.value_label.setMargin(-10)
         self.value_label.setStyleSheet("QLabel {color: " + self.button_settings.valueColor + ";}")
+        self.value_label.setMargin(-10)
         self.layout.addWidget(self.value_label)
 
         self.unit_label.setFont(self.button_settings.unitFont)
         self.unit_label.setAlignment(Qt.AlignCenter)
-        self.unit_label.setStyleSheet("QLabel {color: " + self.button_settings.unitColor + ";}")
+        self.unit_label.setStyleSheet("QLabel {color: " + self.button_settings.unitColor + "; margin-top: -100px;}")
         self.layout.addWidget(self.unit_label)
 
-        self.layout.setSpacing(0)
-        self.layout.setContentsMargins(0,0,0,0)
+
         self.setLayout(self.layout)
 
     def paintEvent(self, event) -> None:
@@ -68,6 +70,7 @@ class FancyDisplayButton(QAbstractButton):
 
     def updateValue(self, value: Union[int, float]) -> None:
         self.value = value
+        self.value_label.setText(str(value))
         self.update()
 
 
@@ -89,12 +92,10 @@ class SimpleDisplayButton(QAbstractButton):
         self.layout.setGeometry(QRect(0,0, *self.size))
 
         self.value_label.setFont(self.button_settings.valueFont)
-        #self.value_label.setStyleSheet("QLabel {color: " + self.button_settings.valueColor + "; background-color: red;}")
         self.value_label.setStyleSheet("QLabel {color: " + self.button_settings.valueColor + ";}")
-        self.value_label.setIndent(0)
 
         self.layout.addWidget(self.value_label)
-        self.value_label.setAlignment(Qt.AlignCenter)
+        self.layout.setAlignment(Qt.AlignCenter)
 
         self.setLayout(self.layout)
 
@@ -111,4 +112,5 @@ class SimpleDisplayButton(QAbstractButton):
 
     def updateValue(self, value: Union[int, float]) -> None:
         self.value = value
+        self.value_label.setText(str(value))
         self.update()

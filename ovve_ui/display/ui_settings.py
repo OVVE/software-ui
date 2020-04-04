@@ -24,7 +24,7 @@ class FancyButtonSettings:
                  labelColor: str ='#A7A9AA',
                  valueColor: str = '#000000',
                  unitColor: str = '#808080',
-                 default_size: Tuple[int, int] = (150, 80)):
+                 default_size: Tuple[int, int] = (115, 65)):
 
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
@@ -84,7 +84,7 @@ class DisplayRectSettings:
                  labelColor: str = '#29ABE2',
                  valueColor: str = '#000000',
                  unitColor: str = '#7394A0',
-                 default_size: Tuple[int, int] = (150, 80)):
+                 default_size: Tuple[int, int] = (160, 115)):
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
         self.unitFont = unitSetting.font
@@ -116,25 +116,31 @@ class PageSettings:
                  valueSetting: TextSetting = TextSetting("Arial Black", 128, True),
                  unitSetting: TextSetting = TextSetting("Arial", 40, False),
                  unitColor: str = '#C5C5C5',
-                 cancelSetting: TextSetting = TextSetting("Arial", 18, False),
-                 cancelColor: str = "#ff0000",
-                 commitSetting: TextSetting = TextSetting("Arial", 18, False),
-                 commitColor: str = "#00FF00",
                  changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
                  changeButtonValueColor: str = '#C5C5C5',
-                 changeButtonBorderColor: str = '#C5C5C5'):
+                 changeButtonBorderColor: str = '#C5C5C5',
+                 changeButtonSpacing: int = 50,
+                 cancelSetting: TextSetting = TextSetting("Arial", 18, True),
+                 cancelColor: str = "#ff0000",
+                 commitSetting: TextSetting = TextSetting("Arial", 18, True),
+                 commitColor: str = "#00FF00",
+                 commitCancelButtonSpacing: int = 100,
+                 ):
 
         self.mainLabelFont = mainLabelSetting.font
         self.valueFont = valueSetting.font
         self.unitFont = unitSetting.font
         self.unitColor = unitColor
-        self.cancelFont = cancelSetting.font
-        self.cancelColor = cancelColor
-        self.commitFont = commitSetting.font
-        self.commitColor = commitColor
         self.changeButtonTextSetting = changeButtonTextSetting
         self.changeButtonValueColor = changeButtonValueColor
         self.changeButtonBorderColor = changeButtonBorderColor
+        self.changeButtonSpacing = changeButtonSpacing
+        self.cancelSetting = cancelSetting
+        self.cancelColor = cancelColor
+        self.commitSetting = commitSetting
+        self.commitColor = commitColor
+        self.commitCancelButtonSpacing = commitCancelButtonSpacing
+
 
         def getCancelBorderPen(self) -> QPen:
             return QPen(QColor(self.cancelColor))

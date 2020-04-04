@@ -22,6 +22,7 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
     layout = QVBoxLayout()
     h_box_11 = QHBoxLayout()
     h_box_12 = QHBoxLayout()
+    h_box_11.setAlignment(Qt.AlignCenter)
 
     v_box_11left = QVBoxLayout()
     v_box_11mid = QVBoxLayout()
@@ -29,7 +30,6 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
 
     window.mode_button_main = window.makeSimpleDisplayButton(
         window.get_mode_display(window.settings.mode),
-        size=(115, 65),
     )
     window.mode_button_main.clicked.connect(lambda: window.display(1))
 
@@ -37,7 +37,6 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
         "Set Resp. Rate",
         window.settings.resp_rate,
         "b/min",
-        size=(115, 65),
     )
 
     window.resp_rate_button_main.clicked.connect(lambda: window.display(2))
@@ -46,7 +45,6 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
         "Set Tidal Volume",
         window.settings.tv,
         "l/min",
-        size=(115, 65),
     )
     window.tv_button_main.clicked.connect(lambda: window.display(3))
 
@@ -54,13 +52,11 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
         "Set I/E Ratio",
         window.get_ie_display(window.settings.ie_ratio),
         "l/min",
-        size=(115, 65),
     )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
 
     window.alarm_button_main = window.makeSimpleDisplayButton(
         "ALARM",
-        size=(115, 65),
         button_settings=SimpleButtonSettings(borderColor="#FF0000",
                                              fillColor='#FFFFFF',
                                              valueColor='#FF0000'),
@@ -69,48 +65,41 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
 
     window.start_button_main = window.makeSimpleDisplayButton(
         "START",
-        size=(115, 65),
     )
-    # TODO: Connect
+    window.start_button_main.clicked.connect(window.changeStartStop)
 
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
         window.params.resp_rate_meas,
         "bpm",
-        size=(175, 115),
     )
 
     window.tv_insp_display_main = window.makeDisplayRect(
         "TV Insp",
         window.params.tv_insp,
         "mL",
-        size=(175, 115),
     )
     window.tv_exp_display_main = window.makeDisplayRect(
         "TV Exp",
         window.params.tv_exp,
         "mL",
-        size=(175, 115),
     )
 
     window.peep_display_main = window.makeDisplayRect(
         "PEEP",
         window.params.peep,
         "cmH2O",
-        size=(175, 115),
     )
 
     window.ppeak_display_main = window.makeDisplayRect(
         "Ppeak",
         window.params.ppeak,
         "cmH2O",
-        size=(175, 115),
     )
     window.pplat_display_main = window.makeDisplayRect(
         "Pplat",
         window.params.pplat,
         "cmH2O",
-        size=(175, 115),
     )
 
     h_box_11.addWidget(window.mode_button_main)
@@ -135,6 +124,8 @@ def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidg
     h_box_12.addLayout(v_box_11left)
     h_box_12.addLayout(v_box_11mid)
     h_box_12.addLayout(v_box_11right)
+
+    h_box_11.setSpacing(18)
 
     layout.addLayout(h_box_11)
     layout.addLayout(h_box_12)
@@ -230,6 +221,13 @@ def initializeRespiratoryRateWidget(window) -> None:
     h_box_2 = QHBoxLayout()
     h_box_3 = QHBoxLayout()
     h_box_4 = QHBoxLayout()
+    h_box_1.setAlignment(Qt.AlignCenter)
+    h_box_2.setAlignment(Qt.AlignCenter)
+    h_box_2.setSpacing(window.ui_settings.page_settings.changeButtonSpacing)
+    h_box_3.setAlignment(Qt.AlignCenter)
+    h_box_4.setAlignment(Qt.AlignCenter)
+    h_box_4.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
+
 
     resp_rate_title_label = QLabel("Set Respiratory Rate")
     resp_rate_title_label.setFont(page_settings.mainLabelFont)
@@ -249,15 +247,27 @@ def initializeRespiratoryRateWidget(window) -> None:
         button_settings=SimpleButtonSettings(fillColor = "#FFFFFF",
                                             borderColor = page_settings.changeButtonBorderColor,
                                             valueSetting = page_settings.changeButtonTextSetting,
-                                                   valueColor = page_settings.changeButtonValueColor))
+                                            valueColor = page_settings.changeButtonValueColor))
     resp_rate_decrement_button = window.makeSimpleDisplayButton(
         "-", size=(50, 50),
         button_settings=SimpleButtonSettings(fillColor="#FFFFFF",
                                              borderColor=page_settings.changeButtonBorderColor,
                                              valueSetting=page_settings.changeButtonTextSetting,
                                              valueColor=page_settings.changeButtonValueColor))
-    resp_rate_apply = window.makeSimpleDisplayButton("APPLY")
-    resp_rate_cancel = window.makeSimpleDisplayButton("CANCEL")
+    resp_rate_apply = window.makeSimpleDisplayButton("APPLY",
+                                                     button_settings=SimpleButtonSettings(
+                                                         fillColor="#FFFFFF",
+                                                         borderColor = page_settings.commitColor,
+                                                         valueSetting = page_settings.commitSetting,
+                                                         valueColor = page_settings.commitColor
+                                                     ))
+    resp_rate_cancel = window.makeSimpleDisplayButton("CANCEL",
+                                                     button_settings=SimpleButtonSettings(
+                                                         fillColor="#FFFFFF",
+                                                         borderColor = page_settings.cancelColor,
+                                                         valueSetting = page_settings.cancelSetting,
+                                                         valueColor = page_settings.cancelColor
+                                                     ))
 
     resp_rate_increment_button.clicked.connect(window.incrementRespRate)
     resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
@@ -278,46 +288,83 @@ def initializeRespiratoryRateWidget(window) -> None:
     v_box.addLayout(h_box_3)
     v_box.addLayout(h_box_4)
 
-
-
     window.page["3"].setLayout(v_box)
 
 def initializeTidalVolumeWidget(window: MainWindow):
     """ Creates Tidal Volume Widget """
+    page_settings = window.ui_settings.page_settings
     v_box = QVBoxLayout()
-    h_box_top = QHBoxLayout()
-    h_box_mid = QHBoxLayout()
-    h_box_bot = QHBoxLayout()
+    h_box_1 = QHBoxLayout()
+    h_box_2 = QHBoxLayout()
+    h_box_3 = QHBoxLayout()
+    h_box_4 = QHBoxLayout()
+    h_box_1.setAlignment(Qt.AlignCenter)
+    h_box_2.setAlignment(Qt.AlignCenter)
+    h_box_2.setSpacing(window.ui_settings.page_settings.changeButtonSpacing)
+    h_box_3.setAlignment(Qt.AlignCenter)
+    h_box_4.setAlignment(Qt.AlignCenter)
+    h_box_4.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
 
-    window.tv_page_rect = window.makeDisplayRect(
-        "Tidal Volume",
-        window.settings.tv,
-        "l/min",
-        size=(400, 200))
+    tv_title_label = QLabel("Set Minute Volume")
+    tv_title_label.setFont(page_settings.mainLabelFont)
+    tv_title_label.setAlignment(Qt.AlignCenter)
+
+    window.tv_page_value_label = QLabel(str(window.local_settings.resp_rate))
+    window.tv_page_value_label.setFont(page_settings.valueFont)
+    window.tv_page_value_label.setAlignment(Qt.AlignCenter)
+
+    tv_unit_label = QLabel("l/min")
+    tv_unit_label.setFont(page_settings.unitFont)
+    tv_unit_label.setStyleSheet("QLabel {color: " + page_settings.unitColor + ";}")
+    tv_unit_label.setAlignment(Qt.AlignCenter)
 
     tv_increment_button = window.makeSimpleDisplayButton(
-        "+ " + str(window.tv_increment))
+        "+", size=(50, 50),
+        button_settings=SimpleButtonSettings(fillColor="#FFFFFF",
+                                             borderColor=page_settings.changeButtonBorderColor,
+                                             valueSetting=page_settings.changeButtonTextSetting,
+                                             valueColor=page_settings.changeButtonValueColor))
     tv_decrement_button = window.makeSimpleDisplayButton(
-        "- " + str(window.tv_increment))
-    tv_apply = window.makeSimpleDisplayButton("APPLY")
-    tv_cancel = window.makeSimpleDisplayButton("CANCEL")
+        "-", size=(50, 50),
+        button_settings=SimpleButtonSettings(fillColor="#FFFFFF",
+                                             borderColor=page_settings.changeButtonBorderColor,
+                                             valueSetting=page_settings.changeButtonTextSetting,
+                                             valueColor=page_settings.changeButtonValueColor))
+    tv_apply = window.makeSimpleDisplayButton("APPLY",
+                                                     button_settings=SimpleButtonSettings(
+                                                         fillColor="#FFFFFF",
+                                                         borderColor=page_settings.commitColor,
+                                                         valueSetting=page_settings.commitSetting,
+                                                         valueColor=page_settings.commitColor
+                                                     ))
+    tv_cancel = window.makeSimpleDisplayButton("CANCEL",
+                                                      button_settings=SimpleButtonSettings(
+                                                          fillColor="#FFFFFF",
+                                                          borderColor=page_settings.cancelColor,
+                                                          valueSetting=page_settings.cancelSetting,
+                                                          valueColor=page_settings.cancelColor
+                                                      ))
 
     tv_increment_button.clicked.connect(window.incrementTidalVol)
     tv_decrement_button.clicked.connect(window.decrementTidalVol)
     tv_apply.clicked.connect(window.commitTidalVol)
     tv_cancel.clicked.connect(window.cancelChange)
 
-    h_box_top.addWidget(window.tv_page_rect)
-    h_box_mid.addWidget(tv_increment_button)
-    h_box_mid.addWidget(tv_decrement_button)
-    h_box_bot.addWidget(tv_apply)
-    h_box_bot.addWidget(tv_cancel)
+    h_box_1.addWidget(tv_title_label)
+    h_box_2.addWidget(tv_increment_button)
+    h_box_2.addWidget(window.tv_page_value_label)
+    h_box_2.addWidget(tv_decrement_button)
+    h_box_3.addWidget(tv_unit_label)
+    h_box_4.addWidget(tv_apply)
+    h_box_4.addWidget(tv_cancel)
 
-    v_box.addLayout(h_box_top)
-    v_box.addLayout(h_box_mid)
-    v_box.addLayout(h_box_bot)
+    v_box.addLayout(h_box_1)
+    v_box.addLayout(h_box_2)
+    v_box.addLayout(h_box_3)
+    v_box.addLayout(h_box_4)
 
     window.page["4"].setLayout(v_box)
+
 
 
 def initializeIERatioWidget(window: MainWindow):
@@ -359,7 +406,7 @@ def initializeIERatioWidget(window: MainWindow):
     h_box_mid.addWidget(ie_change_0)
     h_box_mid.addWidget(ie_change_1)
     h_box_mid.addWidget(ie_change_2)
-    h_box_mid.addWidget(ie_change_3)
+    #h_box_mid.addWidget(ie_change_3)
 
     h_box_bot.addWidget(ie_apply)
     h_box_bot.addWidget(ie_cancel)

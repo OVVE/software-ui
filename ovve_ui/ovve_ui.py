@@ -75,7 +75,7 @@ class MainWindow(QWidget):
 
         self.initalizeAndAddStackWidgets()
 
-        layout.setContentsMargins(0,0,0,0)
+        layout.setContentsMargins(10,10,10,10)
         self.setLayout(layout)
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
@@ -87,7 +87,7 @@ class MainWindow(QWidget):
 
         # Set a callback in the adapter that is called whenever new
         # params arrive from the comms handler
-        self.comms_adapter.set_ui_callback(self.update_ui)
+        self.comms_adapter.set_ui_callback(self.update_main_ui)
 
         # Set the adapter function that is called whenever settings are
         # udpated in the UI
@@ -175,17 +175,21 @@ class MainWindow(QWidget):
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
-    def update_ui(self, params: Params) -> None:
+    def update_main_ui(self, params: Params) -> None:
         self.params = params
         self.updateMainDisplays()
         self.updateGraphs()
-        self.updatePageDisplays()
 
     def updateMainDisplays(self) -> None:
-        self.mode_button_main.updateValue(self.get_mode_display(self.settings.mode))
-        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
-        self.tv_button_main.updateValue(self.settings.tv)
-        self.ie_button_main.updateValue(self.get_ie_display(self.settings.ie_ratio))
+        self.mode_button_main.updateValue(
+            self.get_mode_display(self.settings.mode))
+        self.resp_rate_button_main.updateValue(
+            self.settings.resp_rate)
+        self.tv_button_main.updateValue(
+            self.settings.tv)
+        self.ie_button_main.updateValue(self.get_ie_display(
+            self.settings.ie_ratio))
+        self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
         self.peep_display_main.updateValue(self.params.peep)
         self.tv_insp_display_main.updateValue(self.params.tv_insp)
         self.tv_exp_display_main.updateValue(self.params.tv_exp)
@@ -195,7 +199,7 @@ class MainWindow(QWidget):
     def updatePageDisplays(self) -> None:
         self.mode_page_rect.updateValue(self.get_mode_display(self.settings.mode))
         self.resp_rate_page_value_label.setText(str(self.settings.resp_rate))
-        self.tv_page_rect.updateValue(self.settings.tv)
+        self.tv_page_value_label.setText(str(self.settings.tv))
         self.ie_page_rect.updateValue(self.get_ie_display(self.settings.ie_ratio))
         self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
 
@@ -230,21 +234,23 @@ class MainWindow(QWidget):
     # (right now it's not in the settings)
     def incrementRespRate(self) -> None:
         self.local_settings.resp_rate += self.resp_rate_increment
-        self.resp_rate_page_value_label.setText(str(self.local_settings.resp_rate))
+        self.resp_rate_page_value_label.setText(
+            str(self.local_settings.resp_rate))
 
     def decrementRespRate(self) -> None:
         self.local_settings.resp_rate -= self.resp_rate_increment
-        self.resp_rate_page_value_label.setText(str(self.local_settings.resp_rate))
+        self.resp_rate_page_value_label.setText(
+            str(self.local_settings.resp_rate))
 
     def incrementTidalVol(self) -> None:
         self.local_settings.tv += self.tv_increment
-        self.tv_page_rect.updateValue(
-            self.local_settings.tv)
+        self.tv_page_value_label.setText(
+            str(self.local_settings.tv))
 
     def decrementTidalVol(self) -> None:
         self.local_settings.tv -= self.tv_increment
-        self.tv_page_rect.updateValue(
-            self.local_settings.tv)
+        self.tv_page_value_label.setText(
+            str(self.local_settings.tv))
 
     def changeIERatio(self, new_val: int) -> None:
         self.local_settings.ie_ratio = new_val
@@ -253,6 +259,19 @@ class MainWindow(QWidget):
     def changeAlarm(self, new_val):
         self.local_settings.alarm_mode = new_val
         self.alarm_page_rect.updateValue(self.local_settings.get_alarm_display())
+
+    def changeStartStop(self):
+        if self.settings.run_state == 0:
+            self.settings.run_state = 1
+            self.start_button_main.updateValue("STOP")
+            self.start_button_main.button_settings = SimpleButtonSettings(fillColor = "#ff0000")
+            self.passChanges()
+
+        elif self.settings.run_state == 1:
+            self.settings.run_state = 0
+            self.start_button_main.updateValue("START")
+            self.start_button_main.button_settings = SimpleButtonSettings()
+            self.passChanges()
 
     # TODO: Finish all of these for each var
     def commitMode(self):
@@ -276,10 +295,12 @@ class MainWindow(QWidget):
                 self.settings.resp_rate,
                 self.local_settings.resp_rate,
             ))
+
         self.settings.resp_rate = self.local_settings.resp_rate
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.stack.setCurrentIndex(0)
         self.passChanges()
+        self.local_settings = deepcopy(self.settings)
 
     def commitTidalVol(self) -> None:
         self.logChange(
@@ -292,9 +313,10 @@ class MainWindow(QWidget):
         self.settings.tv = self.local_settings.tv
         self.tv_button_main.updateValue(self.settings.tv)
         self.settings.tv = self.local_settings.tv
-        self.tv_button_main.updateValue(self.settings.tb)
+        self.tv_button_main.updateValue(self.settings.tv)
         self.stack.setCurrentIndex(0)
         self.passChanges()
+        self.local_settings = self.settings
 
     def commitIERatio(self) -> None:
         self.logChange(
