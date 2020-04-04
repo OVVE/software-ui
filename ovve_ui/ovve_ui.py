@@ -17,24 +17,19 @@ from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
 from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
 from display.rectangle import DisplayRect
-from display.ui_settings import (DisplayRectSettings,
-                                 FancyButtonSettings,
-                                 SimpleButtonSettings,
-                                 TextSetting,
-                                 UISettings)
+from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
+                                 SimpleButtonSettings, TextSetting, UISettings)
 from typing import Callable
-from display.widgets import (initializeHomeScreenWidget,
-                             initializeModeWidget,
+from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
-                             initializeIERatioWidget,
-                             initializeAlarmWidget,
-                             initializeGraphWidget
-                             )
+                             initializeIERatioWidget, initializeAlarmWidget,
+                             initializeGraphWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.comms_adapter import CommsAdapter
 from utils.comms_simulator import CommsSimulator
+
 
 class MainWindow(QWidget):
     def __init__(self) -> None:
@@ -48,7 +43,6 @@ class MainWindow(QWidget):
 
         self.resp_rate_increment = 5
         self.tv_increment = 5
-
 
         # Example 1 (changes color of Fancy numbers to red)
         # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
@@ -75,7 +69,7 @@ class MainWindow(QWidget):
 
         self.initalizeAndAddStackWidgets()
 
-        layout.setContentsMargins(10,10,10,10)
+        layout.setContentsMargins(10, 10, 10, 10)
         self.setLayout(layout)
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
@@ -103,7 +97,6 @@ class MainWindow(QWidget):
         #TODO: How to handle start / stop events from UI?
         self.comms_handler.start()
 
-
     def get_mode_display(self, mode):
         switcher = {
             0: "AC",
@@ -120,11 +113,13 @@ class MainWindow(QWidget):
         }
         return switcher.get(ie_ratio, "invalid")
 
-
     def makeFancyDisplayButton(
-            self, label: str, value: Union[int, float], unit: str,
+            self,
+            label: str,
+            value: Union[int, float],
+            unit: str,
             size: Optional[Tuple[int, int]] = None,
-    button_settings: FancyButtonSettings = None )-> FancyDisplayButton:
+            button_settings: FancyButtonSettings = None) -> FancyDisplayButton:
         """ Creates Fancy Display Button """
         return FancyDisplayButton(
             label,
@@ -136,30 +131,34 @@ class MainWindow(QWidget):
             if button_settings is None else button_settings)
 
     def makeSimpleDisplayButton(
-            self, label: str,
-            size: Optional[Tuple[int, int]] = None,
-    button_settings: SimpleButtonSettings = None) -> SimpleDisplayButton:
+        self,
+        label: str,
+        size: Optional[Tuple[int, int]] = None,
+        button_settings: SimpleButtonSettings = None
+    ) -> SimpleDisplayButton:
         """ Creates Simple Display Button """
         return SimpleDisplayButton(
             label,
             parent=None,
             size=size,
-            button_settings= self.ui_settings.simple_button_settings
+            button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
 
     def makeDisplayRect(
-            self, label: str, value: Union[int, float], unit: str,
+            self,
+            label: str,
+            value: Union[int, float],
+            unit: str,
             size: Optional[Tuple[int, int]] = None,
-    rect_settings: DisplayRectSettings = None) -> DisplayRect:
+            rect_settings: DisplayRectSettings = None) -> DisplayRect:
         """ Creates the Display Rectangle """
-        return DisplayRect(
-            label,
-            value,
-            unit,
-            parent=None,
-            size=size,
-            rect_settings= self.ui_settings.display_rect_settings
-            if rect_settings is None else rect_settings)
+        return DisplayRect(label,
+                           value,
+                           unit,
+                           parent=None,
+                           size=size,
+                           rect_settings=self.ui_settings.display_rect_settings
+                           if rect_settings is None else rect_settings)
 
     def initalizeAndAddStackWidgets(self) -> None:
         initializeGraphWidget(self)
@@ -183,12 +182,10 @@ class MainWindow(QWidget):
     def updateMainDisplays(self) -> None:
         self.mode_button_main.updateValue(
             self.get_mode_display(self.settings.mode))
-        self.resp_rate_button_main.updateValue(
-            self.settings.resp_rate)
-        self.tv_button_main.updateValue(
-            self.settings.tv)
-        self.ie_button_main.updateValue(self.get_ie_display(
-            self.settings.ie_ratio))
+        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
+        self.tv_button_main.updateValue(self.settings.tv)
+        self.ie_button_main.updateValue(
+            self.get_ie_display(self.settings.ie_ratio))
         self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
         self.peep_display_main.updateValue(self.params.peep)
         self.tv_insp_display_main.updateValue(self.params.tv_insp)
@@ -197,10 +194,12 @@ class MainWindow(QWidget):
         self.pplat_display_main.updateValue(self.params.pplat)
 
     def updatePageDisplays(self) -> None:
-        self.mode_page_rect.updateValue(self.get_mode_display(self.settings.mode))
+        self.mode_page_rect.updateValue(
+            self.get_mode_display(self.settings.mode))
         self.resp_rate_page_value_label.setText(str(self.settings.resp_rate))
         self.tv_page_value_label.setText(str(self.settings.tv))
-        self.ie_page_rect.updateValue(self.get_ie_display(self.settings.ie_ratio))
+        self.ie_page_rect.updateValue(
+            self.get_ie_display(self.settings.ie_ratio))
         self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
 
     # TODO: Polish up and process data properly
@@ -222,13 +221,13 @@ class MainWindow(QWidget):
         self.pressure_graph_line.setPos(self.ptr, 0)
         self.volume_graph_line.setPos(self.ptr, 0)
 
-
         QtGui.QApplication.processEvents()
 
     # TODO: Finish all of these for each var
     def changeMode(self, new_val: bool) -> None:
         self.local_settings.ac_mode = new_val
-        self.mode_page_rect.updateValue(self.get_mode_display(self.local_settings.mode))
+        self.mode_page_rect.updateValue(
+            self.get_mode_display(self.local_settings.mode))
 
     # TODO: Figure out how to handle increment properly
     # (right now it's not in the settings)
@@ -244,27 +243,28 @@ class MainWindow(QWidget):
 
     def incrementTidalVol(self) -> None:
         self.local_settings.tv += self.tv_increment
-        self.tv_page_value_label.setText(
-            str(self.local_settings.tv))
+        self.tv_page_value_label.setText(str(self.local_settings.tv))
 
     def decrementTidalVol(self) -> None:
         self.local_settings.tv -= self.tv_increment
-        self.tv_page_value_label.setText(
-            str(self.local_settings.tv))
+        self.tv_page_value_label.setText(str(self.local_settings.tv))
 
     def changeIERatio(self, new_val: int) -> None:
         self.local_settings.ie_ratio = new_val
-        self.ie_page_rect.updateValue(self.get_ie_display(self.local_settings.ie_ratio))
+        self.ie_page_rect.updateValue(
+            self.get_ie_display(self.local_settings.ie_ratio))
 
     def changeAlarm(self, new_val):
         self.local_settings.alarm_mode = new_val
-        self.alarm_page_rect.updateValue(self.local_settings.get_alarm_display())
+        self.alarm_page_rect.updateValue(
+            self.local_settings.get_alarm_display())
 
     def changeStartStop(self):
         if self.settings.run_state == 0:
             self.settings.run_state = 1
             self.start_button_main.updateValue("STOP")
-            self.start_button_main.button_settings = SimpleButtonSettings(fillColor = "#ff0000")
+            self.start_button_main.button_settings = SimpleButtonSettings(
+                fillColor="#ff0000")
             self.passChanges()
 
         elif self.settings.run_state == 1:
@@ -283,7 +283,8 @@ class MainWindow(QWidget):
                 self.get_mode_display(self.local_settings.mode),
             ))
         self.settings.mode = self.local_settings.mode
-        self.mode_button_main.updateValue(self.get_mode_display(self.settings.mode))
+        self.mode_button_main.updateValue(
+            self.get_mode_display(self.settings.mode))
         self.stack.setCurrentIndex(0)
         self.passChanges()
 
@@ -327,12 +328,16 @@ class MainWindow(QWidget):
                 self.get_ie_display(self.local_settings.ie_ratio),
             ))
         self.settings.ie_ratio = self.local_settings.ie_ratio
-        self.ie_button_main.updateValue(self.get_ie_display(self.settings.ie_ratio))
+        self.ie_button_main.updateValue(
+            self.get_ie_display(self.settings.ie_ratio))
         self.stack.setCurrentIndex(0)
         self.passChanges()
 
     def commitAlarm(self):
-        self.logChange(Change(datetime.datetime.now(),"Alarm acknowledged", self.settings.get_alarm_display(), self.local_settings.get_alarm_display()))
+        self.logChange(
+            Change(datetime.datetime.now(), "Alarm acknowledged",
+                   self.settings.get_alarm_display(),
+                   self.local_settings.get_alarm_display()))
         self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.stack.setCurrentIndex(0)
@@ -352,8 +357,8 @@ class MainWindow(QWidget):
             print(change.display())
         # TODO: Actually log the change in some data structure
 
-    def set_settings_callback(self,
-        settings_callback: Callable[[Settings], None]) -> None:
+    def set_settings_callback(
+            self, settings_callback: Callable[[Settings], None]) -> None:
         self.settings_callback = settings_callback
 
     def closeEvent(self, *args, **kwargs):
