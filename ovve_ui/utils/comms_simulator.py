@@ -6,6 +6,7 @@ from threading import Thread
 from utils.comms_adapter import CommsAdapter
 from utils.params import Params
 from utils.settings import Settings
+from utils.alarms import Alarms
 
 
 class CommsSimulator():
@@ -55,9 +56,39 @@ class CommsSimulator():
             time.sleep(1)
 
 
+    # Loop once per second
+    # Every N loops fire an alarm
+    # Every time the alarm fires, iterate the alarm that's set to True
+    # All other alarms will be false
+    def simulate_alarms(self) -> None:
+        alarms = Alarms()
+        alarms_dict = alarms.to_dict()
+        alarm_interval = 2
+
+        alarm_to_set = 0
+        loop_count = 0
+        while not self.done:
+            if alarm_interval > 0 and loop_count % alarm_interval == 0:                      
+                alarms_items = list(alarms_dict.items())
+                for i in range(0, len(alarms_items)):
+                    if i == alarm_to_set:
+                        alarms_dict[alarms_items[i][0]] = True
+                    else:
+                        alarms_dict[alarms_items[i][0]] = False
+                self.comms_adapter.update_alarms(alarms_dict)
+                alarm_to_set = (alarm_to_set + 1) % len(alarms_dict.keys())
+            loop_count += 1
+            time.sleep(1)
+
+
+
     def start(self) -> None:
+        self.done = False
+        # Simulate asynchronous params and alarms
         t = Thread(target=self.simulate_params, args=())
+        a = Thread(target=self.simulate_alarms, args=())
         t.start()
+        a.start()
 
     def stop(self) -> None:
         self.done = True
