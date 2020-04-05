@@ -279,9 +279,9 @@ def initializeRespiratoryRateWidget(window) -> None:
 
 
     h_box_1.addWidget(resp_rate_title_label)
-    h_box_2.addWidget(resp_rate_increment_button)
-    h_box_2.addWidget(window.resp_rate_page_value_label)
     h_box_2.addWidget(resp_rate_decrement_button)
+    h_box_2.addWidget(window.resp_rate_page_value_label)
+    h_box_2.addWidget(resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
     h_box_4.addWidget(resp_rate_apply)
     h_box_4.addWidget(resp_rate_cancel)
@@ -357,9 +357,9 @@ def initializeTidalVolumeWidget(window: MainWindow):
     tv_cancel.clicked.connect(window.cancelChange)
 
     h_box_1.addWidget(tv_title_label)
-    h_box_2.addWidget(tv_increment_button)
-    h_box_2.addWidget(window.tv_page_value_label)
     h_box_2.addWidget(tv_decrement_button)
+    h_box_2.addWidget(window.tv_page_value_label)
+    h_box_2.addWidget(tv_increment_button)
     h_box_3.addWidget(tv_unit_label)
     h_box_4.addWidget(tv_apply)
     h_box_4.addWidget(tv_cancel)

@@ -297,6 +297,8 @@ class MainWindow(QWidget):
             self.get_mode_display(self.settings.mode))
         self.stack.setCurrentIndex(0)
         self.passChanges()
+        self.updatePageDisplays()
+
 
     def commitRespRate(self) -> None:
         self.logChange(
@@ -312,6 +314,8 @@ class MainWindow(QWidget):
         self.stack.setCurrentIndex(0)
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
+        self.updatePageDisplays()
+
 
     def commitTidalVol(self) -> None:
         self.logChange(
@@ -323,11 +327,11 @@ class MainWindow(QWidget):
             ))
         self.settings.tv = self.local_settings.tv
         self.tv_button_main.updateValue(self.settings.tv)
-        self.settings.tv = self.local_settings.tv
-        self.tv_button_main.updateValue(self.settings.tv)
         self.stack.setCurrentIndex(0)
         self.passChanges()
-        self.local_settings = self.settings
+        self.local_settings = deepcopy(self.settings)
+        self.updatePageDisplays()
+
 
     def commitIERatio(self) -> None:
         self.logChange(
@@ -342,6 +346,8 @@ class MainWindow(QWidget):
             self.get_ie_display(self.settings.ie_ratio))
         self.stack.setCurrentIndex(0)
         self.passChanges()
+        self.local_settings = deepcopy(self.settings)
+        self.updatePageDisplays()
 
     def commitAlarm(self):
         self.logChange(
@@ -352,6 +358,8 @@ class MainWindow(QWidget):
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.stack.setCurrentIndex(0)
         self.passChanges()
+        self.updatePageDisplays()
+        #TODO: Modify some equivalent of local settings for alarms? Not sure how this works
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
