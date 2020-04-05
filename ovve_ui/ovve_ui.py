@@ -33,6 +33,7 @@ from utils.settings import Settings
 from utils.alarms import Alarms
 from utils.comms_adapter import CommsAdapter
 from utils.comms_simulator import CommsSimulator
+from utils.logger import Logger
 
 class MainWindow(QWidget):
     def __init__(self) -> None:
@@ -74,8 +75,12 @@ class MainWindow(QWidget):
         hbox.addWidget(self.stack)
         self.setLayout(hbox)
 
+        # Instantiate the single logger for the UI
+        self.logger = Logger()
+        self.logger.enable_console = True
+
         # CommsAdapter adapts settings and params to and from the comms handler
-        self.comms_adapter = CommsAdapter()
+        self.comms_adapter = CommsAdapter(self.logger)
 
         # Set a callback in the adapter that is called whenever new
         # params arrive from the comms handler
