@@ -9,6 +9,7 @@ class Logger():
     def __init__(self) -> None:
         self.__enable_console = False
         self.__enable_file = False
+        self.__patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
         self.__path = "."
 
     @property
@@ -28,6 +29,14 @@ class Logger():
         self.__enable_file = value
 
     @property
+    def patient_id(self) -> str:
+        return self.__patient_id
+
+    @patient_id.setter
+    def patient_id(self, value: str) -> None:
+        self.__patient_id = str
+
+    @property
     def path(self) -> str:
         return self.__path
 
@@ -44,6 +53,7 @@ class Logger():
     def log(self, msg_type: str, msg: str) -> None:
         ts = time.time()
         msg_dict = {}
+        msg_dict["patient_id"] = self.__patient_id
         msg_dict["ts"] = ts
         msg_dict["type"] = msg_type
         msg_dict["msg"] = msg
