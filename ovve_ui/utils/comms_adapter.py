@@ -7,13 +7,15 @@ from typing import Callable
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
+from utils.logger import Logger
 
 
 class CommsAdapter():
-    def __init__(self) -> None:
+    def __init__(self, logger: Logger) -> None:
         self.ui_params_callback = None
         self.ui_alarms_callback = None
         self.comms_callback = None
+        self.logger = logger
 
     # Sets the function in the UI that gets called whenever
     # params are updated.
@@ -37,6 +39,7 @@ class CommsAdapter():
         # Call comms handler callback with new settings
         if self.comms_callback:
             settings_str = settings.to_JSON()
+            self.logger.log("settings,", settings_str)
             j = json.loads(settings_str)
             self.comms_callback(j)
         else:
@@ -48,8 +51,7 @@ class CommsAdapter():
 
         # Deserialize or otherwise handle params
         # coming in from the comms handler
-        print("Got updated params from comms")
-        print(params.to_JSON())
+        self.logger.log("params", params.to_JSON())
 
         # Call the callback provided by the UI
         if self.ui_params_callback:
@@ -64,8 +66,7 @@ class CommsAdapter():
 
         # Deserialize or otherwise handle params
         # coming in from the comms handler
-        print("Got updated alarms from comms")
-        print(alarms.to_JSON())
+        self.logger.log("alarms", alarms.to_JSON())
 
         # Call the callback provided by the UI
         if self.ui_alarms_callback:
