@@ -32,6 +32,7 @@ from utils.params import Params
 from utils.settings import Settings
 from utils.comms_adapter import CommsAdapter
 from utils.comms_simulator import CommsSimulator
+from utils.comms_link import CommsLink
 
 class MainWindow(QWidget):
     def __init__(self) -> None:
@@ -89,7 +90,8 @@ class MainWindow(QWidget):
         # the MCU.  It will accept settings updates from the UI.
         #
         # When the real comms handler is available, substitute it here.
-        self.comms_handler = CommsSimulator(self.comms_adapter)
+        #self.comms_handler = CommsSimulator(self.comms_adapter)
+        self.comms_handler = CommsLink(self.comms_adapter)
 
         #TODO: How to handle start / stop events from UI?
         self.comms_handler.start()
