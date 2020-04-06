@@ -407,6 +407,8 @@ class MainWindow(QWidget):
                 self.showFullScreen()
                 self.fullscreen = True
 
+        if event.key() == QtCore.Qt.Key_Q:
+            self.close()
 
 def main() -> None:
     app = QApplication(sys.argv)
