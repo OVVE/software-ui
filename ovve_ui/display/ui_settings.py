@@ -114,13 +114,14 @@ class PageSettings:
     def __init__(self,
                  mainLabelSetting: TextSetting = TextSetting("Arial", 40, True),
                  valueSetting: TextSetting = TextSetting("Arial Black", 110, True),
-                 textValueSetting: TextSetting = TextSetting("Arial Black", 64, True),
+                 textValueSetting: TextSetting = TextSetting("Arial Black", 70, True),
                  unitSetting: TextSetting = TextSetting("Arial", 40, False),
                  valueColor: str = '#000000',
                  unitColor: str = '#C5C5C5',
                  changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
                  changeButtonValueColor: str = '#C5C5C5',
                  changeButtonBorderColor: str = '#C5C5C5',
+                 valueLabelWidth: int = 210,
                  changeButtonSpacing: int = 50,
                  cancelSetting: TextSetting = TextSetting("Arial", 18, True),
                  cancelColor: str = "#ff0000",
@@ -138,6 +139,7 @@ class PageSettings:
         self.changeButtonTextSetting = changeButtonTextSetting
         self.changeButtonValueColor = changeButtonValueColor
         self.changeButtonBorderColor = changeButtonBorderColor
+        self.valueLabelWidth = valueLabelWidth
         self.changeButtonSpacing = changeButtonSpacing
         self.cancelSetting = cancelSetting
         self.cancelColor = cancelColor

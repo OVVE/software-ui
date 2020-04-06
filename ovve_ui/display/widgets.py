@@ -7,7 +7,7 @@ from typing import TypeVar
 import numpy as np
 import pyqtgraph as pg
 
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel
 from PyQt5.QtCore import Qt
 
 from display.ui_settings import SimpleButtonSettings, FancyButtonSettings, DisplayRectSettings, PageSettings
@@ -189,11 +189,14 @@ def initializeModeWidget(window: MainWindow) -> None:
     h_box_1 = QHBoxLayout()
     h_box_2 = QHBoxLayout()
     h_box_3 = QHBoxLayout()
+    h_box_4 = QHBoxLayout()
+
     h_box_1.setAlignment(Qt.AlignCenter)
     h_box_2.setAlignment(Qt.AlignCenter)
     h_box_2.setSpacing(window.ui_settings.page_settings.changeButtonSpacing)
     h_box_3.setAlignment(Qt.AlignCenter)
-    h_box_3.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
+    h_box_4.setAlignment(Qt.AlignCenter)
+    h_box_4.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
 
     mode_title_label = QLabel("Set Ventilation Mode")
     mode_title_label.setFont(page_settings.mainLabelFont)
@@ -204,6 +207,11 @@ def initializeModeWidget(window: MainWindow) -> None:
     window.mode_page_value_label.setAlignment(Qt.AlignCenter)
     window.mode_page_value_label.setStyleSheet(
         "QLabel {color: " + page_settings.valueColor + ";}")
+    window.mode_page_value_label.setFixedWidth(page_settings.valueLabelWidth)
+
+    mode_unit_label = QLabel("")
+    mode_unit_label.setFont(page_settings.unitFont)
+    mode_unit_label.setAlignment(Qt.AlignCenter)
 
     mode_decrement_button = window.makeSimpleDisplayButton(
         "\u2190", size=(50, 50),
@@ -244,12 +252,15 @@ def initializeModeWidget(window: MainWindow) -> None:
     h_box_2.addWidget(mode_decrement_button)
     h_box_2.addWidget(window.mode_page_value_label)
     h_box_2.addWidget(mode_increment_button)
-    h_box_3.addWidget(mode_apply)
-    h_box_3.addWidget(mode_cancel)
+    h_box_3.addWidget(mode_unit_label)
+    h_box_4.addWidget(mode_apply)
+    h_box_4.addWidget(mode_cancel)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
     v_box.addLayout(h_box_3)
+    v_box.addLayout(h_box_4)
+
 
     window.page["2"].setLayout(v_box)
 
@@ -324,6 +335,7 @@ def initializeRespiratoryRateWidget(window) -> None:
     h_box_1.addWidget(resp_rate_title_label)
     h_box_2.addWidget(resp_rate_decrement_button)
     h_box_2.addWidget(window.resp_rate_page_value_label)
+    window.resp_rate_page_value_label.setFixedWidth(page_settings.valueLabelWidth)
     h_box_2.addWidget(resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
     h_box_4.addWidget(resp_rate_apply)
@@ -360,6 +372,7 @@ def initializeTidalVolumeWidget(window: MainWindow):
     window.tv_page_value_label.setStyleSheet(
         "QLabel {color: " + page_settings.valueColor + ";}")
     window.tv_page_value_label.setAlignment(Qt.AlignCenter)
+    window.tv_page_value_label.setFixedWidth(page_settings.valueLabelWidth)
 
     tv_unit_label = QLabel("mL")
     tv_unit_label.setFont(page_settings.unitFont)
@@ -405,6 +418,8 @@ def initializeTidalVolumeWidget(window: MainWindow):
     h_box_2.addWidget(tv_decrement_button)
     h_box_2.addWidget(window.tv_page_value_label)
     h_box_2.addWidget(tv_increment_button)
+
+
     h_box_3.addWidget(tv_unit_label)
     h_box_4.addWidget(tv_apply)
     h_box_4.addWidget(tv_cancel)
@@ -416,8 +431,6 @@ def initializeTidalVolumeWidget(window: MainWindow):
 
     window.page["4"].setLayout(v_box)
 
-
-
 def initializeIERatioWidget(window: MainWindow):
     """ Creates i/e Ratio Widget """
     page_settings = window.ui_settings.page_settings
@@ -425,11 +438,14 @@ def initializeIERatioWidget(window: MainWindow):
     h_box_1 = QHBoxLayout()
     h_box_2 = QHBoxLayout()
     h_box_3 = QHBoxLayout()
+    h_box_4 = QHBoxLayout()
+
     h_box_1.setAlignment(Qt.AlignCenter)
     h_box_2.setAlignment(Qt.AlignCenter)
     h_box_2.setSpacing(window.ui_settings.page_settings.changeButtonSpacing)
     h_box_3.setAlignment(Qt.AlignCenter)
-    h_box_3.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
+    h_box_4.setAlignment(Qt.AlignCenter)
+    h_box_4.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
 
     ie_ratio_title_label = QLabel("Set I/E Ratio")
     ie_ratio_title_label.setFont(page_settings.mainLabelFont)
@@ -440,6 +456,12 @@ def initializeIERatioWidget(window: MainWindow):
     window.ie_ratio_page_value_label.setAlignment(Qt.AlignCenter)
     window.ie_ratio_page_value_label.setStyleSheet(
         "QLabel {color: " + page_settings.valueColor + ";}")
+    window.ie_ratio_page_value_label.setFixedWidth(page_settings.valueLabelWidth)
+
+    ie_unit_label = QLabel("")
+    ie_unit_label.setFont(page_settings.unitFont)
+    ie_unit_label.setAlignment(Qt.AlignCenter)
+
 
     ie_ratio_decrement_button = window.makeSimpleDisplayButton(
         "\u2190", size=(50, 50),
@@ -478,12 +500,15 @@ def initializeIERatioWidget(window: MainWindow):
     h_box_2.addWidget(ie_ratio_decrement_button)
     h_box_2.addWidget(window.ie_ratio_page_value_label)
     h_box_2.addWidget(ie_ratio_increment_button)
-    h_box_3.addWidget(ie_ratio_apply)
-    h_box_3.addWidget(ie_ratio_cancel)
+    h_box_3.addWidget(ie_unit_label)
+    h_box_4.addWidget(ie_ratio_apply)
+    h_box_4.addWidget(ie_ratio_cancel)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
     v_box.addLayout(h_box_3)
+    v_box.addLayout(h_box_4)
+
 
     window.page["5"].setLayout(v_box)
 
