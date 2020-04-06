@@ -198,6 +198,7 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_title_label = QLabel("Set Ventilation Mode")
     mode_title_label.setFont(page_settings.mainLabelFont)
     mode_title_label.setAlignment(Qt.AlignCenter)
+    mode_title_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     window.mode_page_value_label = QLabel(
         window.get_mode_display(window.local_settings.mode))
@@ -283,6 +284,8 @@ def initializeRespiratoryRateWidget(window) -> None:
     resp_rate_title_label = QLabel("Set Respiratory Rate")
     resp_rate_title_label.setFont(page_settings.mainLabelFont)
     resp_rate_title_label.setAlignment(Qt.AlignCenter)
+    resp_rate_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+
 
     window.resp_rate_page_value_label = QLabel(
         str(window.local_settings.resp_rate))
@@ -373,6 +376,8 @@ def initializeTidalVolumeWidget(window: MainWindow):
     tv_title_label = QLabel("Set Tidal Volume")
     tv_title_label.setFont(page_settings.mainLabelFont)
     tv_title_label.setAlignment(Qt.AlignCenter)
+    tv_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+
 
     window.tv_page_value_label = QLabel(str(window.local_settings.resp_rate))
     window.tv_page_value_label.setFont(page_settings.valueFont)
@@ -462,6 +467,8 @@ def initializeIERatioWidget(window: MainWindow):
     ie_ratio_title_label = QLabel("Set I/E Ratio")
     ie_ratio_title_label.setFont(page_settings.mainLabelFont)
     ie_ratio_title_label.setAlignment(Qt.AlignCenter)
+    ie_ratio_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+
 
     window.ie_ratio_page_value_label = QLabel(
         window.get_ie_ratio_display(window.local_settings.ie_ratio))
