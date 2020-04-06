@@ -240,7 +240,6 @@ class MainWindow(QWidget):
         self.mode_page_value_label.setText(
             self.get_mode_display(self.local_settings.mode))
 
-
     def incrementRespRate(self) -> None:
         self.local_settings.resp_rate += self.resp_rate_increment
         self.resp_rate_page_value_label.setText(
@@ -261,15 +260,18 @@ class MainWindow(QWidget):
 
     def incrementIERatio(self) -> None:
         self.local_settings.ie_ratio += 1
-        if self.local_settings.ie_ratio >= len(self.settings.ie_ratio_switcher):
-            self.local_settings.ie_ratio -= len(self.settings.ie_ratio_switcher)
+        if self.local_settings.ie_ratio >= len(
+                self.settings.ie_ratio_switcher):
+            self.local_settings.ie_ratio -= len(
+                self.settings.ie_ratio_switcher)
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio))
 
     def decrementIERatio(self) -> None:
         self.local_settings.ie_ratio -= 1
         if self.local_settings.ie_ratio < 0:
-            self.local_settings.ie_ratio += len(self.settings.ie_ratio_switcher)
+            self.local_settings.ie_ratio += len(
+                self.settings.ie_ratio_switcher)
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio))
 
@@ -308,7 +310,6 @@ class MainWindow(QWidget):
         self.passChanges()
         self.updatePageDisplays()
 
-
     def commitRespRate(self) -> None:
         self.logChange(
             Change(
@@ -325,7 +326,6 @@ class MainWindow(QWidget):
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
 
-
     def commitTidalVol(self) -> None:
         self.logChange(
             Change(
@@ -340,7 +340,6 @@ class MainWindow(QWidget):
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
-
 
     def commitIERatio(self) -> None:
         self.logChange(
@@ -402,7 +401,6 @@ class MainWindow(QWidget):
                 self.hide()
                 self.showFullScreen()
                 self.fullscreen = True
-
 
 
 def main() -> None:
