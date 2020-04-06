@@ -103,20 +103,11 @@ class MainWindow(QWidget):
         self.comms_handler.start()
 
     def get_mode_display(self, mode):
-        switcher = {
-            0: "AC",
-            1: "SIMV",
-        }
-        return switcher.get(mode, "invalid")
+        return self.settings.mode_switcher.get(mode, "invalid")
 
     def get_ie_display(self, ie_ratio):
-        switcher = {
-            0: "1:1",
-            1: "1:1.5",
-            2: "1:2",
-            3: "1:3",
-        }
-        return switcher.get(ie_ratio, "invalid")
+
+        return self.settings.ie_switcher.get(ie_ratio, "invalid")
 
     def makeFancyDisplayButton(
             self,

@@ -9,9 +9,22 @@ class Settings():
     def __init__(self) -> None:
         self.run_state: int = 0
         self.mode: int = 0
+
+        self.mode_switcher: dict = {
+            0: "AC",
+            1: "SIMV",
+        }
+
         self.resp_rate: int = 0
         self.tv: int = 0
         self.ie_ratio: int = 0
+
+        self.ie_switcher: dict = {
+            0: "1:1",
+            1: "1:1.5",
+            2: "1:2",
+            3: "1:3",
+        }
         # False -> Off, True -> On
         # Alarm mode changes from serial comms input
         self.alarm_mode = False
