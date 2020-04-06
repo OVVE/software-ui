@@ -7,107 +7,180 @@ from typing import TypeVar
 import numpy as np
 import pyqtgraph as pg
 
-from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel
+from PyQt5.QtCore import Qt
+
+from display.ui_settings import SimpleButtonSettings, FancyButtonSettings, DisplayRectSettings, PageSettings
 
 
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')
 
 
-def initializeHomeScreenWidget(window: MainWindow) -> None:
+def initializeHomeScreenWidget(window: MainWindow) -> (QVBoxLayout, QStackedWidget):
     """ Creates Home Screen for Widgets """
-    h_box = QHBoxLayout()
-    v_box_left = QVBoxLayout()
-    v_box_mid = QVBoxLayout()
-    v_box_right = QVBoxLayout()
+    layout = QVBoxLayout()
+    h_box_11 = QHBoxLayout()
+    h_box_12 = QHBoxLayout()
+    h_box_11.setAlignment(Qt.AlignCenter)
+
+    v_box_11left = QVBoxLayout()
+    v_box_11mid = QVBoxLayout()
+    v_box_11right = QVBoxLayout()
 
     window.mode_button_main = window.makeSimpleDisplayButton(
-        window.get_mode_display(window.settings.mode))
+        window.get_mode_display(window.settings.mode),
+    )
     window.mode_button_main.clicked.connect(lambda: window.display(1))
 
     window.resp_rate_button_main = window.makeFancyDisplayButton(
-        "Resp. Rate", window.settings.resp_rate, "b/min")
+        "Set Resp. Rate",
+        window.settings.resp_rate,
+        "bpm",
+    )
+
     window.resp_rate_button_main.clicked.connect(lambda: window.display(2))
 
-    window.minute_vol_button_main = window.makeFancyDisplayButton(
-        "Minute Volume", window.settings.tv, "l/min")
-    window.minute_vol_button_main.clicked.connect(lambda: window.display(3))
+    window.tv_button_main = window.makeFancyDisplayButton(
+        "Set Tidal Volume",
+        window.settings.tv,
+        "l/min",
+    )
+    window.tv_button_main.clicked.connect(lambda: window.display(3))
 
     window.ie_button_main = window.makeFancyDisplayButton(
-        "I/E Ratio", window.get_ie_display(window.settings.ie_ratio), "l/min")
+        "Set I/E Ratio",
+        window.get_ie_display(window.settings.ie_ratio),
+        "l/min",
+    )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
 
-    window.peep_display_main = window.makeDisplayRect(
-        "PEEP", 5, "cmH2O")
-    window.tv_insp_display_main = window.makeDisplayRect(
-        "TV Insp", window.params.tv_insp, "mL")
-    window.tv_exp_display_main = window.makeDisplayRect(
-        "TV Exp", window.params.tv_exp, "mL")
-    window.ppeak_display_main = window.makeDisplayRect(
-        "Ppeak", window.params.ppeak, "cmH2O")
-    window.pplat_display_main = window.makeDisplayRect(
-        "Pplat", window.params.pplat, "cmH2O")
+    window.alarm_button_main = window.makeSimpleDisplayButton(
+        "ALARM",
+        button_settings=SimpleButtonSettings(borderColor="#FF0000",
+                                             fillColor='#FFFFFF',
+                                             valueColor='#FF0000'),
+    )
+    window.alarm_button_main.clicked.connect(lambda: window.display(5))
 
+    window.start_button_main = window.makeSimpleDisplayButton(
+        "START",
+    )
+    window.start_button_main.clicked.connect(window.changeStartStop)
+
+    window.resp_rate_display_main = window.makeDisplayRect(
+        "Resp. Rate",
+        window.params.resp_rate_meas,
+        "bpm",
+    )
+
+    window.tv_insp_display_main = window.makeDisplayRect(
+        "TV Insp",
+        window.params.tv_insp,
+        "mL",
+    )
+    window.tv_exp_display_main = window.makeDisplayRect(
+        "TV Exp",
+        window.params.tv_exp,
+        "mL",
+    )
+
+    window.peep_display_main = window.makeDisplayRect(
+        "PEEP",
+        window.params.peep,
+        "cmH2O",
+    )
+
+    window.ppeak_display_main = window.makeDisplayRect(
+        "Ppeak",
+        window.params.ppeak,
+        "cmH2O",
+    )
+    window.pplat_display_main = window.makeDisplayRect(
+        "Pplat",
+        window.params.pplat,
+        "cmH2O",
+    )
+
+    h_box_11.addWidget(window.mode_button_main)
+    h_box_11.addWidget(window.resp_rate_button_main)
+    h_box_11.addWidget(window.tv_button_main)
+    h_box_11.addWidget(window.ie_button_main)
+    h_box_11.addWidget(window.alarm_button_main)
+    h_box_11.addWidget(window.start_button_main)
+
+    v_box_11left.addWidget(window.resp_rate_display_main)
+    v_box_11left.addWidget(window.tv_insp_display_main)
+    v_box_11left.addWidget(window.tv_exp_display_main)
+
+    stack = QStackedWidget()
+
+    v_box_11mid.addWidget(stack)
+
+    v_box_11right.addWidget(window.peep_display_main)
+    v_box_11right.addWidget(window.ppeak_display_main)
+    v_box_11right.addWidget(window.pplat_display_main)
+
+    h_box_12.addLayout(v_box_11left)
+    h_box_12.addLayout(v_box_11mid)
+    h_box_12.addLayout(v_box_11right)
+
+    h_box_11.setSpacing(18)
+
+    layout.addLayout(h_box_11)
+    layout.addLayout(h_box_12)
+    return (layout, stack)
+
+# TODO: current graph system doesn't associate y values with x values.
+#TODO: Add Units
+def initializeGraphWidget(window: MainWindow) -> None:
+    v_box = QVBoxLayout()
     axisStyle = {'color': 'black', 'font-size': '20pt'}
     graph_pen = pg.mkPen(width=5, color="b")
 
     graph_width = 400
-    window.tv_insp_data = np.linspace(0, 0, graph_width)
-    window.flow_graph_ptr = -graph_width
 
-    # TODO: current graph system doesn't associate y values with x values.
-    #       Need to fix?
+    window.flow_data = np.linspace(0, 0, graph_width)
+    window.flow_graph_ptr = -graph_width
     window.flow_graph = pg.PlotWidget()
     window.flow_graph.setFixedWidth(graph_width)
     window.flow_graph_line = window.flow_graph.plot(
-        window.tv_insp_data, pen=graph_pen)  # shows Serial (tv_insp) data for now
+        window.flow_data,
+        pen=graph_pen)
     window.flow_graph.setBackground("w")
     window.flow_graph.setMouseEnabled(False, False)
     flow_graph_left_axis = window.flow_graph.getAxis("left")
-    flow_graph_left_axis.setLabel("Flow", **axisStyle)  # TODO: Add units
+    flow_graph_left_axis.setLabel("Flow", **axisStyle)
 
-    indices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    data = [randint(-10, 10) for _ in range(10)]
-
+    window.pressure_data = np.linspace(0, 0, graph_width)
+    window.pressure_graph_ptr = -graph_width
     window.pressure_graph = pg.PlotWidget()
     window.pressure_graph.setFixedWidth(graph_width)
     window.pressure_graph_line = window.pressure_graph.plot(
-        indices, data, pen=graph_pen)
+        window.pressure_data,
+        pen=graph_pen)
     window.pressure_graph.setBackground("w")
     window.pressure_graph.setMouseEnabled(False, False)
     pressure_graph_left_axis = window.pressure_graph.getAxis("left")
-    pressure_graph_left_axis.setLabel("Pressure", **axisStyle)  # TODO: Add units
+    pressure_graph_left_axis.setLabel("Pressure", **axisStyle)
 
+    window.volume_data = np.linspace(0, 0, graph_width)
+    window.volume_graph_ptr = -graph_width
     window.volume_graph = pg.PlotWidget()
     window.volume_graph.setFixedWidth(graph_width)
-    window.pressure_graph_line = window.volume_graph.plot(
-        indices, data, pen=graph_pen)
+    window.volume_graph_line = window.volume_graph.plot(
+        window.volume_data,
+        pen=graph_pen)
     window.volume_graph.setBackground("w")
     window.volume_graph.setMouseEnabled(False, False)
-    window.pressure_graph_left_axis = window.volume_graph.getAxis("left")
-    window.pressure_graph_left_axis.setLabel("Volume", **axisStyle)  # TODO: Add units
+    volume_graph_left_axis = window.volume_graph.getAxis("left")
+    volume_graph_left_axis.setLabel("Volume", **axisStyle)
 
-    v_box_left.addWidget(window.mode_button_main)
-    v_box_left.addWidget(window.resp_rate_button_main)
-    v_box_left.addWidget(window.minute_vol_button_main)
-    v_box_left.addWidget(window.ie_button_main)
-    v_box_left.addWidget(window.peep_display_main)
+    v_box.addWidget(window.flow_graph)
+    v_box.addWidget(window.pressure_graph)
+    v_box.addWidget(window.volume_graph)
 
-    v_box_mid.addWidget(window.flow_graph)
-    v_box_mid.addWidget(window.pressure_graph)
-    v_box_mid.addWidget(window.volume_graph)
-
-    v_box_right.addWidget(window.tv_insp_display_main)
-    v_box_right.addWidget(window.tv_exp_display_main)
-    v_box_right.addWidget(window.ppeak_display_main)
-    v_box_right.addWidget(window.pplat_display_main)
-
-    h_box.addLayout(v_box_left)
-    h_box.addLayout(v_box_mid)
-    h_box.addLayout(v_box_right)
-    
-    window.page["1"].setLayout(h_box)
-
+    window.page["1"].setLayout(v_box)
 
 def initializeModeWidget(window: MainWindow) -> None:
     """ Creates Mode Widget """
@@ -126,7 +199,7 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_cancel.clicked.connect(window.cancelChange)
 
     window.mode_page_rect = window.makeDisplayRect(
-        "Mode", window.get_mode_display(window.settings.mode), "", size=(500, 200))
+        "Mode", window.get_mode_display(window.settings.mode), "", size=(400, 200))
 
     h_box_top.addWidget(window.mode_page_rect)
     h_box_mid.addWidget(mode_change)
@@ -140,79 +213,164 @@ def initializeModeWidget(window: MainWindow) -> None:
     window.page["2"].setLayout(v_box)
 
 
-def initializeRespitoryRateWidget(window) -> None:
-    """ Creates Respitory Rate Widget """
+def initializeRespiratoryRateWidget(window) -> None:
+    """ Creates Respiratory Rate Widget """
+    page_settings = window.ui_settings.page_settings
     v_box = QVBoxLayout()
-    h_box_top = QHBoxLayout()
-    h_box_mid = QHBoxLayout()
-    h_box_bot = QHBoxLayout()
+    h_box_1 = QHBoxLayout()
+    h_box_2 = QHBoxLayout()
+    h_box_3 = QHBoxLayout()
+    h_box_4 = QHBoxLayout()
+    h_box_1.setAlignment(Qt.AlignCenter)
+    h_box_2.setAlignment(Qt.AlignCenter)
+    h_box_2.setSpacing(window.ui_settings.page_settings.changeButtonSpacing)
+    h_box_3.setAlignment(Qt.AlignCenter)
+    h_box_4.setAlignment(Qt.AlignCenter)
+    h_box_4.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
 
-    window.resp_rate_page_rect = window.makeDisplayRect(
-        "Resp. Rate",
-        window.local_settings.resp_rate,
-        "b/min",
-        size=(500, 200))
+
+    resp_rate_title_label = QLabel("Set Respiratory Rate")
+    resp_rate_title_label.setFont(page_settings.mainLabelFont)
+    resp_rate_title_label.setAlignment(Qt.AlignCenter)
+
+    window.resp_rate_page_value_label = QLabel(str(window.local_settings.resp_rate))
+    window.resp_rate_page_value_label.setFont(page_settings.valueFont)
+    window.resp_rate_page_value_label.setAlignment(Qt.AlignCenter)
+    window.resp_rate_page_value_label.setStyleSheet(
+        "QLabel {color: " + page_settings.valueColor + ";}")
+
+
+    resp_rate_unit_label = QLabel("bpm")
+    resp_rate_unit_label.setFont(page_settings.unitFont)
+    resp_rate_unit_label.setStyleSheet("QLabel {color: " + page_settings.unitColor + ";}")
+    resp_rate_unit_label.setAlignment(Qt.AlignCenter)
 
     resp_rate_increment_button = window.makeSimpleDisplayButton(
-        "+ " + str(window.resp_rate_increment))
+        "+", size = (50,50),
+        button_settings=SimpleButtonSettings(fillColor = "#FFFFFF",
+                                            borderColor = page_settings.changeButtonBorderColor,
+                                            valueSetting = page_settings.changeButtonTextSetting,
+                                            valueColor = page_settings.changeButtonValueColor))
     resp_rate_decrement_button = window.makeSimpleDisplayButton(
-        "- " + str(window.resp_rate_increment))
-    resp_rate_apply = window.makeSimpleDisplayButton("APPLY")
-    resp_rate_cancel = window.makeSimpleDisplayButton("CANCEL")
+        "-", size=(50, 50),
+        button_settings=SimpleButtonSettings(fillColor="#FFFFFF",
+                                             borderColor=page_settings.changeButtonBorderColor,
+                                             valueSetting=page_settings.changeButtonTextSetting,
+                                             valueColor=page_settings.changeButtonValueColor))
+    resp_rate_apply = window.makeSimpleDisplayButton("APPLY",
+                                                     button_settings=SimpleButtonSettings(
+                                                         fillColor="#FFFFFF",
+                                                         borderColor = page_settings.commitColor,
+                                                         valueSetting = page_settings.commitSetting,
+                                                         valueColor = page_settings.commitColor
+                                                     ))
+    resp_rate_cancel = window.makeSimpleDisplayButton("CANCEL",
+                                                     button_settings=SimpleButtonSettings(
+                                                         fillColor="#FFFFFF",
+                                                         borderColor = page_settings.cancelColor,
+                                                         valueSetting = page_settings.cancelSetting,
+                                                         valueColor = page_settings.cancelColor
+                                                     ))
 
     resp_rate_increment_button.clicked.connect(window.incrementRespRate)
     resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
     resp_rate_apply.clicked.connect(window.commitRespRate)
     resp_rate_cancel.clicked.connect(window.cancelChange)
 
-    h_box_top.addWidget(window.resp_rate_page_rect)
-    h_box_mid.addWidget(resp_rate_increment_button)
-    h_box_mid.addWidget(resp_rate_decrement_button)
-    h_box_bot.addWidget(resp_rate_apply)
-    h_box_bot.addWidget(resp_rate_cancel)
 
-    v_box.addLayout(h_box_top)
-    v_box.addLayout(h_box_mid)
-    v_box.addLayout(h_box_bot)
+    h_box_1.addWidget(resp_rate_title_label)
+    h_box_2.addWidget(resp_rate_decrement_button)
+    h_box_2.addWidget(window.resp_rate_page_value_label)
+    h_box_2.addWidget(resp_rate_increment_button)
+    h_box_3.addWidget(resp_rate_unit_label)
+    h_box_4.addWidget(resp_rate_apply)
+    h_box_4.addWidget(resp_rate_cancel)
+
+    v_box.addLayout(h_box_1)
+    v_box.addLayout(h_box_2)
+    v_box.addLayout(h_box_3)
+    v_box.addLayout(h_box_4)
 
     window.page["3"].setLayout(v_box)
 
-def initializeMinuteVolumeWidget(window: MainWindow):
-    """ Creates Minute Volume Widget """
+def initializeTidalVolumeWidget(window: MainWindow):
+    """ Creates Tidal Volume Widget """
+    page_settings = window.ui_settings.page_settings
     v_box = QVBoxLayout()
-    h_box_top = QHBoxLayout()
-    h_box_mid = QHBoxLayout()
-    h_box_bot = QHBoxLayout()
+    h_box_1 = QHBoxLayout()
+    h_box_2 = QHBoxLayout()
+    h_box_3 = QHBoxLayout()
+    h_box_4 = QHBoxLayout()
+    h_box_1.setAlignment(Qt.AlignCenter)
+    h_box_2.setAlignment(Qt.AlignCenter)
+    h_box_2.setSpacing(window.ui_settings.page_settings.changeButtonSpacing)
+    h_box_3.setAlignment(Qt.AlignCenter)
+    h_box_4.setAlignment(Qt.AlignCenter)
+    h_box_4.setSpacing(window.ui_settings.page_settings.commitCancelButtonSpacing)
 
-    window.minute_vol_page_rect = window.makeDisplayRect(
-        "Minute Volume",
-        window.local_settings.tv,
-        "l/min",
-        size=(500, 200))
+    tv_title_label = QLabel("Set Minute Volume")
+    tv_title_label.setFont(page_settings.mainLabelFont)
+    tv_title_label.setAlignment(Qt.AlignCenter)
 
-    minute_vol_increment_button = window.makeSimpleDisplayButton(
-        "+ " + str(window.tv_increment))
-    minute_vol_decrement_button = window.makeSimpleDisplayButton(
-        "- " + str(window.tv_increment))
-    minute_vol_apply = window.makeSimpleDisplayButton("APPLY")
-    minute_vol_cancel = window.makeSimpleDisplayButton("CANCEL")
+    window.tv_page_value_label = QLabel(str(window.local_settings.resp_rate))
+    window.tv_page_value_label.setFont(page_settings.valueFont)
+    window.tv_page_value_label.setStyleSheet(
+        "QLabel {color: " + page_settings.valueColor + ";}")
+    window.tv_page_value_label.setAlignment(Qt.AlignCenter)
 
-    minute_vol_increment_button.clicked.connect(window.incrementMinuteVol)
-    minute_vol_decrement_button.clicked.connect(window.decrementMinuteVol)
-    minute_vol_apply.clicked.connect(window.commitMinuteVol)
-    minute_vol_cancel.clicked.connect(window.cancelChange)
+    tv_unit_label = QLabel("l/min")
+    tv_unit_label.setFont(page_settings.unitFont)
+    tv_unit_label.setStyleSheet(
+        "QLabel {color: " + page_settings.unitColor + ";}")
+    tv_unit_label.setAlignment(Qt.AlignCenter)
 
-    h_box_top.addWidget(window.minute_vol_page_rect)
-    h_box_mid.addWidget(minute_vol_increment_button)
-    h_box_mid.addWidget(minute_vol_decrement_button)
-    h_box_bot.addWidget(minute_vol_apply)
-    h_box_bot.addWidget(minute_vol_cancel)
+    tv_increment_button = window.makeSimpleDisplayButton(
+        "+", size=(50, 50),
+        button_settings=SimpleButtonSettings(fillColor="#FFFFFF",
+                                             borderColor=page_settings.changeButtonBorderColor,
+                                             valueSetting=page_settings.changeButtonTextSetting,
+                                             valueColor=page_settings.changeButtonValueColor))
+    tv_decrement_button = window.makeSimpleDisplayButton(
+        "-", size=(50, 50),
+        button_settings=SimpleButtonSettings(fillColor="#FFFFFF",
+                                             borderColor=page_settings.changeButtonBorderColor,
+                                             valueSetting=page_settings.changeButtonTextSetting,
+                                             valueColor=page_settings.changeButtonValueColor))
+    tv_apply = window.makeSimpleDisplayButton("APPLY",
+                                                     button_settings=SimpleButtonSettings(
+                                                         fillColor="#FFFFFF",
+                                                         borderColor=page_settings.commitColor,
+                                                         valueSetting=page_settings.commitSetting,
+                                                         valueColor=page_settings.commitColor
+                                                     ))
+    tv_cancel = window.makeSimpleDisplayButton("CANCEL",
+                                                      button_settings=SimpleButtonSettings(
+                                                          fillColor="#FFFFFF",
+                                                          borderColor=page_settings.cancelColor,
+                                                          valueSetting=page_settings.cancelSetting,
+                                                          valueColor=page_settings.cancelColor
+                                                      ))
 
-    v_box.addLayout(h_box_top)
-    v_box.addLayout(h_box_mid)
-    v_box.addLayout(h_box_bot)
+    tv_increment_button.clicked.connect(window.incrementTidalVol)
+    tv_decrement_button.clicked.connect(window.decrementTidalVol)
+    tv_apply.clicked.connect(window.commitTidalVol)
+    tv_cancel.clicked.connect(window.cancelChange)
+
+    h_box_1.addWidget(tv_title_label)
+    h_box_2.addWidget(tv_decrement_button)
+    h_box_2.addWidget(window.tv_page_value_label)
+    h_box_2.addWidget(tv_increment_button)
+    h_box_3.addWidget(tv_unit_label)
+    h_box_4.addWidget(tv_apply)
+    h_box_4.addWidget(tv_cancel)
+
+    v_box.addLayout(h_box_1)
+    v_box.addLayout(h_box_2)
+    v_box.addLayout(h_box_3)
+    v_box.addLayout(h_box_4)
 
     window.page["4"].setLayout(v_box)
+
 
 
 def initializeIERatioWidget(window: MainWindow):
@@ -223,9 +381,12 @@ def initializeIERatioWidget(window: MainWindow):
     h_box_bot = QHBoxLayout()
 
     window.ie_page_rect = window.makeDisplayRect(
-        "I/E Ratio", window.get_ie_display(window.settings.ie_ratio), "", size=(500, 200))
+        "I/E Ratio",
+        window.get_ie_display(window.settings.ie_ratio),
+        "",
+        size=(400, 200))
 
-    ie_change_size = (150, 50)
+    ie_change_size = (100, 50)
 
     ie_change_0 = window.makeSimpleDisplayButton(
         window.get_ie_display(0), size=ie_change_size)
@@ -251,7 +412,7 @@ def initializeIERatioWidget(window: MainWindow):
     h_box_mid.addWidget(ie_change_0)
     h_box_mid.addWidget(ie_change_1)
     h_box_mid.addWidget(ie_change_2)
-    h_box_mid.addWidget(ie_change_3)
+    #h_box_mid.addWidget(ie_change_3)
 
     h_box_bot.addWidget(ie_apply)
     h_box_bot.addWidget(ie_cancel)
@@ -261,3 +422,31 @@ def initializeIERatioWidget(window: MainWindow):
     v_box.addLayout(h_box_bot)
 
     window.page["5"].setLayout(v_box)
+
+def initializeAlarmWidget(window: MainWindow): #Alarm
+    v_box_6 = QVBoxLayout()
+    h_box_6top = QHBoxLayout()
+    #h_box_6middle = QHBoxLayout()
+    h_box_6bottom = QHBoxLayout()
+
+    alarm_ack = window.makeSimpleDisplayButton("Acknowledge")
+    alarm_cancel= window.makeSimpleDisplayButton("Cancel")
+
+    # Acknowledge alarm stops the alarms
+    alarm_ack.clicked.connect(lambda: window.commitAlarm())
+    alarm_cancel.clicked.connect(window.cancelChange)
+
+    window.alarm_page_rect = window.makeDisplayRect("Alarm",
+                                                    window.settings.get_alarm_display(),
+                                                    "", size = (400,200))
+
+    h_box_6top.addWidget(window.alarm_page_rect)
+    #h_box_6middle.addWidget(alarm_toggle)
+    h_box_6bottom.addWidget(alarm_ack)
+    h_box_6bottom.addWidget(alarm_cancel)
+
+    v_box_6.addLayout(h_box_6top)
+    #v_box_6.addLayout(h_box_6middle)
+    v_box_6.addLayout(h_box_6bottom)
+
+    window.page["6"].setLayout(v_box_6)
