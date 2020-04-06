@@ -17,11 +17,12 @@ class TextSetting:
 class FancyButtonSettings:
     def __init__(self,
                  labelSetting: TextSetting = TextSetting("Arial", 12, True),
-                 valueSetting: TextSetting = TextSetting("Arial Black", 36, True),
+                 valueSetting: TextSetting = TextSetting(
+                     "Arial Black", 36, True),
                  unitSetting: TextSetting = TextSetting("Arial", 10, False),
-                 fillColor: str ='#f2fff0',
+                 fillColor: str = '#f2fff0',
                  borderColor: str = '#c5c5c5',
-                 labelColor: str ='#A7A9AA',
+                 labelColor: str = '#A7A9AA',
                  valueColor: str = '#000000',
                  unitColor: str = '#808080',
                  default_size: Tuple[int, int] = (115, 65)):
@@ -51,9 +52,11 @@ class FancyButtonSettings:
     def getUnitPen(self) -> QPen:
         return QPen(QColor(self.unitColor))
 
+
 class SimpleButtonSettings:
     def __init__(self,
-                 valueSetting: TextSetting = TextSetting("Arial Black", 24, False),
+                 valueSetting: TextSetting = TextSetting(
+                     "Arial Black", 24, False),
                  fillColor: str = '#f2fff0',
                  borderColor: str = '#C5C5C5',
                  valueColor: str = '#000000',
@@ -74,10 +77,12 @@ class SimpleButtonSettings:
     def getValuePen(self) -> QPen:
         return QPen(QColor(self.valueColor))
 
+
 class DisplayRectSettings:
     def __init__(self,
                  labelSetting: TextSetting = TextSetting("Arial", 24, True),
-                 valueSetting: TextSetting = TextSetting("Arial Black", 52, True),
+                 valueSetting: TextSetting = TextSetting(
+                     "Arial Black", 52, True),
                  unitSetting: TextSetting = TextSetting("Arial", 18, False),
                  fillColor: str = '#ECFAFF',
                  borderColor: str = '#C5C5C5',
@@ -110,24 +115,27 @@ class DisplayRectSettings:
     def getUnitPen(self) -> QPen:
         return QPen(QColor(self.unitColor))
 
+
 class PageSettings:
-    def __init__(self,
-                 mainLabelSetting: TextSetting = TextSetting("Arial", 40, True),
-                 valueSetting: TextSetting = TextSetting("Arial Black", 110, True),
-                 textValueSetting: TextSetting = TextSetting("Arial Black", 64, True),
-                 unitSetting: TextSetting = TextSetting("Arial", 40, False),
-                 valueColor: str = '#000000',
-                 unitColor: str = '#C5C5C5',
-                 changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
-                 changeButtonValueColor: str = '#C5C5C5',
-                 changeButtonBorderColor: str = '#C5C5C5',
-                 changeButtonSpacing: int = 50,
-                 cancelSetting: TextSetting = TextSetting("Arial", 18, True),
-                 cancelColor: str = "#ff0000",
-                 commitSetting: TextSetting = TextSetting("Arial", 18, True),
-                 commitColor: str = "#00FF00",
-                 commitCancelButtonSpacing: int = 100,
-                 ):
+    def __init__(
+        self,
+        mainLabelSetting: TextSetting = TextSetting("Arial", 40, True),
+        valueSetting: TextSetting = TextSetting("Arial Black", 110, True),
+        textValueSetting: TextSetting = TextSetting("Arial Black", 70, True),
+        unitSetting: TextSetting = TextSetting("Arial", 40, False),
+        valueColor: str = '#000000',
+        unitColor: str = '#C5C5C5',
+        changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
+        changeButtonValueColor: str = '#C5C5C5',
+        changeButtonBorderColor: str = '#C5C5C5',
+        valueLabelWidth: int = 210,
+        changeButtonSpacing: int = 50,
+        cancelSetting: TextSetting = TextSetting("Arial", 18, True),
+        cancelColor: str = "#ff0000",
+        commitSetting: TextSetting = TextSetting("Arial", 18, True),
+        commitColor: str = "#00FF00",
+        commitCancelButtonSpacing: int = 100,
+    ):
 
         self.mainLabelFont = mainLabelSetting.font
         self.valueFont = valueSetting.font
@@ -138,13 +146,13 @@ class PageSettings:
         self.changeButtonTextSetting = changeButtonTextSetting
         self.changeButtonValueColor = changeButtonValueColor
         self.changeButtonBorderColor = changeButtonBorderColor
+        self.valueLabelWidth = valueLabelWidth
         self.changeButtonSpacing = changeButtonSpacing
         self.cancelSetting = cancelSetting
         self.cancelColor = cancelColor
         self.commitSetting = commitSetting
         self.commitColor = commitColor
         self.commitCancelButtonSpacing = commitCancelButtonSpacing
-
 
         def getCancelBorderPen(self) -> QPen:
             return QPen(QColor(self.cancelColor))
@@ -155,30 +163,31 @@ class PageSettings:
         def getChangeBorderPen(self) -> QPen:
             return QPen(QColor(self.changeButtonColor))
 
+
 class UISettings:
-    def __init__(self,
-                 fancy_button_settings: FancyButtonSettings = FancyButtonSettings(),
-                 simple_button_settings: SimpleButtonSettings = SimpleButtonSettings(),
-                 display_rect_settings: DisplayRectSettings = DisplayRectSettings(),
-                 page_settings: PageSettings = PageSettings()):
+    def __init__(
+        self,
+        fancy_button_settings: FancyButtonSettings = FancyButtonSettings(),
+        simple_button_settings: SimpleButtonSettings = SimpleButtonSettings(),
+        display_rect_settings: DisplayRectSettings = DisplayRectSettings(),
+        page_settings: PageSettings = PageSettings()):
 
         self.fancy_button_settings = fancy_button_settings
         self.simple_button_settings = simple_button_settings
         self.display_rect_settings = display_rect_settings
         self.page_settings = page_settings
 
-    def set_fancy_button_settings(
-            self, new_settings: FancyButtonSettings) -> None:
+    def set_fancy_button_settings(self,
+                                  new_settings: FancyButtonSettings) -> None:
         self.fancy_button_settings = new_settings
 
-    def set_simple_button_settings(
-            self, new_settings: SimpleButtonSettings) -> None:
+    def set_simple_button_settings(self,
+                                   new_settings: SimpleButtonSettings) -> None:
         self.simple_button_settings = new_settings
 
-    def set_display_rect_settings(
-            self, new_settings: DisplayRectSettings) -> None:
+    def set_display_rect_settings(self,
+                                  new_settings: DisplayRectSettings) -> None:
         self.display_rect_settings = new_settings
 
-    def set_page_settings(
-            self, new_settings: PageSettings) -> None:
+    def set_page_settings(self, new_settings: PageSettings) -> None:
         self.page_settings = new_settings
