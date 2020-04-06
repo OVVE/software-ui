@@ -39,6 +39,8 @@ class MainWindow(QWidget):
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
 
+        self.fullscreen = False
+
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
 
@@ -388,6 +390,19 @@ class MainWindow(QWidget):
 
     def closeEvent(self, *args, **kwargs):
         self.comms_handler.stop()
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_F:
+            if self.fullscreen:
+                self.hide()
+                self.showNormal()
+                self.fullscreen = False
+
+            elif not self.fullscreen:
+                self.hide()
+                self.showFullScreen()
+                self.fullscreen = True
+
 
 
 def main() -> None:
