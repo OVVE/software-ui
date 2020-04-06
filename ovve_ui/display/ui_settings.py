@@ -113,7 +113,8 @@ class DisplayRectSettings:
 class PageSettings:
     def __init__(self,
                  mainLabelSetting: TextSetting = TextSetting("Arial", 40, True),
-                 valueSetting: TextSetting = TextSetting("Arial Black", 128, True),
+                 valueSetting: TextSetting = TextSetting("Arial Black", 110, True),
+                 textValueSetting: TextSetting = TextSetting("Arial Black", 64, True),
                  unitSetting: TextSetting = TextSetting("Arial", 40, False),
                  valueColor: str = '#000000',
                  unitColor: str = '#C5C5C5',
@@ -130,8 +131,9 @@ class PageSettings:
 
         self.mainLabelFont = mainLabelSetting.font
         self.valueFont = valueSetting.font
-        self.valueColor = valueColor
+        self.textValueFont = textValueSetting.font
         self.unitFont = unitSetting.font
+        self.valueColor = valueColor
         self.unitColor = unitColor
         self.changeButtonTextSetting = changeButtonTextSetting
         self.changeButtonValueColor = changeButtonValueColor

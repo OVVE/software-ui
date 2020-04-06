@@ -42,8 +42,8 @@ class MainWindow(QWidget):
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
 
-        self.resp_rate_increment = 5
-        self.tv_increment = 5
+        self.resp_rate_increment = 1
+        self.tv_increment = 25
 
         # Example 1 (changes color of Fancy numbers to red)
         # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
@@ -105,9 +105,8 @@ class MainWindow(QWidget):
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
 
-    def get_ie_display(self, ie_ratio):
-
-        return self.settings.ie_switcher.get(ie_ratio, "invalid")
+    def get_ie_ratio_display(self, ie_ratio):
+        return self.settings.ie_ratio_switcher.get(ie_ratio, "invalid")
 
     def makeFancyDisplayButton(
             self,
@@ -186,7 +185,7 @@ class MainWindow(QWidget):
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.tv_button_main.updateValue(self.settings.tv)
         self.ie_button_main.updateValue(
-            self.get_ie_display(self.settings.ie_ratio))
+            self.get_ie_ratio_display(self.settings.ie_ratio))
         self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
         self.peep_display_main.updateValue(self.params.peep)
         self.tv_insp_display_main.updateValue(self.params.tv_insp)
@@ -195,12 +194,12 @@ class MainWindow(QWidget):
         self.pplat_display_main.updateValue(self.params.pplat)
 
     def updatePageDisplays(self) -> None:
-        self.mode_page_rect.updateValue(
+        self.mode_page_value_label.setText(
             self.get_mode_display(self.settings.mode))
         self.resp_rate_page_value_label.setText(str(self.settings.resp_rate))
         self.tv_page_value_label.setText(str(self.settings.tv))
-        self.ie_page_rect.updateValue(
-            self.get_ie_display(self.settings.ie_ratio))
+        self.ie_ratio_page_value_label.setText(
+            self.get_ie_ratio_display(self.settings.ie_ratio))
         self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
 
     # TODO: Polish up and process data properly
@@ -225,13 +224,21 @@ class MainWindow(QWidget):
         QtGui.QApplication.processEvents()
 
     # TODO: Finish all of these for each var
-    def changeMode(self, new_val: bool) -> None:
-        self.local_settings.ac_mode = new_val
-        self.mode_page_rect.updateValue(
+    def incrementMode(self) -> None:
+        self.local_settings.mode += 1
+        if self.local_settings.mode >= len(self.settings.mode_switcher):
+            self.local_settings.mode -= len(self.settings.mode_switcher)
+        self.mode_page_value_label.setText(
             self.get_mode_display(self.local_settings.mode))
 
-    # TODO: Figure out how to handle increment properly
-    # (right now it's not in the settings)
+    def decrementMode(self) -> None:
+        self.local_settings.mode -= 1
+        if self.local_settings.mode < 0:
+            self.local_settings.mode += len(self.settings.mode_switcher)
+        self.mode_page_value_label.setText(
+            self.get_mode_display(self.local_settings.mode))
+
+
     def incrementRespRate(self) -> None:
         self.local_settings.resp_rate += self.resp_rate_increment
         self.resp_rate_page_value_label.setText(
@@ -250,10 +257,19 @@ class MainWindow(QWidget):
         self.local_settings.tv -= self.tv_increment
         self.tv_page_value_label.setText(str(self.local_settings.tv))
 
-    def changeIERatio(self, new_val: int) -> None:
-        self.local_settings.ie_ratio = new_val
-        self.ie_page_rect.updateValue(
-            self.get_ie_display(self.local_settings.ie_ratio))
+    def incrementIERatio(self) -> None:
+        self.local_settings.ie_ratio += 1
+        if self.local_settings.ie_ratio >= len(self.settings.ie_ratio_switcher):
+            self.local_settings.ie_ratio -= len(self.settings.ie_ratio_switcher)
+        self.ie_ratio_page_value_label.setText(
+            self.get_ie_ratio_display(self.local_settings.ie_ratio))
+
+    def decrementIERatio(self) -> None:
+        self.local_settings.ie_ratio -= 1
+        if self.local_settings.ie_ratio < 0:
+            self.local_settings.ie_ratio += len(self.settings.ie_ratio_switcher)
+        self.ie_ratio_page_value_label.setText(
+            self.get_ie_ratio_display(self.local_settings.ie_ratio))
 
     def changeAlarm(self, new_val):
         self.local_settings.alarm_mode = new_val
@@ -286,7 +302,7 @@ class MainWindow(QWidget):
         self.settings.mode = self.local_settings.mode
         self.mode_button_main.updateValue(
             self.get_mode_display(self.settings.mode))
-        self.stack.setCurrentIndex(0)
+        self.display(0)
         self.passChanges()
         self.updatePageDisplays()
 
@@ -302,7 +318,7 @@ class MainWindow(QWidget):
 
         self.settings.resp_rate = self.local_settings.resp_rate
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
-        self.stack.setCurrentIndex(0)
+        self.display(0)
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
@@ -318,7 +334,7 @@ class MainWindow(QWidget):
             ))
         self.settings.tv = self.local_settings.tv
         self.tv_button_main.updateValue(self.settings.tv)
-        self.stack.setCurrentIndex(0)
+        self.display(0)
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
@@ -329,13 +345,13 @@ class MainWindow(QWidget):
             Change(
                 datetime.datetime.now(),
                 "I/E Ratio",
-                self.get_ie_display(self.settings.ie_ratio),
-                self.get_ie_display(self.local_settings.ie_ratio),
+                self.get_ie_ratio_display(self.settings.ie_ratio),
+                self.get_ie_ratio_display(self.local_settings.ie_ratio),
             ))
         self.settings.ie_ratio = self.local_settings.ie_ratio
         self.ie_button_main.updateValue(
-            self.get_ie_display(self.settings.ie_ratio))
-        self.stack.setCurrentIndex(0)
+            self.get_ie_ratio_display(self.settings.ie_ratio))
+        self.display(0)
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
@@ -347,7 +363,7 @@ class MainWindow(QWidget):
                    self.local_settings.get_alarm_display()))
         self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
-        self.stack.setCurrentIndex(0)
+        self.display(0)
         self.passChanges()
         self.updatePageDisplays()
         #TODO: Modify some equivalent of local settings for alarms? Not sure how this works
@@ -355,7 +371,7 @@ class MainWindow(QWidget):
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
         self.updateMainDisplays()
-        self.stack.setCurrentIndex(0)
+        self.display(0)
         self.updatePageDisplays()
 
     def passChanges(self) -> None:

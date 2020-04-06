@@ -19,7 +19,7 @@ class Settings():
         self.tv: int = 0
         self.ie_ratio: int = 0
 
-        self.ie_switcher: dict = {
+        self.ie_ratio_switcher: dict = {
             0: "1:1",
             1: "1:1.5",
             2: "1:2",
