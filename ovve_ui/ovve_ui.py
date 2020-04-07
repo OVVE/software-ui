@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import os
 import sys
@@ -35,7 +36,7 @@ from utils.logger import Logger
 
 
 class MainWindow(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, is_sim: bool=False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
@@ -100,13 +101,11 @@ class MainWindow(QWidget):
         # udpated in the UI
         self.set_settings_callback(self.comms_adapter.update_settings)
 
-        # The comms handler is a simulator for now.  It will send
-        # random values for the parameters that are updated periodically from
-        # the MCU.  It will accept settings updates from the UI.
-        #
-        # When the real comms handler is available, substitute it here.
-        #self.comms_handler = CommsSimulator(self.comms_adapter)
-        self.comms_handler = CommsLink(self.comms_adapter)
+        if not is_sim:
+            self.comms_handler = CommsLink(self.comms_adapter)
+        else:
+            self.comms_handler = CommsSimulator(self.comms_adapter)
+        
 
         #TODO: How to handle start / stop events from UI?
         self.comms_handler.start()
@@ -413,8 +412,13 @@ class MainWindow(QWidget):
             self.close()
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description='User interface for OVVE')
+    parser.add_argument('-s', "--sim", action='store_true', 
+                        help='Run with simulated data')
+    args = parser.parse_args()
+
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(args.sim)
     window.show()
     app.exec_()
     sys.exit()
