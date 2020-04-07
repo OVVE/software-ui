@@ -300,7 +300,8 @@ class MainWindow(QWidget):
             self.passChanges()
 
         elif self.settings.run_state == 1:
-            confirmStop = QMessageBox.critical(self, 'Confirm Stop', "Are you sure you want to stop ventilation?",
+            confirmStop = QMessageBox.critical(self, 'Confirm Stop', "Caution: this will stop ventilation immediately. "
+                                                                     "Proceed?",
                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if confirmStop == QMessageBox.Yes:
                 self.settings.run_state = 0
