@@ -413,7 +413,7 @@ class MainWindow(QWidget):
 def main() -> None:
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
+    window.showFullScreen()
     app.exec_()
     sys.exit()
 
