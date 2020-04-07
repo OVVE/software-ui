@@ -47,8 +47,7 @@ class CommsSimulator():
                 params_dict['flow'] = random.randrange(15, 20)
                 params_dict['tv_insp'] = random.randrange(475, 575)
                 params_dict['tv_exp'] = random.randrange(475, 575)
-                params_dict['tv_min'] = random.randrange(475, 575)
-                params_dict['tv_min'] = random.randrange(475, 575)
+                params_dict['tv_rate'] = random.randrange(475, 575)
                 params_dict['control_state'] = 0
                 params_dict['battery_level'] = 255
                 self.comms_adapter.update_params(params_dict)
@@ -69,18 +68,18 @@ class CommsSimulator():
         alarm_to_set = 0
         loop_count = 0
         while not self.done:
-            if alarm_interval > 0 and loop_count % alarm_interval == 0:                      
-                alarms_items = list(alarms_dict.items())
-                for i in range(0, len(alarms_items)):
-                    if i == alarm_to_set:
-                        alarms_dict[alarms_items[i][0]] = True
-                    else:
-                        alarms_dict[alarms_items[i][0]] = False
-                self.comms_adapter.update_alarms(alarms_dict)
-                alarm_to_set = (alarm_to_set + 1) % len(alarms_dict.keys())
-            loop_count += 1
+            if self.settings.run_state > 0:
+                if alarm_interval > 0 and loop_count % alarm_interval == 0:                      
+                    alarms_items = list(alarms_dict.items())
+                    for i in range(0, len(alarms_items)):
+                        if i == alarm_to_set:
+                            alarms_dict[alarms_items[i][0]] = True
+                        else:
+                            alarms_dict[alarms_items[i][0]] = False
+                    self.comms_adapter.update_alarms(alarms_dict)
+                    alarm_to_set = (alarm_to_set + 1) % len(alarms_dict.keys())
+                loop_count += 1
             time.sleep(1)
-
 
 
     def start(self) -> None:

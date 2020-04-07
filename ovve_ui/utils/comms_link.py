@@ -1,7 +1,7 @@
 import json
 import random
 import time
-from threading import Thread
+from threading import Thread, Lock
 import serial
 import sys
 from time import sleep
@@ -28,10 +28,12 @@ class CommsLink():
         self.ser = 0
         self.crcFailCnt = 0
         self.init_serial()
-        
+        self.setting_lock = Lock()
 
     def update_settings(self, settings_dict: dict) -> None:
+        self.settings_lock.acquire()
         self.settings.from_dict(settings_dict)
+        self.settings_lock.release()
         print("Got updated settings from UI")
         print(self.settings.to_JSON())
 
@@ -141,14 +143,13 @@ class CommsLink():
                 in_pkt['reserved']=int.from_bytes(byteData[62:64], byteorder='little')
                 in_pkt['alarm_bits']=int.from_bytes(byteData[64:68], byteorder='little')
                 in_pkt['crc']=int.from_bytes(byteData[68:], byteorder='little')
-                
+
                 # DEBUG
                 print ('Received SEQ and CRC:')
                 print (in_pkt['sequence_count'])
                 print (in_pkt['crc'])
                 #END DEBUG
-                # UI may need this keeping
-                self.seq_num = in_pkt['sequence_count']
+
                 # Needed for the return packet
                 cmd_pkt['sequence_count'] = in_pkt['sequence_count']
                 # ENDIF
@@ -161,6 +162,9 @@ class CommsLink():
             cmd_byteData = b""
             #packet_version = 1
 
+            # Lock to prevent settings from being written in the middle of
+            # creating the packet.
+            self.settings_lock.acquire()
             # get the updates from settings TODO: Make this event driven and only when callbackis called
             cmd_pkt['mode_value'] = self.settings.mode
             cmd_pkt['respiratory_rate_set'] = self.settings.resp_rate
@@ -173,7 +177,7 @@ class CommsLink():
             cmd_byteData += bytes(cmd_pkt['respiratory_rate_set'].to_bytes(4, endian))
             cmd_byteData += bytes(cmd_pkt['tidal_volume_set'].to_bytes(4, endian))
             cmd_byteData += bytes(cmd_pkt['ie_ratio_set'].to_bytes(4, endian))
-            
+
             # TO DO set alarmbits correctly if sequence or CRC failed
             cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
             calcSendCRC = self.crccitt(cmd_byteData.hex())
@@ -187,8 +191,8 @@ class CommsLink():
             try:
                 self.ser.write(cmd_byteData)
             except:
-                print("Faile to write to serial")
-            
+                print("Failed to write to serial")
+
             # DEBUG
             print ("Packet Written:")
             print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
@@ -219,18 +223,11 @@ class CommsLink():
                 params_dict['tv_insp'] = in_pkt['volume_in_measured']
                 params_dict['tv_exp'] = in_pkt['volume_out_measured']
                 params_dict['tv_rate'] = in_pkt['volume_rate_measured']
-                # Not sure what is tv_min keeping it like in sumulator for now
-                params_dict['tv_min'] = random.randrange(475, 575)
                 params_dict['control_state'] = 0
                 params_dict['battery_level'] = in_pkt['battery_level']
-                # is this class variable necessary?
-                # self. seqnum = params_dict['seq_num']
                 self.comms_adapter.update_params(params_dict)
-                # we got here
-                # print ("UI parameters updated")
 
-            #
-            #time.sleep(1)
+            self.settings_lock.release()
 
     def init_serial(self):
     
@@ -271,6 +268,7 @@ class CommsLink():
 
 
     def start(self) -> None:
+        self.done = False
         t = Thread(target=self.process_SerialData, args=())
         t.start()
 
