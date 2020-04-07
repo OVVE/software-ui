@@ -83,6 +83,12 @@ class MainWindow(QWidget):
         # Instantiate the single logger for the UI
         self.logger = Logger()
         self.logger.enable_console = True
+        self.logger.enable_file = True
+
+        # TODO: Set patient_id from the UI
+        self.logger.patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
+        self.logger.path = os.path.join("/tmp", "ovve_logs", self.logger.patient_id)
+        self.logger.filename = str(datetime.datetime.now()) + ".log.txt"
 
         # CommsAdapter adapts settings and params to and from the comms handler
         self.comms_adapter = CommsAdapter(self.logger)
