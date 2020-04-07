@@ -155,9 +155,10 @@ def process_in_serial():
         cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
         calcCRC = crccitt(cmd_byteData.hex())
         # print ('CALC CRC HEX and int: ')
+        
         # print(calcCRC)
         # print(int(calcCRC, 16))
-        #cmd_pkt['crc']  = bytes.fromhex(calcCRC)
+        cmd_pkt['crc']  = bytes.fromhex(calcCRC)
 
         cmd_byteData += bytearray.fromhex(calcCRC)
         #cmd_byteData += cmd_pkt['crc']

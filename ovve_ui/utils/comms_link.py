@@ -9,10 +9,6 @@ import binascii
 import crc16
 import codecs
 
-# BAUD = 38400
-# PORT = "/dev/ttyACM0"
-# SER_TIMEOUT = 0.055
-
 from utils.comms_adapter import CommsAdapter
 from utils.params import Params
 from utils.settings import Settings
@@ -30,7 +26,9 @@ class CommsLink():
         self.PORT = "/dev/ttyACM0"
         self.SER_TIMEOUT = 0.055
         self.ser = 0
+        self.crcFailCnt = 0
         self.init_serial()
+        
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings.from_dict(settings_dict)
@@ -43,132 +41,195 @@ class CommsLink():
         params = Params()
         params_str = params.to_JSON()
         params_dict = json.loads(params_str)
+        prevSeq = 0
+        error_count = 0
+        currentSeq = 0
+        validData = False
 
-        in_pkt={'sequence_count': 0,            # bytes 1 - 2 - rpi unsigned short int
-            'packet_version': 0,             # byte 3      - rpi unsigned char
-            'mode_value': 0,                 # byte 4      - rpi unsigned char
-            'respiratory_rate_measured': 0, # bytes 5 - 8 - rpi unsigned int
-            'respiratory_rate_set': 0,      # bytes 9 - 12
-            'tidal_volume_measured': 0,     # bytes 13 - 16
-            'tidal_volume_set': 0,          # bytes 17 - 20
-            'ie_ratio_measured': 0,         # bytes 22 - 24
-            'ie_ratio_set': 0,              # bytes 25 - 28
-            'peep_value_measured': 0,       # bytes 29 - 32
-            'peak_pressure_measured': 0,    # bytes 33 - 36
-            'plateau_value_measurement': 0, # bytes 37 - 40
-            'pressure_measured': 0,         # bytes 41 - 44
-            'flow_measured': 0,             # bytes 45 - 48
-            'volume_in_measured': 0,        # bytes 49 - 52
-            'volume_out_measured': 0,       # bytes 53 - 56
-            'volume_rate_measured': 0,      # bytes 57 - 60
-            'control_state': 0,              # byte 61       - rpi unsigned char
-            'battery_level': 0,              # byte 62
-            'reserved': 0,                  # bytes 63 - 64 - rpi unsigned int
-            'alarm_bits': 0,                # bytes 65 - 68
-            'crc': 0 }                      # bytes 69 - 70 
+        in_pkt={'sequence_count': 0,            # bytes  0- 1 - rpi unsigned short int
+            'packet_version': 0,             # byte 2      - rpi unsigned char
+            'mode_value': 0,                 # byte 3      - rpi unsigned char
+            'respiratory_rate_measured': 0, # bytes 4 - 7 - rpi unsigned int
+            'respiratory_rate_set': 0,      # bytes 8 - 11
+            'tidal_volume_measured': 0,     # bytes 12 - 15
+            'tidal_volume_set': 0,          # bytes 16 - 19
+            'ie_ratio_measured': 0,         # bytes 20 - 23
+            'ie_ratio_set': 0,              # bytes 24 - 27
+            'peep_value_measured': 0,       # bytes 28 - 31
+            'peak_pressure_measured': 0,    # bytes 32 - 35
+            'plateau_value_measurement': 0, # bytes 36 - 39
+            'pressure_measured': 0,         # bytes 40 - 43
+            'flow_measured': 0,             # bytes 44 - 47
+            'volume_in_measured': 0,        # bytes 48 - 51
+            'volume_out_measured': 0,       # bytes 52 - 55
+            'volume_rate_measured': 0,      # bytes 56 - 59
+            'control_state': 0,              # byte 60       - rpi unsigned char
+            'battery_level': 0,              # byte 61
+            'reserved': 0,                  # bytes 62 - 63 - rpi unsigned int
+            'alarm_bits': 0,                # bytes 64 - 67
+            'crc': 0 }                      # bytes 68 - 69 
 
-        cmd_pkt = {'start_byte':255,
-                    'sequence_count': 0,               # bytes 1 - 2 - rpi unsigned short int
-                    'packet_version': 0,                         # byte 3      - rpi unsigned char
-                    'mode_value': 0,                             # byte 4      - rpi unsigned char
+        cmd_pkt = {'sequence_count': 0,               # bytes 0 - 1 - rpi unsigned short int
+                    'packet_version': 1,                         # byte 2      - rpi unsigned char
+                    'mode_value': 0,                             # byte 3      - rpi unsigned char
                     'respiratory_rate_set': 0, # bytes 5 - 8 - rpi unsigned int
-                    'tidal_volume_set':  0,         # bytes 9 - 12
-                    'ie_ratio_set':  0,             # bytes 13 - 16
-                    'alarm_bits':   0,              # bytes 17 - 20
-                    'crc':   0 }                    # bytes 21 - 22 - rpi unsigned short int  
-        
+                    'tidal_volume_set':  0,         # bytes 8 - 11
+                    'ie_ratio_set':  0,             # bytes 12 - 15
+                    'alarm_bits':   0,              # bytes 16 - 19
+                    'crc':   0 }                    # bytes 20 - 21 - rpi unsigned short int  
             
         self.ser.reset_input_buffer()
-        error_count = 0
 
         while not self.done:
             
-            byteData = self.read_all(self.ser, 71)
-            #byteData = ser.read(72)
-            #2 ways to print
-            #print (byteData)  #raw will show ascii if can be decoded
-            #hex only -- byte order is reversed
-            #print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
-            if byteData[0] == 0xff:
-                #TO DO -- Map all packets to parameter structs
-                in_pkt['sequence_count']=int.from_bytes(byteData[1:3], byteorder='little')
-                in_pkt['packet_version']=byteData[3]
-                in_pkt['mode_value']=byteData[4]
-                in_pkt['respiratory_rate_measured']=int.from_bytes(byteData[5:9], byteorder='little')
-                in_pkt['respiratory_rate_set']=int.from_bytes(byteData[9:13], byteorder='little')
-                in_pkt['tidal_volume_measured']=int.from_bytes(byteData[13:17], byteorder='little')
-                in_pkt['tidal_volume_set']=int.from_bytes(byteData[9:13], byteorder='little')
-                in_pkt['ie_ratio_measured']=int.from_bytes(byteData[13:17], byteorder='little')
-                in_pkt['ie_ratio_set']=int.from_bytes(byteData[9:13], byteorder='little')
-                in_pkt['crc']=int.from_bytes(byteData[69:71], byteorder='little')
+            byteData = self.read_all(self.ser, 70)
+            # DEBUG
+            # 2 ways to print for debugging 
+            # print (byteData)  #raw will show ascii if can be decoded
+            # hex only -- byte order is reversed
+            # print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
+            # END DEBUG
+            if byteData[0:2] == b'\x00\x00':
+                prevSeq = -1 
+                currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
+            else:
+                prevSeq = (int.from_bytes(byteData[0:2], byteorder='little') - 1)
+                currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
                 
+                #TO DO -- Map all packets to parameter structs
+                 
+            if  currentSeq !=  ( prevSeq + 1) :
+                print ("There appears to be Sequence Error")
+                print (currentSeq)
+                print (prevSeq)
+
+            # calculate CRC instead of
+            rcvdCRC = int.from_bytes(byteData[68:], byteorder='little')
+
+
+            # rcvdCRC = (int.from_bytes(byteData[0:2], byteorder='little')).hex()
+            calcRcvCRC = self.crccitt(byteData[0:68].hex())
+            calcRcvCRC = int(calcRcvCRC, 16)
+            if calcRcvCRC != rcvdCRC:
+                print ("CRC check failed")
+                self.crcFailCnt += self.crcFailCnt
+                print (rcvdCRC)
+                print (calcRcvCRC)
+                cmd_pkt['sequence_count'] = in_pkt['sequence_count']
+
+            else:
+                validData = True
+                in_pkt['sequence_count']=int.from_bytes(byteData[0:2], byteorder='little')
+                in_pkt['packet_version']=byteData[2]
+                in_pkt['mode_value']=byteData[3]
+                in_pkt['respiratory_rate_measured']=int.from_bytes(byteData[4:8], byteorder='little')
+                in_pkt['respiratory_rate_set']=int.from_bytes(byteData[8:12], byteorder='little')
+                in_pkt['tidal_volume_measured']=int.from_bytes(byteData[12:16], byteorder='little')
+                in_pkt['tidal_volume_set']=int.from_bytes(byteData[16:20], byteorder='little')
+                in_pkt['ie_ratio_measured']=int.from_bytes(byteData[20:24], byteorder='little')
+                in_pkt['ie_ratio_set']=int.from_bytes(byteData[24:28], byteorder='little')
+                in_pkt['peep_value_measured']=int.from_bytes(byteData[28:32], byteorder='little')
+                in_pkt['peak_pressure_measured']=int.from_bytes(byteData[32:36], byteorder='little')
+                in_pkt['plateau_value_measured']=int.from_bytes(byteData[36:40], byteorder='little')
+                in_pkt['pressure_measured']=int.from_bytes(byteData[40:44], byteorder='little')
+                in_pkt['flow_measured']=int.from_bytes(byteData[44:48], byteorder='little')
+                in_pkt['volume_in_measured']=int.from_bytes(byteData[48:52], byteorder='little')
+                in_pkt['volume_out_measured']=int.from_bytes(byteData[52:56], byteorder='little')
+                in_pkt['volume_rate_measured']=int.from_bytes(byteData[56:60], byteorder='little')
+                in_pkt['control_state']=byteData[60]
+                in_pkt['battery_level']=byteData[61]
+                in_pkt['reserved']=int.from_bytes(byteData[62:64], byteorder='little')
+                in_pkt['alarm_bits']=int.from_bytes(byteData[64:68], byteorder='little')
+                in_pkt['crc']=int.from_bytes(byteData[68:], byteorder='little')
+                
+                # DEBUG
                 print ('Received SEQ and CRC:')
                 print (in_pkt['sequence_count'])
                 print (in_pkt['crc'])
+                #END DEBUG
+                # UI may need this keeping
                 self.seq_num = in_pkt['sequence_count']
-                #self.settings.resp_rate = in_pkt['sequence_count']
+                # Needed for the return packet
                 cmd_pkt['sequence_count'] = in_pkt['sequence_count']
-                
-            else:
-                error_count = error_count + 1
-                print ('drop packets count ' + str(error_count))
+                # ENDIF
 
+            # ecu_settings_dict = {'to_JSON':ecu_settings_str, 'run_state': 0,'mode': 0,'tv': 0,'resp_rate':0 ,'ie_ratio': 0}
+            # self.comms_adapter.update_settings()
 
+            # create the return packet
             endian = "little"
             cmd_byteData = b""
-            start_byte = 0xFF
-            packet_version = 1
-           
-            cmd_byteData += bytes(start_byte.to_bytes(1, endian))
-            cmd_byteData += bytes(in_pkt['sequence_count'].to_bytes(2, endian))
-            cmd_byteData += bytes(in_pkt['packet_version'].to_bytes(1, endian))
+            #packet_version = 1
+
+            # get the updates from settings TODO: Make this event driven and only when callbackis called
+            cmd_pkt['mode_value'] = self.settings.mode
+            cmd_pkt['respiratory_rate_set'] = self.settings.resp_rate
+            cmd_pkt['tidal_volume_set'] = self.settings.tv
+            cmd_pkt['ie_ratio_set'] = self.settings.ie_ratio
+
+            cmd_byteData += bytes(cmd_pkt['sequence_count'].to_bytes(2, endian))
+            cmd_byteData += bytes(cmd_pkt['packet_version'].to_bytes(1, endian))
             cmd_byteData += bytes(cmd_pkt['mode_value'].to_bytes(1, endian))
             cmd_byteData += bytes(cmd_pkt['respiratory_rate_set'].to_bytes(4, endian))
             cmd_byteData += bytes(cmd_pkt['tidal_volume_set'].to_bytes(4, endian))
             cmd_byteData += bytes(cmd_pkt['ie_ratio_set'].to_bytes(4, endian))
+            
+            # TO DO set alarmbits correctly if sequence or CRC failed
             cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
-            calcCRC = self.crccitt(cmd_byteData.hex())
-            print ('CALC CRC HEX and int: ')
-            print(calcCRC)
-            print(int(calcCRC, 16))
-            cmd_pkt['crc']  = bytes.fromhex(calcCRC)
-
-            #cmd_byteData += bytes(cmd_pkt['crc'].to_bytes(2, endian))
+            calcSendCRC = self.crccitt(cmd_byteData.hex())
+            # DEBUG
+            # print ('CALC sent CRC HEX and int: ')
+            # print(calcSendCRC)
+            # print(int(calcSendCRC, 16))
+            #end DEBUG
+            cmd_pkt['crc']  = bytes.fromhex(calcSendCRC)
             cmd_byteData += cmd_pkt['crc']
-
-            self.ser.write(cmd_byteData)
+            try:
+                self.ser.write(cmd_byteData)
+            except:
+                print("Faile to write to serial")
             
+            # DEBUG
+            print ("Packet Written:")
+            print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
             print("Sent back SEQ and CRC: ")
-            
-            print (int.from_bytes(cmd_byteData[1:3], byteorder='little'))
-            print (int.from_bytes(cmd_byteData[21:], byteorder='big'))
+            print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
+            print (int.from_bytes(cmd_byteData[20:], byteorder='big'))
+            # END DEBUG
 
-            params_dict['run_state'] = self.settings.run_state
-            params_dict['seq_num'] = self.seqnum
-            params_dict['packet_version'] = self.packet_version
-            params_dict['mode'] = self.settings.mode
-            params_dict['resp_rate_meas'] = self.settings.resp_rate
-            params_dict['resp_rate_set'] = self.settings.resp_rate
-            params_dict['tv_meas'] = self.settings.tv
-            params_dict['tv_set'] = self.settings.tv
-            params_dict['ie_ratio_meas'] = self.settings.ie_ratio
-            params_dict['ie_ratio_set'] = self.settings.ie_ratio
-            params_dict['peep'] = random.randrange(3, 6)
-            params_dict['ppeak'] = random.randrange(15, 20)
-            params_dict['pplat'] = random.randrange(15, 20)
-            params_dict['pressure'] = random.randrange(15, 20)
-            params_dict['flow'] = random.randrange(15, 20)
-            params_dict['tv_insp'] = random.randrange(475, 575)
-            #params_dict['tv_exp'] = random.randrange(475, 575)
-            #testing if actual data from arduino can be displayed in GUI
-            params_dict['tv_exp'] = in_pkt['sequence_count']
-            params_dict['tv_min'] = random.randrange(475, 575)
-            params_dict['tv_min'] = random.randrange(475, 575)
-            params_dict['control_state'] = 0
-            params_dict['battery_level'] = 255
-            self.comms_adapter.update_params(params_dict)
+            #Update dict only if there is valid data
+            if validData == True:
+                # any settings set will not retunr correctly yet until Arduino sets set values correctly
+                # We can use the settings values like in simulator if so desired or maybe compare them
+                params_dict['run_state'] = self.settings.run_state
+                params_dict['seq_num'] = in_pkt['sequence_count']
+                params_dict['packet_version'] = in_pkt['packet_version']
+                params_dict['mode'] = in_pkt['mode_value']
+                params_dict['resp_rate_meas'] = in_pkt['respiratory_rate_measured']
+                params_dict['resp_rate_set'] = in_pkt['respiratory_rate_set']
+                params_dict['tv_meas'] = in_pkt['tidal_volume_measured']
+                params_dict['tv_set'] = in_pkt['tidal_volume_set']
+                params_dict['ie_ratio_meas'] = in_pkt['ie_ratio_measured']
+                params_dict['ie_ratio_set'] = in_pkt['ie_ratio_set']
+                params_dict['peep'] = in_pkt['peep_value_measured']
+                params_dict['ppeak'] = in_pkt['peak_pressure_measured']
+                params_dict['pplat'] = in_pkt['plateau_value_measurement']
+                params_dict['pressure'] = in_pkt['pressure_measured']
+                params_dict['flow'] = in_pkt['flow_measured']
+                params_dict['tv_insp'] = in_pkt['volume_in_measured']
+                params_dict['tv_exp'] = in_pkt['volume_out_measured']
+                params_dict['tv_rate'] = in_pkt['volume_rate_measured']
+                # Not sure what is tv_min keeping it like in sumulator for now
+                params_dict['tv_min'] = random.randrange(475, 575)
+                params_dict['control_state'] = 0
+                params_dict['battery_level'] = in_pkt['battery_level']
+                # is this class variable necessary?
+                # self. seqnum = params_dict['seq_num']
+                self.comms_adapter.update_params(params_dict)
+                # we got here
+                # print ("UI parameters updated")
 
-            #self.seqnum += 1
+            #
             #time.sleep(1)
 
     def init_serial(self):
@@ -207,41 +268,6 @@ class CommsLink():
                 break
 
         return read_buffer
-
-    def simulate_params(self) -> None:
-        params = Params()
-        params_str = params.to_JSON()
-        params_dict = json.loads(params_str)
-
-        while not self.done:
-            params_dict['run_state'] = self.settings.run_state
-            params_dict['seq_num'] = self.seqnum
-            params_dict['packet_version'] = self.packet_version
-            params_dict['mode'] = self.settings.mode
-            params_dict['resp_rate_meas'] = self.settings.resp_rate
-            params_dict['resp_rate_set'] = self.settings.resp_rate
-            params_dict['tv_meas'] = self.settings.tv
-            params_dict['tv_set'] = self.settings.tv
-            params_dict['ie_ratio_meas'] = self.settings.ie_ratio
-            params_dict['ie_ratio_set'] = self.settings.ie_ratio
-            params_dict['peep'] = random.randrange(3, 6)
-            params_dict['ppeak'] = random.randrange(15, 20)
-            params_dict['pplat'] = random.randrange(15, 20)
-            params_dict['pressure'] = random.randrange(15, 20)
-            params_dict['flow'] = random.randrange(15, 20)
-            params_dict['tv_insp'] = random.randrange(475, 575)
-            params_dict['tv_exp'] = random.randrange(475, 575)
-            params_dict['tv_min'] = random.randrange(475, 575)
-            params_dict['tv_min'] = random.randrange(475, 575)
-            params_dict['control_state'] = 0
-            params_dict['battery_level'] = 255
-            self.comms_adapter.update_params(params_dict)
-
-            self.seqnum += 1
-            time.sleep(1)
-
-
-
 
 
     def start(self) -> None:

@@ -84,6 +84,7 @@ def send_Data():
         
         print (int.from_bytes(cmd_byteData[1:3], byteorder='little'))
         print (int.from_bytes(cmd_byteData[21:], byteorder='big'))
+        sleep(0.1)
 
 send_Data()
 
