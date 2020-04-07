@@ -1,0 +1,518 @@
+Open: /dev/ttyACM0
+Received SEQ and CRC:
+7
+50581
+Packet Written:
+\x7\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x8e\x90
+Sent back SEQ and CRC: 
+7
+36496
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227296.947189, "type": "params", "msg": "{\"seq_num\": 7, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 500, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+8
+42697
+Packet Written:
+\x8\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xbb\x30
+Sent back SEQ and CRC: 
+8
+47920
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.0200913, "type": "params", "msg": "{\"seq_num\": 8, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 479, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+9
+39998
+Packet Written:
+\x9\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x8e\x83
+Sent back SEQ and CRC: 
+9
+36483
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.122461, "type": "params", "msg": "{\"seq_num\": 9, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 516, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+10
+54055
+Packet Written:
+\xa\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xd0\x56
+Sent back SEQ and CRC: 
+10
+53334
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.224682, "type": "params", "msg": "{\"seq_num\": 10, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 564, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+11
+59856
+Packet Written:
+\xb\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xe5\xe5
+Sent back SEQ and CRC: 
+11
+58853
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.3209202, "type": "params", "msg": "{\"seq_num\": 11, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 482, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+12
+19733
+Packet Written:
+\xc\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6d\xfc
+Sent back SEQ and CRC: 
+12
+28156
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.4214048, "type": "params", "msg": "{\"seq_num\": 12, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 545, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+13
+30690
+Packet Written:
+\xd\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x58\x4f
+Sent back SEQ and CRC: 
+13
+22607
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.5200052, "type": "params", "msg": "{\"seq_num\": 13, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 554, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+14
+14587
+Packet Written:
+\xe\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6\x9a
+Sent back SEQ and CRC: 
+14
+1690
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.6221826, "type": "params", "msg": "{\"seq_num\": 14, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 484, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+15
+524
+Packet Written:
+\xf\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x33\x29
+Sent back SEQ and CRC: 
+15
+13097
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.722783, "type": "params", "msg": "{\"seq_num\": 15, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 553, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+16
+65091
+Packet Written:
+\x10\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6d\xda
+Sent back SEQ and CRC: 
+16
+28122
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.8188694, "type": "params", "msg": "{\"seq_num\": 16, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 523, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+17
+50356
+Packet Written:
+\x11\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x58\x69
+Sent back SEQ and CRC: 
+17
+22633
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227297.921094, "type": "params", "msg": "{\"seq_num\": 17, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 532, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+18
+35757
+Packet Written:
+\x12\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6\xbc
+Sent back SEQ and CRC: 
+18
+1724
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.020856, "type": "params", "msg": "{\"seq_num\": 18, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 493, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+19
+45402
+Packet Written:
+\x13\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x33\xf
+Sent back SEQ and CRC: 
+19
+13071
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.1217802, "type": "params", "msg": "{\"seq_num\": 19, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 541, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+20
+5535
+Packet Written:
+\x14\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xbb\x16
+Sent back SEQ and CRC: 
+20
+47894
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.2201395, "type": "params", "msg": "{\"seq_num\": 20, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 552, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+21
+12136
+Packet Written:
+\x15\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x8e\xa5
+Sent back SEQ and CRC: 
+21
+36517
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.3225343, "type": "params", "msg": "{\"seq_num\": 21, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 478, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+22
+24689
+Packet Written:
+\x16\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xd0\x70
+Sent back SEQ and CRC: 
+22
+53360
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.4209511, "type": "params", "msg": "{\"seq_num\": 22, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 484, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+23
+23174
+Packet Written:
+\x17\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xe5\xc3
+Sent back SEQ and CRC: 
+23
+58819
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.5194767, "type": "params", "msg": "{\"seq_num\": 23, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 516, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+24
+14810
+Packet Written:
+\x18\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xd0\x63
+Sent back SEQ and CRC: 
+24
+53347
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.62183, "type": "params", "msg": "{\"seq_num\": 24, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 517, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+25
+813
+Packet Written:
+\x19\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xe5\xd0
+Sent back SEQ and CRC: 
+25
+58832
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.7201622, "type": "params", "msg": "{\"seq_num\": 25, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 535, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+26
+19508
+Packet Written:
+\x1a\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xbb\x5
+Sent back SEQ and CRC: 
+26
+47877
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.8227034, "type": "params", "msg": "{\"seq_num\": 26, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 544, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+27
+30403
+Packet Written:
+\x1b\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x8e\xb6
+Sent back SEQ and CRC: 
+27
+36534
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227298.9209342, "type": "params", "msg": "{\"seq_num\": 27, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 513, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+28
+53766
+Packet Written:
+\x1c\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6\xaf
+Sent back SEQ and CRC: 
+28
+1711
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.0195422, "type": "params", "msg": "{\"seq_num\": 28, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 477, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+29
+59633
+Packet Written:
+\x1d\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x33\x1c
+Sent back SEQ and CRC: 
+29
+13084
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.121878, "type": "params", "msg": "{\"seq_num\": 29, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 537, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+30
+42984
+Packet Written:
+\x1e\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6d\xc9
+Sent back SEQ and CRC: 
+30
+28105
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.2199752, "type": "params", "msg": "{\"seq_num\": 30, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 522, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+31
+40223
+Packet Written:
+\x1f\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x58\x7a
+Sent back SEQ and CRC: 
+31
+22650
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.3224323, "type": "params", "msg": "{\"seq_num\": 31, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 568, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+32
+20311
+Packet Written:
+\x20\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xd0\x2f
+Sent back SEQ and CRC: 
+32
+53295
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.4207788, "type": "params", "msg": "{\"seq_num\": 32, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 563, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+33
+30112
+Packet Written:
+\x21\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xe5\x9c
+Sent back SEQ and CRC: 
+33
+58780
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.5230553, "type": "params", "msg": "{\"seq_num\": 33, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 489, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+34
+15033
+Packet Written:
+\x22\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xbb\x49
+Sent back SEQ and CRC: 
+34
+47945
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.6218185, "type": "params", "msg": "{\"seq_num\": 34, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 544, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+35
+78
+Packet Written:
+\x23\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x8e\xfa
+Sent back SEQ and CRC: 
+35
+36602
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.7196262, "type": "params", "msg": "{\"seq_num\": 35, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 493, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+36
+42123
+Packet Written:
+\x24\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6\xe3
+Sent back SEQ and CRC: 
+36
+1763
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.8217778, "type": "params", "msg": "{\"seq_num\": 36, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 550, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+37
+40572
+Packet Written:
+\x25\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x33\x50
+Sent back SEQ and CRC: 
+37
+13136
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227299.9200974, "type": "params", "msg": "{\"seq_num\": 37, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 500, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+38
+53605
+Packet Written:
+\x26\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6d\x85
+Sent back SEQ and CRC: 
+38
+28037
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.0223787, "type": "params", "msg": "{\"seq_num\": 38, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 478, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+39
+60306
+Packet Written:
+\x27\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x58\x36
+Sent back SEQ and CRC: 
+39
+22582
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.1206756, "type": "params", "msg": "{\"seq_num\": 39, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 500, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+40
+35022
+Packet Written:
+\x28\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6d\x96
+Sent back SEQ and CRC: 
+40
+28054
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.2190895, "type": "params", "msg": "{\"seq_num\": 40, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 506, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+41
+45625
+Packet Written:
+\x29\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x58\x25
+Sent back SEQ and CRC: 
+41
+22565
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.3214376, "type": "params", "msg": "{\"seq_num\": 41, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 479, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+42
+64800
+Packet Written:
+\x2a\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x6\xf0
+Sent back SEQ and CRC: 
+42
+1776
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.4197407, "type": "params", "msg": "{\"seq_num\": 42, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 502, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+43
+51159
+Packet Written:
+\x2b\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x33\x43
+Sent back SEQ and CRC: 
+43
+13123
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.5225935, "type": "params", "msg": "{\"seq_num\": 43, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 525, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+44
+25362
+Packet Written:
+\x2c\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\x0\xbb\x5a
+Sent back SEQ and CRC: 
+44
+47962
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.6211112, "type": "params", "msg": "{\"seq_num\": 44, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 489, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+2020-04-06 20:41:40.658221: I/E Ratio changed from 1:1 to 1:1.5
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.665766, "type": "settings,", "msg": "{\"run_state\": 0, \"mode\": 0, \"tv\": 0, \"resp_rate\": 0, \"ie_ratio\": 1}"}
+Got updated settings from UI
+{"run_state": 0, "mode": 0, "tv": 0, "resp_rate": 0, "ie_ratio": 1}
+Received SEQ and CRC:
+45
+23013
+Packet Written:
+\x2d\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xc9\x3a
+Sent back SEQ and CRC: 
+45
+51514
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.7238872, "type": "params", "msg": "{\"seq_num\": 45, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 555, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+46
+5884
+Packet Written:
+\x2e\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x97\xef
+Sent back SEQ and CRC: 
+46
+38895
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.8250432, "type": "params", "msg": "{\"seq_num\": 46, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 552, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+47
+11275
+Packet Written:
+\x2f\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xa2\x5c
+Sent back SEQ and CRC: 
+47
+41564
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227300.9217975, "type": "params", "msg": "{\"seq_num\": 47, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 486, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+48
+53316
+Packet Written:
+\x30\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xfc\xaf
+Sent back SEQ and CRC: 
+48
+64687
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.0225945, "type": "params", "msg": "{\"seq_num\": 48, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 552, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+49
+60083
+Packet Written:
+\x31\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xc9\x1c
+Sent back SEQ and CRC: 
+49
+51484
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.122722, "type": "params", "msg": "{\"seq_num\": 49, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 502, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+50
+42410
+Packet Written:
+\x32\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x97\xc9
+Sent back SEQ and CRC: 
+50
+38857
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.222649, "type": "params", "msg": "{\"seq_num\": 50, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 525, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+51
+40797
+Packet Written:
+\x33\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xa2\x7a
+Sent back SEQ and CRC: 
+51
+41594
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.3218255, "type": "params", "msg": "{\"seq_num\": 51, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 558, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+52
+15256
+Packet Written:
+\x34\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x2a\x63
+Sent back SEQ and CRC: 
+52
+10851
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.4212742, "type": "params", "msg": "{\"seq_num\": 52, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 480, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+53
+367
+Packet Written:
+\x35\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x1f\xd0
+Sent back SEQ and CRC: 
+53
+8144
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.5218408, "type": "params", "msg": "{\"seq_num\": 53, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 560, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+54
+20086
+Packet Written:
+\x36\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x41\x5
+Sent back SEQ and CRC: 
+54
+16645
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.622041, "type": "params", "msg": "{\"seq_num\": 54, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 501, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+55
+29825
+Packet Written:
+\x37\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x74\xb6
+Sent back SEQ and CRC: 
+55
+29878
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.7222881, "type": "params", "msg": "{\"seq_num\": 55, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 539, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+56
+6109
+Packet Written:
+\x38\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x41\x16
+Sent back SEQ and CRC: 
+56
+16662
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.8206635, "type": "params", "msg": "{\"seq_num\": 56, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 496, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+57
+11562
+Packet Written:
+\x39\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x74\xa5
+Sent back SEQ and CRC: 
+57
+29861
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227301.9190583, "type": "params", "msg": "{\"seq_num\": 57, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 531, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+58
+25139
+Packet Written:
+\x3a\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x2a\x70
+Sent back SEQ and CRC: 
+58
+10864
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227302.0213296, "type": "params", "msg": "{\"seq_num\": 58, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 540, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+59
+22724
+Packet Written:
+\x3b\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x1f\xc3
+Sent back SEQ and CRC: 
+59
+8131
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227302.1197062, "type": "params", "msg": "{\"seq_num\": 59, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 560, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+60
+64513
+Packet Written:
+\x3c\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\x97\xda
+Sent back SEQ and CRC: 
+60
+38874
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227302.2220032, "type": "params", "msg": "{\"seq_num\": 60, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 570, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+61
+50934
+Packet Written:
+\x3d\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xa2\x69
+Sent back SEQ and CRC: 
+61
+41577
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227302.320856, "type": "params", "msg": "{\"seq_num\": 61, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 526, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+62
+35311
+Packet Written:
+\x3e\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xfc\xbc
+Sent back SEQ and CRC: 
+62
+64700
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227302.422969, "type": "params", "msg": "{\"seq_num\": 62, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 521, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
+Received SEQ and CRC:
+63
+45848
+Packet Written:
+\x3f\x0\x1\x0\x0\x0\x0\x0\x0\x0\x0\x0\x1\x0\x0\x0\x0\x0\x0\x0\xc9\xf
+Sent back SEQ and CRC: 
+63
+51471
+{"patient_id": "13c50304-5a34-4a39-8665-bde212f2f206", "ts": 1586227302.5335572, "type": "params", "msg": "{\"seq_num\": 63, \"packet_version\": 1, \"mode\": 0, \"resp_rate_meas\": 0, \"resp_rate_set\": 0, \"tv_meas\": 0, \"tv_set\": 0, \"ie_ratio_meas\": 0, \"ie_ratio_set\": 0, \"peep\": 0, \"ppeak\": 0, \"pplat\": 0, \"pressure\": 0, \"flow\": 0, \"tv_insp\": 0, \"tv_exp\": 0, \"tv_min\": 550, \"control_state\": 0, \"run_state\": 0, \"battery_level\": 0}"}
