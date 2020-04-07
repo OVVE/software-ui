@@ -27,7 +27,7 @@ class Params():
             "flow": 0,
             "tv_insp": 0,
             "tv_exp": 0,
-            "tv_min": 0,
+            "tv_rate": 0,
             "control_state": 0,
             "run_state": 0,
             "battery_level": 0,
@@ -164,12 +164,12 @@ class Params():
         self._param["tv_exp"] = value
 
     @property
-    def tv_min(self) -> int:
-        return self._param["tv_min"]
+    def tv_rate(self) -> int:
+        return self._param["tv_rate"]
 
-    @tv_min.setter
-    def tv_min(self, value: int) -> None:
-        self._param["tv_min"] = value
+    @tv_rate.setter
+    def tv_rate(self, value: int) -> None:
+        self._param["tv_rate"] = value
 
     @property
     def control_state(self) -> int:
