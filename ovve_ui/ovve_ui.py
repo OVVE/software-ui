@@ -12,7 +12,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget)
+                             QWidget, QMessageBox)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
@@ -300,10 +300,18 @@ class MainWindow(QWidget):
             self.passChanges()
 
         elif self.settings.run_state == 1:
-            self.settings.run_state = 0
-            self.start_button_main.updateValue("START")
-            self.start_button_main.button_settings = SimpleButtonSettings()
-            self.passChanges()
+            confirmStop = QMessageBox.critical(self, 'Confirm Stop', "Are you sure you want to stop ventilation?",
+                                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if confirmStop == QMessageBox.Yes:
+                self.settings.run_state = 0
+                self.start_button_main.updateValue("START")
+                self.start_button_main.button_settings = SimpleButtonSettings()
+                self.passChanges()
+
+            else:
+                print('Aborted stop.')
+                return
+
 
     # TODO: Finish all of these for each var
     def commitMode(self):
