@@ -4,6 +4,7 @@ from time import sleep
 import binascii
 import crc16
 import codecs
+import struct
 
 BAUD = 38400
 PORT = "/dev/ttyACM0"
@@ -40,7 +41,7 @@ def crccitt(hex_string):
     crc = crc16.crc16xmodem(byte_seq, 0xffff)
     return '{:04X}'.format(crc & 0xffff)
 
-def read_all(port, chunk_size=200):
+def read_all(port, chunk_size=70):
     """Read all characters on the serial port and return them."""
     if not port.timeout:
         raise TypeError('Port needs to have a timeout set!')
@@ -94,14 +95,14 @@ def process_in_serial():
                 'crc':   0 }                    # bytes 21 - 22 - rpi unsigned short int  
     
            
-    ser.reset_input_buffer()
+    #ser.reset_input_buffer()
     error_count = 0
     prevByte = 0
     while True:
         byteData = read_all(ser, 70)
-        #byteData = ser.read(72)
+        #byteData = ser.read(70)
         #2 ways to print
-        #print (byteData)  #raw will show ascii if can be decoded
+        # print (byteData)  #raw will show ascii if can be decoded
         #hex only -- byte order is reversed
         print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
         if byteData[0] == 0x00:
@@ -113,12 +114,6 @@ def process_in_serial():
             in_pkt['sequence_count']=int.from_bytes(byteData[0:2], byteorder='little')
             in_pkt['packet_version']=byteData[2]
             in_pkt['mode_value']=byteData[3]
-            # in_pkt['respiratory_rate_measured']=int.from_bytes(byteData[4:8], byteorder='little')
-            # in_pkt['respiratory_rate_set']=int.from_bytes(byteData[8:12], byteorder='little')
-            # in_pkt['tidal_volume_measured']=int.from_bytes(byteData[12:16], byteorder='little')
-            # in_pkt['tidal_volume_set']=int.from_bytes(byteData[9:13], byteorder='little')
-            # in_pkt['ie_ratio_measured']=int.from_bytes(byteData[13:17], byteorder='little')
-            # in_pkt['ie_ratio_set']=int.from_bytes(byteData[9:13], byteorder='little')
             in_pkt['crc']=int.from_bytes(byteData[68:70], byteorder='little')
             
             print ('Received SEQ and CRC:')
@@ -129,8 +124,6 @@ def process_in_serial():
             print (int(calcRcvCRC, 16))
             if in_pkt['crc'] != int(calcRcvCRC,16):
                 print ("Mismatch")
-
-
             cmd_pkt['sequence_count'] = in_pkt['sequence_count']
             
         else:
@@ -143,10 +136,6 @@ def process_in_serial():
         start_byte = 0xFF
         packet_version = 1
 
-        
-        
-        # cmd_byteData += bytes(start_byte.to_bytes(1, endian))
-        #in_pkt['sequence_count'] = in_pkt['sequence_count'] + 1
         cmd_byteData += bytes(in_pkt['sequence_count'].to_bytes(2, endian))
         cmd_byteData += bytes(in_pkt['packet_version'].to_bytes(1, endian))
         cmd_byteData += bytes(cmd_pkt['mode_value'].to_bytes(1, endian))
@@ -154,27 +143,38 @@ def process_in_serial():
         cmd_byteData += bytes(cmd_pkt['tidal_volume_set'].to_bytes(4, endian))
         cmd_byteData += bytes(cmd_pkt['ie_ratio_set'].to_bytes(4, endian))
         cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
+        #Get CRC
         calcCRC = crccitt(cmd_byteData.hex())
-        # print ('CALC CRC HEX and int: ')
-        
-        # print(calcCRC)
-        CRCtoSend = int.from_bytes(bytearray.fromhex(calcCRC),byteorder='big')
-        
-
-        #cmd_byteData += bytearray.fromhex(calcCRC)
-        cmd_byteData += bytes(CRCtoSend.to_bytes(4, endian))
+        print ('CALC CRC HEX and byte: ')
+        # flip the bits
+        CRCtoSend = struct.pack('<Q', int(calcCRC, base=16))
+        print(calcCRC)
+        print (CRCtoSend)
+        cmd_byteData += CRCtoSend[0:2]
         cmd_pkt['crc']  = bytes.fromhex(calcCRC)
-        #cmd_byteData += cmd_pkt['crc']
-
-        ser.write(cmd_byteData)
+        
+        if (len(bytearray(cmd_byteData))) == 22:
+            try:
+                ser.write(cmd_byteData)
+                ser.flush()
+            except:
+                print('serial write error')
+        else:
+            print ('Data packet too long')
+        print('length wrote CRC Length CRC Array:')
+        print (len(bytearray(cmd_byteData)))
+        #print (len(CRCtoSend))
+        #print (bytearray(CRCtoSend))
+        CRCtoSend = None        
+        #print(bytearray(cmd_byteData))
         
         print("Sent back SEQ and CRC: ")
         print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
         print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
-        print (int.from_bytes(cmd_byteData[20:], byteorder='big'))
         print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
 
+if __name__ == '__main__':
+    process_in_serial()
 
-process_in_serial()
 
 

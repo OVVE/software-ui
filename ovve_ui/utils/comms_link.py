@@ -173,6 +173,7 @@ class CommsLink():
                 cmd_pkt['tidal_volume_set'] = self.settings.tv
                 cmd_pkt['ie_ratio_set'] = self.settings.ie_ratio
                 self.settings_lock.release()
+
                 cmd_byteData += bytes(cmd_pkt['sequence_count'].to_bytes(2, endian))
                 cmd_byteData += bytes(cmd_pkt['packet_version'].to_bytes(1, endian))
                 cmd_byteData += bytes(cmd_pkt['mode_value'].to_bytes(1, endian))
@@ -182,8 +183,8 @@ class CommsLink():
                 # TO DO set alarmbits correctly if sequence or CRC failed
                 cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
                 calcSendCRC = self.crccitt(cmd_byteData.hex())
-                CRCtoSend = int.from_bytes(bytearray.fromhex(calcSendCRC),byteorder='big')
-            
+                # CRCtoSend = int.from_bytes(bytearray.fromhex(calcSendCRC),byteorder='big')
+                CRCtoSend = bytearray.fromhex(calcSendCRC)
 
                 #cmd_byteData += bytearray.fromhex(calcCRC)
                 cmd_byteData += bytes(CRCtoSend.to_bytes(4, endian))
