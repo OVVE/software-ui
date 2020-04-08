@@ -12,7 +12,8 @@ import codecs
 from utils.comms_adapter import CommsAdapter
 from utils.params import Params
 from utils.settings import Settings
-#from utils.serial_watchdog import Watchdog
+from utils.serial_watchdog import Watchdog
+
 
 
 class CommsLink():
@@ -83,10 +84,10 @@ class CommsLink():
                     'crc':   0 }                    # bytes 20 - 21 - rpi unsigned short int  
             
         self.ser.reset_input_buffer()
-
         while not self.done:
             
             byteData = self.read_all(self.ser, 70)
+            self.ser.flush()
             # DEBUG
             # 2 ways to print for debugging 
             # print (byteData)  #raw will show ascii if can be decoded
@@ -108,9 +109,9 @@ class CommsLink():
                 print (currentSeq)
                 print (prevSeq)
 
-            # calculate CRC instead of
+            # calculate CRC 
             rcvdCRC = int.from_bytes(byteData[68:], byteorder='little')
-
+            # reverse HEX order
             calcRcvCRC = self.crccitt(byteData[0:68].hex())
             calcRcvCRC = int(calcRcvCRC, 16)
             if calcRcvCRC != rcvdCRC:
@@ -119,7 +120,7 @@ class CommsLink():
                 print (rcvdCRC)
                 print (calcRcvCRC)
                 cmd_pkt['sequence_count'] = in_pkt['sequence_count']
-
+                validData = False
             else:
                 validData = True
                 in_pkt['sequence_count']=int.from_bytes(byteData[0:2], byteorder='little')
@@ -146,9 +147,9 @@ class CommsLink():
                 in_pkt['crc']=int.from_bytes(byteData[68:], byteorder='little')
 
                 # DEBUG
-                # print ('Received SEQ and CRC:')
-                # print (in_pkt['sequence_count'])
-                # print (in_pkt['crc'])
+                print ('Received SEQ and CRC:')
+                print (in_pkt['sequence_count'])
+                print (in_pkt['crc'])
                 #END DEBUG
 
                 # Needed for the return packet
@@ -156,49 +157,53 @@ class CommsLink():
                 # ENDIF
 
 
-
-            # create the return packet
-            endian = "little"
-            cmd_byteData = b""
-            #packet_version = 1
-
-            # Lock to prevent settings from being written in the middle of
-            # creating the packet.
-            self.settings_lock.acquire()
-            # get the updates from settings TODO: Make this event driven and only when callbackis called
-            cmd_pkt['mode_value'] = self.settings.mode
-            cmd_pkt['respiratory_rate_set'] = self.settings.resp_rate
-            cmd_pkt['tidal_volume_set'] = self.settings.tv
-            cmd_pkt['ie_ratio_set'] = self.settings.ie_ratio
-
-            cmd_byteData += bytes(cmd_pkt['sequence_count'].to_bytes(2, endian))
-            cmd_byteData += bytes(cmd_pkt['packet_version'].to_bytes(1, endian))
-            cmd_byteData += bytes(cmd_pkt['mode_value'].to_bytes(1, endian))
-            cmd_byteData += bytes(cmd_pkt['respiratory_rate_set'].to_bytes(4, endian))
-            cmd_byteData += bytes(cmd_pkt['tidal_volume_set'].to_bytes(4, endian))
-            cmd_byteData += bytes(cmd_pkt['ie_ratio_set'].to_bytes(4, endian))
-
-            # TO DO set alarmbits correctly if sequence or CRC failed
-            cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
-            calcSendCRC = self.crccitt(cmd_byteData.hex())
-            CRCtoSend = int.from_bytes(bytearray.fromhex(calcSendCRC),byteorder='big')
-        
-
-            #cmd_byteData += bytearray.fromhex(calcCRC)
-            cmd_byteData += bytes(CRCtoSend.to_bytes(4, endian))
-            # DEBUG
-            # print ('CALC sent CRC HEX and int: ')
-            # print(calcSendCRC)
-            # print(int(calcSendCRC, 16))
-            #end DEBUG
-            cmd_pkt['crc']  = bytes(CRCtoSend.to_bytes(4, endian))
-            
+            wd = Watchdog(30)
             try:
-                self.ser.reset_output_buffer()
-                self.ser.write(cmd_byteData)
-            except:
-                print("Failed to write to serial")
+                # create the return packet
+                endian = "little"
+                cmd_byteData = b""
+                #packet_version = 1
+
+                # Lock to prevent settings from being written in the middle of
+                # creating the packet.
+                self.settings_lock.acquire()
+                # get the updates from settings TODO: Make this event driven and only when callbackis called
+                cmd_pkt['mode_value'] = self.settings.mode
+                cmd_pkt['respiratory_rate_set'] = self.settings.resp_rate
+                cmd_pkt['tidal_volume_set'] = self.settings.tv
+                cmd_pkt['ie_ratio_set'] = self.settings.ie_ratio
+                self.settings_lock.release()
+                cmd_byteData += bytes(cmd_pkt['sequence_count'].to_bytes(2, endian))
+                cmd_byteData += bytes(cmd_pkt['packet_version'].to_bytes(1, endian))
+                cmd_byteData += bytes(cmd_pkt['mode_value'].to_bytes(1, endian))
+                cmd_byteData += bytes(cmd_pkt['respiratory_rate_set'].to_bytes(4, endian))
+                cmd_byteData += bytes(cmd_pkt['tidal_volume_set'].to_bytes(4, endian))
+                cmd_byteData += bytes(cmd_pkt['ie_ratio_set'].to_bytes(4, endian))
+                # TO DO set alarmbits correctly if sequence or CRC failed
+                cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
+                calcSendCRC = self.crccitt(cmd_byteData.hex())
+                CRCtoSend = int.from_bytes(bytearray.fromhex(calcSendCRC),byteorder='big')
+            
+
+                #cmd_byteData += bytearray.fromhex(calcCRC)
+                cmd_byteData += bytes(CRCtoSend.to_bytes(4, endian))
+                # DEBUG
+                # print ('CALC sent CRC HEX and int: ')
+                # print(calcSendCRC)
+                # print(int(calcSendCRC, 16))
+                #end DEBUG
+                cmd_pkt['crc']  = bytes(CRCtoSend.to_bytes(4, endian))
                 
+                try:
+                    
+                    self.ser.write(cmd_byteData)
+                    self.ser.flush()
+                    
+                except:
+                    print("Failed to write to serial")
+            except:
+                print('Exceeded allotted processing time')
+            wd.stop()    
 
             # DEBUG
             # print ("Packet Written:")
@@ -236,7 +241,7 @@ class CommsLink():
                 params_dict['battery_level'] = in_pkt['battery_level']
                 self.comms_adapter.update_params(params_dict)
 
-            self.settings_lock.release()
+           # self.settings_lock.release()
 
     def init_serial(self) -> False:
 
@@ -287,7 +292,7 @@ class CommsLink():
             read_buffer += byte_chunk
             if not len(byte_chunk) == chunk_size:
                 break
-
+        self.ser.flush()
         return read_buffer
 
     def process_Alarms(self):
