@@ -12,6 +12,7 @@ import codecs
 from utils.comms_adapter import CommsAdapter
 from utils.params import Params
 from utils.settings import Settings
+#from utils.serial_watchdog import Watchdog
 
 
 class CommsLink():
@@ -20,6 +21,7 @@ class CommsLink():
         self.comms_adapter.set_comms_callback(self.update_settings)
         self.done = False
         self.settings = Settings()
+        self.settings_lock = Lock()
         self.seqnum = 0
         self.packet_version = 1
         self.BAUD = 38400
@@ -27,8 +29,8 @@ class CommsLink():
         self.SER_TIMEOUT = 0.055
         self.ser = 0
         self.crcFailCnt = 0
-        self.init_serial()
         self.setting_lock = Lock()
+        
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
@@ -89,6 +91,7 @@ class CommsLink():
             # 2 ways to print for debugging 
             # print (byteData)  #raw will show ascii if can be decoded
             # hex only -- byte order is reversed
+            # print ("Packet Rcvd:")
             # print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
             # END DEBUG
             if byteData[0:2] == b'\x00\x00':
@@ -108,8 +111,6 @@ class CommsLink():
             # calculate CRC instead of
             rcvdCRC = int.from_bytes(byteData[68:], byteorder='little')
 
-
-            # rcvdCRC = (int.from_bytes(byteData[0:2], byteorder='little')).hex()
             calcRcvCRC = self.crccitt(byteData[0:68].hex())
             calcRcvCRC = int(calcRcvCRC, 16)
             if calcRcvCRC != rcvdCRC:
@@ -145,17 +146,16 @@ class CommsLink():
                 in_pkt['crc']=int.from_bytes(byteData[68:], byteorder='little')
 
                 # DEBUG
-                print ('Received SEQ and CRC:')
-                print (in_pkt['sequence_count'])
-                print (in_pkt['crc'])
+                # print ('Received SEQ and CRC:')
+                # print (in_pkt['sequence_count'])
+                # print (in_pkt['crc'])
                 #END DEBUG
 
                 # Needed for the return packet
                 cmd_pkt['sequence_count'] = in_pkt['sequence_count']
                 # ENDIF
 
-            # ecu_settings_dict = {'to_JSON':ecu_settings_str, 'run_state': 0,'mode': 0,'tv': 0,'resp_rate':0 ,'ie_ratio': 0}
-            # self.comms_adapter.update_settings()
+
 
             # create the return packet
             endian = "little"
@@ -181,30 +181,39 @@ class CommsLink():
             # TO DO set alarmbits correctly if sequence or CRC failed
             cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
             calcSendCRC = self.crccitt(cmd_byteData.hex())
+            CRCtoSend = int.from_bytes(bytearray.fromhex(calcSendCRC),byteorder='big')
+        
+
+            #cmd_byteData += bytearray.fromhex(calcCRC)
+            cmd_byteData += bytes(CRCtoSend.to_bytes(4, endian))
             # DEBUG
             # print ('CALC sent CRC HEX and int: ')
             # print(calcSendCRC)
             # print(int(calcSendCRC, 16))
             #end DEBUG
-            cmd_pkt['crc']  = bytes.fromhex(calcSendCRC)
-            cmd_byteData += cmd_pkt['crc']
+            cmd_pkt['crc']  = bytes(CRCtoSend.to_bytes(4, endian))
+            
             try:
+                self.ser.reset_output_buffer()
                 self.ser.write(cmd_byteData)
             except:
                 print("Failed to write to serial")
+                
 
             # DEBUG
-            print ("Packet Written:")
-            print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+            # print ("Packet Written:")
+            # print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
             print("Sent back SEQ and CRC: ")
             print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
-            print (int.from_bytes(cmd_byteData[20:], byteorder='big'))
+            print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
             # END DEBUG
 
             #Update dict only if there is valid data
             if validData == True:
                 # any settings set will not retunr correctly yet until Arduino sets set values correctly
                 # We can use the settings values like in simulator if so desired or maybe compare them
+                # RE: Run_state, we still need to implment getting this from Arduino. Currently I am just getting zero
+                # When done, this will MSB off in_pkt['mode_value']
                 params_dict['run_state'] = self.settings.run_state
                 params_dict['seq_num'] = in_pkt['sequence_count']
                 params_dict['packet_version'] = in_pkt['packet_version']
@@ -229,20 +238,35 @@ class CommsLink():
 
             self.settings_lock.release()
 
-    def init_serial(self):
-    
-        #global ser          #Must be declared in Each Function
+    def init_serial(self) -> False:
+
         self.ser = serial.Serial()
         self.ser.baudrate = self.BAUD
         self.ser.port = self.PORT 
         #a little less than polling spped from arduino
         self.ser.timeout = self.SER_TIMEOUT
-        self.ser.open()          #Opens SerialPort
+        
+        try:
+            
+            if self.ser == None:
+                self.ser.open()
+                print ("Successfully connected to port %r." % self.ser.port)
+                return True
+            else:
+                if self.ser.isOpen():
+                    self.ser.close()
+                    print ("Disconnected current connection.")
+                    return False
+                else:
+                    self.ser.open()
+                    print ("Connected to port %r." % self.ser.port)
+                    return True
+        except serial.SerialException:
+            return False
+                    
 
-        # print port open or closed
-        if self.ser.isOpen():
-            print ('Open: ' + self.ser.portstr)
-        sleep(1)
+                    # print port open or closed
+
 
     def crccitt(self, hex_string):
         byte_seq = binascii.unhexlify(hex_string)
@@ -266,11 +290,26 @@ class CommsLink():
 
         return read_buffer
 
+    def process_Alarms(self):
+        # Will add functionality at a later date
+        pass
 
     def start(self) -> None:
         self.done = False
+        
+        if self.init_serial():
+            print ('Serial Init Successful')
+        else:
+            print ('Serial Initialization failed')
+            self.stop()
+            # When the alarm infrastructure is done this would trigger an alarm
+            return False
         t = Thread(target=self.process_SerialData, args=())
+        a = Thread(target=self.process_Alarms, args=())
         t.start()
+        a.start
 
     def stop(self) -> None:
+        if self.ser.isOpen():
+            self.ser.close()
         self.done = True

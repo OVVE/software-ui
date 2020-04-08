@@ -146,6 +146,7 @@ def process_in_serial():
         
         
         # cmd_byteData += bytes(start_byte.to_bytes(1, endian))
+        #in_pkt['sequence_count'] = in_pkt['sequence_count'] + 1
         cmd_byteData += bytes(in_pkt['sequence_count'].to_bytes(2, endian))
         cmd_byteData += bytes(in_pkt['packet_version'].to_bytes(1, endian))
         cmd_byteData += bytes(cmd_pkt['mode_value'].to_bytes(1, endian))
@@ -157,18 +158,22 @@ def process_in_serial():
         # print ('CALC CRC HEX and int: ')
         
         # print(calcCRC)
-        # print(int(calcCRC, 16))
-        cmd_pkt['crc']  = bytes.fromhex(calcCRC)
+        CRCtoSend = int.from_bytes(bytearray.fromhex(calcCRC),byteorder='big')
+        
 
-        cmd_byteData += bytearray.fromhex(calcCRC)
+        #cmd_byteData += bytearray.fromhex(calcCRC)
+        cmd_byteData += bytes(CRCtoSend.to_bytes(4, endian))
+        cmd_pkt['crc']  = bytes.fromhex(calcCRC)
         #cmd_byteData += cmd_pkt['crc']
 
         ser.write(cmd_byteData)
         
-        # print("Sent back SEQ and CRC: ")
-        # 
-        # print (int.from_bytes(cmd_byteData[1:3], byteorder='little'))
-        # print (int.from_bytes(cmd_byteData[21:], byteorder='big'))
+        print("Sent back SEQ and CRC: ")
+        print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+        print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
+        print (int.from_bytes(cmd_byteData[20:], byteorder='big'))
+        print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
+
 
 process_in_serial()
 
