@@ -13,7 +13,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget, QMessageBox)
+                             QWidget, QMessageBox, QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
@@ -294,19 +294,57 @@ class MainWindow(QWidget):
             self.passChanges()
 
         elif self.settings.run_state == 1:
-            confirmStop = QMessageBox.critical(self, 'Confirm Stop', "Caution: this will stop ventilation immediately. "
-                                                                     "Proceed?",
-                                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if confirmStop == QMessageBox.Yes:
-                self.settings.run_state = 0
-                self.start_button_main.updateValue("START")
-                self.start_button_main.button_settings = SimpleButtonSettings()
-                self.passChanges()
+            self.showStartStopConfirm()
 
-            else:
-                print('Aborted stop.')
-                return
 
+    def showStartStopConfirm(self):
+        d = QDialog()
+        d.setFixedWidth(600)
+        d.setFixedHeight(300)
+
+        d_h_box_1 = QHBoxLayout()
+        d_h_box_2 = QHBoxLayout()
+        d_v_box = QVBoxLayout()
+        d_label = QLabel("Caution: this will stop ventilation immediately. "
+                         "Proceed?")
+        d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
+        d_label.setWordWrap(True)
+        d_label.setAlignment(Qt.AlignCenter)
+
+        d_cancel = QPushButton("Cancel")
+        d_cancel.clicked.connect(lambda: d.reject())
+        d_cancel.setFont(self.ui_settings.simple_button_settings.valueFont)
+        d_cancel.setStyleSheet("QPushButton {background-color: " +
+                               self.ui_settings.page_settings.cancelColor
+                               + ";}")
+
+
+        d_confirm = QPushButton("Confirm")
+        d_confirm.clicked.connect(lambda: self.stopVentilation(d))
+        d_confirm.setFont(self.ui_settings.simple_button_settings.valueFont)
+        d_confirm.setStyleSheet("QPushButton {background-color: " +
+                               self.ui_settings.page_settings.commitColor
+                               + ";}")
+
+        d_h_box_1.addWidget(d_label)
+        d_h_box_2.addWidget(d_cancel)
+        d_h_box_2.addWidget(d_confirm)
+        d_h_box_2.setSpacing(100)
+        d_v_box.addLayout(d_h_box_1)
+        d_v_box.addLayout(d_h_box_2)
+
+        d.setLayout(d_v_box)
+        d.setWindowTitle("Confirm Stop")
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
+
+
+    def stopVentilation(self, d: QDialog):
+        d.reject()
+        self.settings.run_state = 0
+        self.start_button_main.updateValue("START")
+        self.start_button_main.button_settings = SimpleButtonSettings()
+        self.passChanges()
 
     # TODO: Finish all of these for each var
     def commitMode(self):
