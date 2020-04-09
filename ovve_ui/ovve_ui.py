@@ -1,4 +1,6 @@
+import argparse
 import datetime
+import json
 import os
 import sys
 from copy import deepcopy
@@ -12,7 +14,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget, QMessageBox)
+                             QWidget, QMessageBox, QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton
 from display.change import Change
@@ -28,18 +30,21 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
-from utils.comms_adapter import CommsAdapter
 from utils.comms_simulator import CommsSimulator
+from utils.comms_link import CommsLink
 from utils.logger import Logger
 
 
 class MainWindow(QWidget):
-    def __init__(self) -> None:
+    new_settings_signal = pyqtSignal(dict)
+
+    def __init__(self, is_sim: bool=False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
-
+        
+        
         self.fullscreen = False
 
         # you can pass new settings for different object classes here
@@ -90,30 +95,17 @@ class MainWindow(QWidget):
         self.logger.path = os.path.join("/tmp", "ovve_logs", self.logger.patient_id)
         self.logger.filename = str(datetime.datetime.now()) + ".log.txt"
 
-        # CommsAdapter adapts settings and params to and from the comms handler
-        self.comms_adapter = CommsAdapter(self.logger)
 
-        # Set a callback in the adapter that is called whenever new
-        # params arrive from the comms handler
-        self.comms_adapter.set_ui_params_callback(self.update_ui_params)
+        if not is_sim:
+            self.comms_handler = CommsLink()
+        else:
+            self.comms_handler = CommsSimulator()
 
-        # Set a callback in the adapter that is called whenever new
-        # params arrive from the comms handler
-        self.comms_adapter.set_ui_alarms_callback(self.update_ui_alarms)
-
-        # Set the adapter function that is called whenever settings are
-        # udpated in the UI
-        self.set_settings_callback(self.comms_adapter.update_settings)
-
-        # The comms handler is a simulator for now.  It will send
-        # random values for the parameters that are updated periodically from
-        # the MCU.  It will accept settings updates from the UI.
-        #
-        # When the real comms handler is available, substitute it here.
-        self.comms_handler = CommsSimulator(self.comms_adapter)
-
-        #TODO: How to handle start / stop events from UI?
+        self.comms_handler.new_params.connect(self.update_ui_params)
+        self.comms_handler.new_alarms.connect(self.update_ui_alarms)
+        self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
+
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -182,14 +174,18 @@ class MainWindow(QWidget):
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
-    def update_ui_params(self, params: Params) -> None:
-        self.params = params
+    def update_ui_params(self, params_dict: dict) -> None:
+        self.params = Params()
+        self.params.from_dict(params_dict)
+        self.logger.log("params", self.params.to_JSON())
         self.updateMainDisplays()
         self.updateGraphs()
 
-    def update_ui_alarms(self, alarms: Alarms) -> None:
-        self.alarms = alarms
-        print("UI received alarms from comms adapter")
+    def update_ui_alarms(self, alarms_dict: dict) -> None:
+        self.alarms = Alarms()
+        self.alarms.from_dict(alarms_dict)
+        self.logger.log("alarms", self.alarms.to_JSON())
+
         #TODO: Implement UI alarm handling
 
     def updateMainDisplays(self) -> None:
@@ -300,19 +296,57 @@ class MainWindow(QWidget):
             self.passChanges()
 
         elif self.settings.run_state == 1:
-            confirmStop = QMessageBox.critical(self, 'Confirm Stop', "Caution: this will stop ventilation immediately. "
-                                                                     "Proceed?",
-                                               QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-            if confirmStop == QMessageBox.Yes:
-                self.settings.run_state = 0
-                self.start_button_main.updateValue("START")
-                self.start_button_main.button_settings = SimpleButtonSettings()
-                self.passChanges()
+            self.showStartStopConfirm()
 
-            else:
-                print('Aborted stop.')
-                return
 
+    def showStartStopConfirm(self):
+        d = QDialog()
+        d.setFixedWidth(600)
+        d.setFixedHeight(300)
+
+        d_h_box_1 = QHBoxLayout()
+        d_h_box_2 = QHBoxLayout()
+        d_v_box = QVBoxLayout()
+        d_label = QLabel("Caution: this will stop ventilation immediately. "
+                         "Proceed?")
+        d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
+        d_label.setWordWrap(True)
+        d_label.setAlignment(Qt.AlignCenter)
+
+        d_cancel = QPushButton("Cancel")
+        d_cancel.clicked.connect(lambda: d.reject())
+        d_cancel.setFont(self.ui_settings.simple_button_settings.valueFont)
+        d_cancel.setStyleSheet("QPushButton {background-color: " +
+                               self.ui_settings.page_settings.cancelColor
+                               + ";}")
+
+
+        d_confirm = QPushButton("Confirm")
+        d_confirm.clicked.connect(lambda: self.stopVentilation(d))
+        d_confirm.setFont(self.ui_settings.simple_button_settings.valueFont)
+        d_confirm.setStyleSheet("QPushButton {background-color: " +
+                               self.ui_settings.page_settings.commitColor
+                               + ";}")
+
+        d_h_box_1.addWidget(d_label)
+        d_h_box_2.addWidget(d_cancel)
+        d_h_box_2.addWidget(d_confirm)
+        d_h_box_2.setSpacing(100)
+        d_v_box.addLayout(d_h_box_1)
+        d_v_box.addLayout(d_h_box_2)
+
+        d.setLayout(d_v_box)
+        d.setWindowTitle("Confirm Stop")
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
+
+
+    def stopVentilation(self, d: QDialog):
+        d.reject()
+        self.settings.run_state = 0
+        self.start_button_main.updateValue("START")
+        self.start_button_main.button_settings = SimpleButtonSettings()
+        self.passChanges()
 
     # TODO: Finish all of these for each var
     def commitMode(self):
@@ -396,7 +430,11 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def passChanges(self) -> None:
-        self.settings_callback(self.settings)
+        #self.settings_callback(self.settings)
+        settings_str = self.settings.to_JSON()
+        self.logger.log("settings,", settings_str)
+        j = json.loads(settings_str)
+        self.new_settings_signal.emit(j)
 
     def logChange(self, change: Change) -> None:
         if change.old_val != change.new_val:
@@ -408,7 +446,7 @@ class MainWindow(QWidget):
         self.settings_callback = settings_callback
 
     def closeEvent(self, *args, **kwargs):
-        self.comms_handler.stop()
+        self.comms_handler.terminate()
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_F:
@@ -426,8 +464,13 @@ class MainWindow(QWidget):
             self.close()
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description='User interface for OVVE')
+    parser.add_argument('-s', "--sim", action='store_true', 
+                        help='Run with simulated data')
+    args = parser.parse_args()
+
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(args.sim)
     window.showFullScreen()
     app.exec_()
     sys.exit()
