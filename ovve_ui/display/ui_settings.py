@@ -16,10 +16,10 @@ class TextSetting:
 #TODO: Abstract text placement
 class FancyButtonSettings:
     def __init__(self,
-                 labelSetting: TextSetting = TextSetting("Arial", 12, True),
+                 labelSetting: TextSetting = TextSetting("Arial", 8, True),
                  valueSetting: TextSetting = TextSetting(
-                     "Arial Black", 36, True),
-                 unitSetting: TextSetting = TextSetting("Arial", 10, False),
+                     "Arial", 24, True),
+                 unitSetting: TextSetting = TextSetting("Arial", 8, False),
                  fillColor: str = '#f2fff0',
                  borderColor: str = '#c5c5c5',
                  labelColor: str = '#A7A9AA',
@@ -41,7 +41,7 @@ class FancyButtonSettings:
         return QBrush(QColor(self.fillColor))
 
     def getBorderPen(self) -> QPen:
-        return QPen(QColor(self.borderColor), 1, Qt.SolidLine)
+        return QPen(QColor(self.borderColor), 2, Qt.SolidLine)
 
     def getLabelPen(self) -> QPen:
         return QPen(QColor(self.labelColor))
@@ -56,7 +56,7 @@ class FancyButtonSettings:
 class SimpleButtonSettings:
     def __init__(self,
                  valueSetting: TextSetting = TextSetting(
-                     "Arial Black", 24, False),
+                     "Arial Black", 18, False),
                  fillColor: str = '#f2fff0',
                  borderColor: str = '#C5C5C5',
                  valueColor: str = '#000000',
@@ -72,7 +72,7 @@ class SimpleButtonSettings:
         return QBrush(QColor(self.fillColor))
 
     def getBorderPen(self) -> QPen:
-        return QPen(QColor(self.borderColor), 1, Qt.SolidLine)
+        return QPen(QColor(self.borderColor), 2, Qt.SolidLine)
 
     def getValuePen(self) -> QPen:
         return QPen(QColor(self.valueColor))
@@ -80,10 +80,10 @@ class SimpleButtonSettings:
 
 class DisplayRectSettings:
     def __init__(self,
-                 labelSetting: TextSetting = TextSetting("Arial", 24, True),
+                 labelSetting: TextSetting = TextSetting("Arial", 16, True),
                  valueSetting: TextSetting = TextSetting(
-                     "Arial Black", 52, True),
-                 unitSetting: TextSetting = TextSetting("Arial", 18, False),
+                     "Arial Black", 38, True),
+                 unitSetting: TextSetting = TextSetting("Arial", 12, False),
                  fillColor: str = '#ECFAFF',
                  borderColor: str = '#C5C5C5',
                  labelColor: str = '#29ABE2',
@@ -104,7 +104,7 @@ class DisplayRectSettings:
         return QBrush(QColor(self.fillColor))
 
     def getBorderPen(self) -> QPen:
-        return QPen(QColor(self.borderColor), 1, Qt.SolidLine)
+        return QPen(QColor(self.borderColor), 2, Qt.SolidLine)
 
     def getLabelPen(self) -> QPen:
         return QPen(QColor(self.labelColor))
@@ -119,10 +119,10 @@ class DisplayRectSettings:
 class PageSettings:
     def __init__(
         self,
-        mainLabelSetting: TextSetting = TextSetting("Arial", 40, True),
-        valueSetting: TextSetting = TextSetting("Arial Black", 110, True),
-        textValueSetting: TextSetting = TextSetting("Arial Black", 70, True),
-        unitSetting: TextSetting = TextSetting("Arial", 40, False),
+        mainLabelSetting: TextSetting = TextSetting("Arial", 30, True),
+        valueSetting: TextSetting = TextSetting("Arial Black", 65, True),
+        textValueSetting: TextSetting = TextSetting("Arial Black", 60, True),
+        unitSetting: TextSetting = TextSetting("Arial", 30, False),
         valueColor: str = '#000000',
         unitColor: str = '#C5C5C5',
         changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
@@ -130,9 +130,9 @@ class PageSettings:
         changeButtonBorderColor: str = '#C5C5C5',
         valueLabelWidth: int = 210,
         changeButtonSpacing: int = 50,
-        cancelSetting: TextSetting = TextSetting("Arial", 18, True),
+        cancelSetting: TextSetting = TextSetting("Arial", 14, True),
         cancelColor: str = "#ff0000",
-        commitSetting: TextSetting = TextSetting("Arial", 18, True),
+        commitSetting: TextSetting = TextSetting("Arial", 14, True),
         commitColor: str = "#00FF00",
         commitCancelButtonSpacing: int = 100,
     ):

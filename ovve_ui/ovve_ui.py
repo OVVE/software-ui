@@ -471,7 +471,7 @@ def main() -> None:
 
     app = QApplication(sys.argv)
     window = MainWindow(args.sim)
-    window.show()
+    window.showFullScreen()
     app.exec_()
     sys.exit()
 
