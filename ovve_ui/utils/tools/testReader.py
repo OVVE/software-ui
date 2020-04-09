@@ -29,7 +29,7 @@ def init_serial():
     # print port open or closed
     if ser.isOpen():
         print ('Open: ' + ser.portstr)
-    sleep(1)    
+    #sleep(1)    
 #Function Ends Here
         
 
@@ -41,8 +41,11 @@ def crccitt(hex_string):
     crc = crc16.crc16xmodem(byte_seq, 0xffff)
     return '{:04X}'.format(crc & 0xffff)
 
-def read_all(port, chunk_size=70):
+def read_all(port, chunk_size=200):
     """Read all characters on the serial port and return them."""
+    
+    if not port.isOpen():
+        raise SerialException('Serial is diconnected')  
     if not port.timeout:
         raise TypeError('Port needs to have a timeout set!')
 
@@ -55,7 +58,7 @@ def read_all(port, chunk_size=70):
         read_buffer += byte_chunk
         if not len(byte_chunk) == chunk_size:
             break
-
+    #port.reset_input_buffer()
     return read_buffer
 
 #ser.flush()
@@ -98,8 +101,15 @@ def process_in_serial():
     #ser.reset_input_buffer()
     error_count = 0
     prevByte = 0
+    sleep(.5)
+    byteData = b'\x00'
+    ValidPkt = 0
     while True:
         byteData = read_all(ser, 70)
+        if len(bytearray(byteData)) != 70:
+            byteData = read_all(ser, 70)
+        else:
+            ValidPkt += ValidPkt
         #byteData = ser.read(70)
         #2 ways to print
         # print (byteData)  #raw will show ascii if can be decoded
@@ -128,11 +138,12 @@ def process_in_serial():
             
         else:
             error_count = error_count + 1
-            print ('drop packets count ' + str(error_count))
+            print ('Dropped packets count ' + str(error_count))
+            print ('Valid packets count ' + str(ValidPkt))
 
         #prevByte = (int.from_bytes(byteData[1:3], byteorder='little') - 1)
         endian = "little"
-        cmd_byteData = b""
+        cmd_byteData = b''
         start_byte = 0xFF
         packet_version = 1
 
@@ -172,6 +183,8 @@ def process_in_serial():
         print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
         print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
         print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
+        byteData = b'\x00'
+
 
 if __name__ == '__main__':
     process_in_serial()
