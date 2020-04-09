@@ -86,7 +86,6 @@ class CommsSimulator():
             time.sleep(1)
 
 
-
     def start(self) -> None:
         self.done = False
         # Simulate asynchronous params and alarms
