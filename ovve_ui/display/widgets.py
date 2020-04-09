@@ -546,7 +546,8 @@ def initializeAlarmWidget(window: MainWindow):  #Alarm
     alarm_ack = window.makeSimpleDisplayButton("Set")
     alarm_cancel = window.makeSimpleDisplayButton("Cancel")
 
-    # Acknowledge alarm stops the alarm    alarm_ack.clicked.connect(lambda: window.commitAlarm())
+    # Acknowledge alarm stops the alarm   
+    alarm_ack.clicked.connect(lambda: window.commitAlarm())
     alarm_cancel.clicked.connect(window.cancelChange)
 
     window.alarm_page_rect = window.makeDisplayRect(
