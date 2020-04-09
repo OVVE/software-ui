@@ -10,17 +10,18 @@ import crc16
 import codecs
 import struct
 
-from utils.comms_adapter import CommsAdapter
 from utils.params import Params
 from utils.settings import Settings
 from utils.serial_watchdog import Watchdog
+from PyQt5.QtCore import QThread, pyqtSignal
 
 
+class CommsLink(QThread):
+    new_params = pyqtSignal(dict)
+    new_alarms = pyqtSignal(dict)
 
-class CommsLink():
-    def __init__(self, comms_adapter: CommsAdapter) -> None:
-        self.comms_adapter = comms_adapter
-        self.comms_adapter.set_comms_callback(self.update_settings)
+    def __init__(self) -> None:
+        QThread.__init__(self)
         self.done = False
         self.settings = Settings()
         self.settings_lock = Lock()
@@ -254,7 +255,7 @@ class CommsLink():
                 params_dict['tv_rate'] = in_pkt['volume_rate_measured']
                 params_dict['control_state'] = 0
                 params_dict['battery_level'] = in_pkt['battery_level']
-                self.comms_adapter.update_params(params_dict)
+                self.new_params.emit(params_dict)
 
            # self.settings_lock.release()
 
@@ -308,26 +309,15 @@ class CommsLink():
         port.reset_input_buffer()
         return read_buffer
 
-    def process_Alarms(self):
-        # Will add functionality at a later date
-        pass
 
-    def start(self) -> None:
+    def run(self) -> None:
         self.done = False
         
         if self.init_serial():
             print ('Serial Init Successful')
         else:
             print ('Serial Initialization failed')
-            self.stop()
             # When the alarm infrastructure is done this would trigger an alarm
-            return False
-        t = Thread(target=self.process_SerialData, args=())
-        a = Thread(target=self.process_Alarms, args=())
-        t.start()
-        a.start
-
-    def stop(self) -> None:
-        if self.ser.isOpen():
-            self.ser.close()
-        self.done = True
+            return
+        self.process_SerialData()
+       
