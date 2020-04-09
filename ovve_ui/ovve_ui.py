@@ -1,3 +1,4 @@
+import argparse
 import datetime
 import json
 import os
@@ -30,13 +31,14 @@ from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
 from utils.comms_simulator import CommsSimulator
+from utils.comms_link import CommsLink
 from utils.logger import Logger
 
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
-    
-    def __init__(self) -> None:
+
+    def __init__(self, is_sim: bool=False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
@@ -93,17 +95,17 @@ class MainWindow(QWidget):
         self.logger.path = os.path.join("/tmp", "ovve_logs", self.logger.patient_id)
         self.logger.filename = str(datetime.datetime.now()) + ".log.txt"
 
-        # The comms handler is a simulator for now.  It will send
-        # random values for the parameters that are updated periodically from
-        # the MCU.  It will accept settings updates from the UI.
-        #
-        # When the real comms handler is available, substitute it here.
-        self.comms_handler = CommsSimulator()
+
+        if not is_sim:
+            self.comms_handler = CommsLink()
+        else:
+            self.comms_handler = CommsSimulator()
+
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
-
         self.comms_handler.start()
+
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -462,8 +464,13 @@ class MainWindow(QWidget):
             self.close()
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description='User interface for OVVE')
+    parser.add_argument('-s', "--sim", action='store_true', 
+                        help='Run with simulated data')
+    args = parser.parse_args()
+
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(args.sim)
     window.show()
     app.exec_()
     sys.exit()
