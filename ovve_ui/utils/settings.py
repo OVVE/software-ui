@@ -15,8 +15,8 @@ class Settings():
             1: "SIMV",
         }
 
-        self.resp_rate: int = 0
-        self.tv: int = 0
+        self.resp_rate: int = 20
+        self.tv: int = 475
         self.ie_ratio: int = 0
 
         self.ie_ratio_switcher: dict = {

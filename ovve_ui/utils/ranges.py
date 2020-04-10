@@ -11,8 +11,8 @@ class Ranges():
             "min_resp_rate": 5, #Unit: bpm
             "max_resp_rate": 35,
             "resp_rate_increment": 1,
-            "tv_min": 150, #Unit: mL
-            "tv_max": 800,
+            "min_tv": 150, #Unit: mL
+            "max_tv": 800,
             "tv_increment": 25
         }
 

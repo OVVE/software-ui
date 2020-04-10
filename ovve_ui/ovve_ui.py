@@ -267,10 +267,18 @@ class MainWindow(QWidget):
     def incrementTidalVol(self) -> None:
         self.local_settings.tv += self.ranges._ranges["tv_increment"]
         self.tv_page_value_label.setText(str(self.local_settings.tv))
+        if self.local_settings.tv + self.ranges._ranges["tv_increment"] \
+            > self.ranges._ranges["max_tv"]:
+            self.tv_increment_button.hide()
+        self.tv_decrement_button.show()
 
     def decrementTidalVol(self) -> None:
         self.local_settings.tv -= self.ranges._ranges["tv_increment"]
         self.tv_page_value_label.setText(str(self.local_settings.tv))
+        if self.local_settings.tv - self.ranges._ranges["tv_increment"] \
+            < self.ranges._ranges["min_tv"]:
+            self.tv_decrement_button.hide()
+        self.tv_increment_button.show()
 
     def incrementIERatio(self) -> None:
         self.local_settings.ie_ratio += 1
