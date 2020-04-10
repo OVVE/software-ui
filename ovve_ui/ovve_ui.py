@@ -81,13 +81,13 @@ class MainWindow(QWidget):
         layout.setContentsMargins(10, 10, 10, 10)
         self.setLayout(layout)
         palette = QtGui.QPalette()
-        palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
 
         # Instantiate the single logger for the UI
         self.logger = Logger()
-        self.logger.enable_console = True
+        # self.logger.enable_console = True
+        self.logger.enable_console = False
         self.logger.enable_file = True
 
         # TODO: Set patient_id from the UI
@@ -181,11 +181,29 @@ class MainWindow(QWidget):
         self.updateMainDisplays()
         self.updateGraphs()
 
+    def _flash_background_color(self, col: QColor):
+        palette = self.palette()
+        palette.setColor(QtGui.QPalette.Background, col)
+        self.setPalette(palette)
+
+    color = pyqtProperty(QColor, fset=_flash_background_color)
+
     def update_ui_alarms(self, alarms_dict: dict) -> None:
         self.alarms = Alarms()
         self.alarms.from_dict(alarms_dict)
         self.logger.log("alarms", self.alarms.to_JSON())
-
+        for i in range(len(alarms_dict)):
+            if list(alarms_dict.items())[i][1]:
+                self.showAlarm(i)
+                self.alarm_state = True
+                self.alarmBackgroundFlash = QPropertyAnimation(self, b"color")
+                self.alarmBackgroundFlash.setDuration(2500)
+                self.alarmBackgroundFlash.setLoopCount(-1)
+                self.alarmBackgroundFlash.setStartValue(QColor(255,255,255))
+                self.alarmBackgroundFlash.setKeyValueAt(0.49, QColor(255, 255, 255))
+                self.alarmBackgroundFlash.setKeyValueAt(0.51, QColor(255, 0, 0))
+                self.alarmBackgroundFlash.setEndValue(QColor(255,0,0))
+                self.alarmBackgroundFlash.start()
         #TODO: Implement UI alarm handling
 
     def updateMainDisplays(self) -> None:
@@ -298,6 +316,53 @@ class MainWindow(QWidget):
         elif self.settings.run_state == 1:
             self.showStartStopConfirm()
 
+    def showAlarm(self, code: int):
+        d = QDialog()
+        d.setFixedWidth(600)
+        d.setFixedHeight(300)
+
+        d_h_box_1 = QHBoxLayout()
+        d_h_box_2 = QHBoxLayout()
+        d_v_box = QVBoxLayout()
+        d_label = QLabel(list(self.alarms.to_dict().items())[code][0])
+        d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
+        d_label.setWordWrap(True)
+        d_label.setAlignment(Qt.AlignCenter)
+
+        d_ack = QPushButton("Cancel")
+        d_ack.clicked.connect(lambda: self.dismissAlarmPopup(code, d))
+        d_ack.setFont(self.ui_settings.simple_button_settings.valueFont)
+        d_ack.setStyleSheet("QPushButton {background-color: " +
+                               self.ui_settings.page_settings.cancelColor
+                               + ";}")
+
+        d_h_box_1.addWidget(d_label)
+        d_h_box_2.addWidget(d_ack)
+        d_h_box_2.setSpacing(100)
+        d_v_box.addLayout(d_h_box_1)
+        d_v_box.addLayout(d_h_box_2)
+
+        d.setLayout(d_v_box)
+        d.setWindowTitle("Confirm Stop")
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
+
+    def dismissAlarmPopup(self, code: int, d: QDialog):
+        alarms_dict = self.alarms.to_dict()
+        alarms_items = list(alarms_dict.items())
+        alarms_dict[alarms_items[code][0]] = False
+        print(f'Setting{alarms_items[code][0]} to False')
+        self.alarms.from_dict(alarms_dict)
+        self.comms_handler.new_alarms
+        # print(self.alarms.to_dict())
+        d.reject()
+
+
+    #TODO: Potentially rethink this: it clears all alarms at once so may not work well for simultaneous alarms
+    def clearAlarms(self):
+        self.alarm_state = False
+        self.setStyleSheet("{background-color: white;}")
+
 
     def showStartStopConfirm(self):
         d = QDialog()
@@ -320,7 +385,6 @@ class MainWindow(QWidget):
                                self.ui_settings.page_settings.cancelColor
                                + ";}")
 
-
         d_confirm = QPushButton("Confirm")
         d_confirm.clicked.connect(lambda: self.stopVentilation(d))
         d_confirm.setFont(self.ui_settings.simple_button_settings.valueFont)
@@ -339,7 +403,6 @@ class MainWindow(QWidget):
         d.setWindowTitle("Confirm Stop")
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
-
 
     def stopVentilation(self, d: QDialog):
         d.reject()
@@ -460,8 +523,30 @@ class MainWindow(QWidget):
                 self.showFullScreen()
                 self.fullscreen = True
 
-        if event.key() == QtCore.Qt.Key_Q:
+        elif event.key() == QtCore.Qt.Key_Q:
             self.close()
+
+        elif event.key() == QtCore.Qt.Key_W:
+            self.comms_handler.fireAlarm(0)
+
+        elif event.key() == QtCore.Qt.Key_E:
+            self.comms_handler.fireAlarm(1)
+
+        elif event.key() == QtCore.Qt.Key_R:
+            self.comms_handler.fireAlarm(2)
+
+        elif event.key() == QtCore.Qt.Key_T:
+            self.comms_handler.fireAlarm(3)
+
+        elif event.key() == QtCore.Qt.Key_Y:
+            self.comms_handler.fireAlarm(4)
+
+        elif event.key() == QtCore.Qt.Key_U:
+            self.comms_handler.fireAlarm(5)
+
+        elif event.key() == QtCore.Qt.Key_I:
+            self.comms_handler.fireAlarm(6)
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='User interface for OVVE')
@@ -471,7 +556,7 @@ def main() -> None:
 
     app = QApplication(sys.argv)
     window = MainWindow(args.sim)
-    window.showFullScreen()
+    window.showNormal()
     app.exec_()
     sys.exit()
 

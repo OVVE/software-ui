@@ -9,6 +9,7 @@ from utils.alarms import Alarms
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, pyqtSignal
+from copy import deepcopy
 
 
 class CommsSimulator(QThread):
@@ -22,11 +23,15 @@ class CommsSimulator(QThread):
         self.seqnum = 0
         self.packet_version = 1
         self.settings_lock = Lock()
+        self.firedAlarms = []
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
         self.settings.from_dict(settings_dict)
         self.settings_lock.release()
+
+    def fireAlarm(self, key: int):
+        self.firedAlarms.append(key)
 
     def run(self) -> None:
         params = Params()
@@ -65,16 +70,26 @@ class CommsSimulator(QThread):
                 # Every N loops fire an alarm
                 # Every time the alarm fires, iterate the alarm that's set to True
                 # All other alarms will be false
-                if alarm_interval > 0 and self.seqnum % alarm_interval == 0:                      
-                    alarms_items = list(alarms_dict.items())
-                    for i in range(0, len(alarms_items)):
-                        if i == alarm_to_set:
-                            alarms_dict[alarms_items[i][0]] = True
-                        else:
-                            alarms_dict[alarms_items[i][0]] = False
-                    self.new_alarms.emit(alarms_dict)
-                    alarm_to_set = (alarm_to_set + 1) % len(alarms_dict.keys())
-                    
+                # if alarm_interval > 0 and self.seqnum % alarm_interval == 0:
+                #     alarms_items = list(alarms_dict.items())
+                #     for i in range(0, len(alarms_items)):
+                #         if i == alarm_to_set:
+                #             alarms_dict[alarms_items[i][0]] = True
+                #         else:
+                #             alarms_dict[alarms_items[i][0]] = False
+                #     self.new_alarms.emit(alarms_dict)
+                #     alarm_to_set = (alarm_to_set + 1) % len(alarms_dict.keys())
+                #
+                alarms_items = list(alarms_dict.items())
+                orig_alarms_dict = alarms_dict.copy()
+
+                for i in self.firedAlarms:
+                    alarms_dict[alarms_items[i][0]] = True
+                self.firedAlarms.clear()
+                self.new_alarms.emit(alarms_dict)
+                alarms_dict = orig_alarms_dict
                 self.seqnum += 1
+
+
             self.settings_lock.release()
             self.sleep(1)
