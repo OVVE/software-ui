@@ -46,7 +46,7 @@ class MainWindow(QWidget):
         
         
         self.fullscreen = False
-        # self.fullscreen = True
+        # self.fullscreen = True #TODO: Change back
 
         self.alarm_state = False
 
@@ -89,7 +89,7 @@ class MainWindow(QWidget):
 
         # Instantiate the single logger for the UI
         self.logger = Logger()
-        # self.logger.enable_console = True
+        # self.logger.enable_console = True #TODO: Change back
         self.logger.enable_console = False
         self.logger.enable_file = True
         self.logger.write_buffer_len = 100
@@ -100,10 +100,12 @@ class MainWindow(QWidget):
         self.logger.filename = str(datetime.datetime.now()) + ".log.txt"
 
 
-        if not is_sim:
-            self.comms_handler = CommsLink()
-        else:
-            self.comms_handler = CommsSimulator()
+        # if not is_sim:
+        #     self.comms_handler = CommsLink()
+        # else:
+        #     self.comms_handler = CommsSimulator() #TODO change back
+
+        self.comms_handler = CommsSimulator()
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
