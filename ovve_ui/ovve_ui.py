@@ -46,6 +46,9 @@ class MainWindow(QWidget):
         
         
         self.fullscreen = False
+        # self.fullscreen = True
+
+        self.alarm_state = False
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -193,16 +196,17 @@ class MainWindow(QWidget):
         self.alarms.from_dict(alarms_dict)
         self.logger.log("alarms", self.alarms.to_JSON())
         for i in range(len(alarms_dict)):
-            if list(alarms_dict.items())[i][1]:
+            if list(alarms_dict.items())[i][1]: #TODO: Revisit this for multi alarm handling
                 self.showAlarm(i)
                 self.alarm_state = True
+                self.alarm_button_main.updateValue("SILENCE")
                 self.alarmBackgroundFlash = QPropertyAnimation(self, b"color")
                 self.alarmBackgroundFlash.setDuration(2500)
                 self.alarmBackgroundFlash.setLoopCount(-1)
-                self.alarmBackgroundFlash.setStartValue(QColor(255,255,255))
-                self.alarmBackgroundFlash.setKeyValueAt(0.49, QColor(255, 255, 255))
-                self.alarmBackgroundFlash.setKeyValueAt(0.51, QColor(255, 0, 0))
-                self.alarmBackgroundFlash.setEndValue(QColor(255,0,0))
+                self.alarmBackgroundFlash.setStartValue(QColor(255,0,0))
+                self.alarmBackgroundFlash.setKeyValueAt(0.499, QColor(255, 0, 0))
+                self.alarmBackgroundFlash.setKeyValueAt(0.501, QColor(255,255 , 255))
+                self.alarmBackgroundFlash.setEndValue(QColor(255,255,255))
                 self.alarmBackgroundFlash.start()
         #TODO: Implement UI alarm handling
 
@@ -359,10 +363,14 @@ class MainWindow(QWidget):
 
 
     #TODO: Potentially rethink this: it clears all alarms at once so may not work well for simultaneous alarms
-    def clearAlarms(self):
-        self.alarm_state = False
-        self.setStyleSheet("{background-color: white;}")
-
+    def alarmButtonClicked(self):
+        if self.alarm_state:
+            self.alarm_state = False
+            self.alarm_button_main.updateValue("ALARM")
+            self.alarmBackgroundFlash.stop()
+        else:
+            self.display(5)
+            #TODO: Do something else here?
 
     def showStartStopConfirm(self):
         d = QDialog()
@@ -484,7 +492,6 @@ class MainWindow(QWidget):
         self.display(0)
         self.passChanges()
         self.updatePageDisplays()
-        #TODO: Modify some equivalent of local settings for alarms? Not sure how this works
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)

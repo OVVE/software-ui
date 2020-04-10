@@ -60,7 +60,7 @@ def initializeHomeScreenWidget(
                                              fillColor='#FFFFFF',
                                              valueColor='#FF0000'),
     )
-    window.alarm_button_main.clicked.connect(lambda: window.display(5))
+    window.alarm_button_main.clicked.connect(window.alarmButtonClicked)
 
     window.start_button_main = window.makeSimpleDisplayButton("START", )
     window.start_button_main.clicked.connect(window.changeStartStop)
