@@ -89,6 +89,7 @@ class MainWindow(QWidget):
         self.logger = Logger()
         self.logger.enable_console = True
         self.logger.enable_file = True
+        self.logger.write_buffer_len = 100
 
         # TODO: Set patient_id from the UI
         self.logger.patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
