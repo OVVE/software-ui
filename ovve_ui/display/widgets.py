@@ -301,7 +301,7 @@ def initializeRespiratoryRateWidget(window) -> None:
                                        page_settings.unitColor + ";}")
     resp_rate_unit_label.setAlignment(Qt.AlignCenter)
 
-    resp_rate_decrement_button = window.makeSimpleDisplayButton(
+    window.resp_rate_decrement_button = window.makeSimpleDisplayButton(
         "-",
         size=(50, 50),
         button_settings=SimpleButtonSettings(
@@ -310,7 +310,15 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    resp_rate_increment_button = window.makeSimpleDisplayButton(
+    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy()
+    resp_rate_decrement_size_policy.setRetainSizeWhenHidden(True)
+    window.resp_rate_decrement_button.setSizePolicy(resp_rate_decrement_size_policy)
+
+    if window.local_settings.resp_rate - window.ranges._ranges["resp_rate_increment"] \
+            < window.ranges._ranges["min_resp_rate"]:
+        window.resp_rate_decrement_button.hide()
+
+    window.resp_rate_increment_button = window.makeSimpleDisplayButton(
         "+",
         size=(50, 50),
         button_settings=SimpleButtonSettings(
@@ -319,6 +327,14 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
+    resp_rate_increment_size_policy = window.resp_rate_increment_button.sizePolicy()
+    resp_rate_increment_size_policy.setRetainSizeWhenHidden(True)
+    window.resp_rate_increment_button.setSizePolicy(resp_rate_increment_size_policy)
+
+    if window.local_settings.resp_rate + window.ranges._ranges["resp_rate_increment"] \
+            > window.ranges._ranges["max_resp_rate"]:
+        window.resp_rate_increment_button.hide()
+
     resp_rate_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
@@ -326,6 +342,7 @@ def initializeRespiratoryRateWidget(window) -> None:
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
             valueColor=page_settings.commitColor))
+
     resp_rate_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
@@ -334,17 +351,18 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.cancelSetting,
             valueColor=page_settings.cancelColor))
 
-    resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
-    resp_rate_increment_button.clicked.connect(window.incrementRespRate)
+    window.resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
+    window.resp_rate_increment_button.clicked.connect(window.incrementRespRate)
+
     resp_rate_apply.clicked.connect(window.commitRespRate)
     resp_rate_cancel.clicked.connect(window.cancelChange)
 
     h_box_1.addWidget(resp_rate_title_label)
-    h_box_2.addWidget(resp_rate_decrement_button)
+    h_box_2.addWidget(window.resp_rate_decrement_button)
     h_box_2.addWidget(window.resp_rate_page_value_label)
     window.resp_rate_page_value_label.setFixedWidth(
         page_settings.valueLabelWidth)
-    h_box_2.addWidget(resp_rate_increment_button)
+    h_box_2.addWidget( window.resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
     h_box_4.addWidget(resp_rate_apply)
     h_box_4.addWidget(resp_rate_cancel)
@@ -353,6 +371,8 @@ def initializeRespiratoryRateWidget(window) -> None:
     v_box.addLayout(h_box_2)
     v_box.addLayout(h_box_3)
     v_box.addLayout(h_box_4)
+
+
 
     window.page["3"].setLayout(v_box)
 
