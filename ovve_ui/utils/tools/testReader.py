@@ -29,7 +29,7 @@ def init_serial():
     # print port open or closed
     if ser.isOpen():
         print ('Open: ' + ser.portstr)
-    #sleep(1)    
+    sleep(1)    
 #Function Ends Here
         
 

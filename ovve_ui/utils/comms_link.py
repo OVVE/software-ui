@@ -102,7 +102,8 @@ class CommsLink(QThread):
             # print (byteData)  #raw will show ascii if can be decoded
             # hex only -- byte order is reversed
             # print ("Packet Rcvd:")
-            # print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
+            print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
+            print(len(bytearray(byteData)))
             # END DEBUG
             if byteData[0:2] == b'\x00\x00':
                 prevSeq = -1 
@@ -271,6 +272,7 @@ class CommsLink(QThread):
             if self.ser == None:
                 self.ser.open()
                 print ("Successfully connected to port %r." % self.ser.port)
+                sleep(1)
                 return True
             else:
                 if self.ser.isOpen():
