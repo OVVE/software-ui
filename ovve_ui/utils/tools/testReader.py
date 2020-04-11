@@ -7,8 +7,8 @@ import codecs
 import struct
 
 BAUD = 38400
-PORT = "/dev/ttyACM0"
-SER_TIMEOUT = 0.055
+PORT = "/dev/ttyUSB0"
+SER_TIMEOUT = 0.07
 
 
 #Global Variables
@@ -35,6 +35,7 @@ def init_serial():
 
 #Call the Serial Initilization Function, Main Program Starts from here
 init_serial()
+
 
 def crccitt(hex_string):
     byte_seq = binascii.unhexlify(hex_string)
@@ -101,12 +102,13 @@ def process_in_serial():
     #ser.reset_input_buffer()
     error_count = 0
     prevByte = 0
-    sleep(.5)
+    #sleep(1)
     byteData = b'\x00'
     ValidPkt = 0
     while True:
         byteData = read_all(ser, 70)
         if len(bytearray(byteData)) != 70:
+            print('reread')
             byteData = read_all(ser, 70)
         else:
             ValidPkt += ValidPkt
@@ -166,10 +168,11 @@ def process_in_serial():
         
         if (len(bytearray(cmd_byteData))) == 22:
             i = 0
-            for i in range(len(cmd_byteData)):
-                self.ser.write(cmd_byteData[i:i+1])
-                #self.ser.write(cmd_byteData)
-                #self.ser.reset_output_buffer()
+            try:
+                for i in range(len(cmd_byteData)):
+                    ser.write(cmd_byteData[i:i+1])
+                    #self.ser.write(cmd_byteData)
+                    #self.ser.reset_output_buffer()
             except serial.SerialException:
                 print('Serial write error')
         else:

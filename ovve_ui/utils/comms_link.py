@@ -28,7 +28,7 @@ class CommsLink(QThread):
         self.seqnum = 0
         self.packet_version = 1
         self.BAUD = 38400
-        self.PORT = "/dev/ttyACM0"
+        self.PORT = "/dev/ttyUSB0"
         self.SER_TIMEOUT = 0.060
         self.ser = 0
         self.crcFailCnt = 0
@@ -43,6 +43,12 @@ class CommsLink(QThread):
         print(self.settings.to_JSON())
 
     #This function processes the serial data from Arduino and sends ACK
+
+    def calculate_runstate(self, mode_value):
+        VC_CMV_ASSITED_OFF = 0
+        VC_CMV_ASSITED_ON = 1
+        VC_CMV_NON_ASSITED_OFF = 2
+        pass
 
     def process_SerialData(self) -> None:
         params = Params()
@@ -187,6 +193,8 @@ class CommsLink(QThread):
             cmd_pkt['ie_ratio_set'] = self.settings.ie_ratio
 
             self.settings_lock.release()
+
+            self.calculate_runstate(cmd_pkt['mode_value'] )
 
             cmd_byteData += bytes(cmd_pkt['sequence_count'].to_bytes(2, endian))
             cmd_byteData += bytes(cmd_pkt['packet_version'].to_bytes(1, endian))
