@@ -29,7 +29,7 @@ class CommsLink(QThread):
         self.packet_version = 1
         self.BAUD = 38400
         self.PORT = "/dev/ttyACM0"
-        self.SER_TIMEOUT = 0.055
+        self.SER_TIMEOUT = 0.060
         self.ser = 0
         self.crcFailCnt = 0
         self.setting_lock = Lock()
@@ -93,6 +93,7 @@ class CommsLink(QThread):
             
             byteData = self.read_all(self.ser, 70)
             if len(bytearray(byteData)) != 70:
+                print("reread")
                 byteData = self.read_all(self.ser, 70)
             else:
                 ValidPkt += ValidPkt
@@ -102,7 +103,7 @@ class CommsLink(QThread):
             # print (byteData)  #raw will show ascii if can be decoded
             # hex only -- byte order is reversed
             # print ("Packet Rcvd:")
-            print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
+            # print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
             print(len(bytearray(byteData)))
             # END DEBUG
             if byteData[0:2] == b'\x00\x00':
@@ -201,8 +202,8 @@ class CommsLink(QThread):
             CRCtoSend = struct.pack('<Q', int(calcCRC, base=16))
             print ('CALC CRC HEX and byte: ')
 
-            print(calcCRC)
-            print (CRCtoSend)
+            #print(calcCRC)
+            #print (CRCtoSend)
             #send only 2 bytes
             cmd_byteData += CRCtoSend[0:2]
             
@@ -210,9 +211,12 @@ class CommsLink(QThread):
             # TO DO put in separate function
             if (len(bytearray(cmd_byteData))) == 22:
                 try:
-                    self.ser.write(cmd_byteData)
-                    self.ser.reset_output_buffer()
-                except:
+                    i = 0
+                    for i in range(len(cmd_byteData)):
+                        ser.write(cmd_byteData[i:i+1])
+                    ser.write(cmd_byteData)
+                    #self.ser.reset_output_buffer()
+                except serial.SerialException:
                     print('Serial write error')
             else:
                 print ('Data packet too long')
@@ -272,7 +276,7 @@ class CommsLink(QThread):
             if self.ser == None:
                 self.ser.open()
                 print ("Successfully connected to port %r." % self.ser.port)
-                sleep(1)
+                
                 return True
             else:
                 if self.ser.isOpen():
@@ -308,7 +312,7 @@ class CommsLink(QThread):
             read_buffer += byte_chunk
             if not len(byte_chunk) == chunk_size:
                 break
-        port.reset_input_buffer()
+        #port.reset_input_buffer()
         return read_buffer
 
 
@@ -316,6 +320,7 @@ class CommsLink(QThread):
         self.done = False
         
         if self.init_serial():
+            sleep(1)
             print ('Serial Init Successful')
         else:
             print ('Serial Initialization failed')

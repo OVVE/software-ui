@@ -165,11 +165,13 @@ def process_in_serial():
         cmd_pkt['crc']  = bytes.fromhex(calcCRC)
         
         if (len(bytearray(cmd_byteData))) == 22:
-            try:
-                ser.write(cmd_byteData)
-                ser.flush()
-            except:
-                print('serial write error')
+            i = 0
+            for i in range(len(cmd_byteData)):
+                self.ser.write(cmd_byteData[i:i+1])
+                #self.ser.write(cmd_byteData)
+                #self.ser.reset_output_buffer()
+            except serial.SerialException:
+                print('Serial write error')
         else:
             print ('Data packet too long')
         print('length wrote CRC Length CRC Array:')
