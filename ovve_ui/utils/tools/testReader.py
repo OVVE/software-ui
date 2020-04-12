@@ -8,8 +8,8 @@ import struct
 
 BAUD = 38400
 PORT = "/dev/ttyUSB0"
-SER_TIMEOUT = 0.055
-SER_WRITE_TIMEOUT = 0.005
+SER_TIMEOUT = 0.065
+SER_WRITE_TIMEOUT = 0.03
 
 
 #Global Variables
@@ -25,7 +25,7 @@ def init_serial():
     ser.port = PORT 
     #a little less than polling spped from arduino
     ser.timeout = SER_TIMEOUT
-    ser.write_timeout = SER_WRITE_TIMEOUT
+    #ser.write_timeout = SER_WRITE_TIMEOUT
     ser.open()          #Opens SerialPort
 
     # print port open or closed
@@ -113,6 +113,7 @@ def process_in_serial():
     #sleep(1)
     byteData = b''
     ValidPkt = 0
+    prevSeq = -1
     while True:
         print('begin:')
         byteData = read_all(ser, 70)
@@ -120,41 +121,55 @@ def process_in_serial():
             #byteData = b''
             print('reread')
             byteData = read_all(ser, 70)
-        else:
-            ValidPkt += ValidPkt
+        # else:
+        #     ValidPkt += ValidPkt
+            
         #byteData = ser.read(70)
         #2 ways to print
         # print (byteData)  #raw will show ascii if can be decoded
         #hex only -- byte order is reversed
         print(''.join(r'\x'+hex(letter)[2:] for letter in byteData))
         if byteData[0:2] == b'\x00\x00':
-            prevByte = -1 
+            prevSeq = -1 
+            currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
         else:
-            prevByte = (int.from_bytes(byteData[0:2], byteorder='little') - 1)
-       
-        if (int.from_bytes(byteData[0:2], byteorder='little') - prevByte ) == 1 :
-            in_pkt['sequence_count']=int.from_bytes(byteData[0:2], byteorder='little')
-            in_pkt['packet_version']=int.from_bytes(byteData[2:3], byteorder='little')
-            in_pkt['mode_value']=int.from_bytes(byteData[3:4], byteorder='little')
-            in_pkt['crc']=int.from_bytes(byteData[68:70], byteorder='little')
+            prevSeq = (int.from_bytes(byteData[0:2], byteorder='little') - 1)
+            currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
             
-            print ('Received SEQ and CRC:')
-            print (in_pkt['sequence_count'])
-            print (in_pkt['crc'])
-            calcRcvCRC = crccitt(byteData[0:68].hex())
-            print("Calculated CRC:")
-            #print (int(calcRcvCRC, 16))
-            if in_pkt['crc'] != int(calcRcvCRC,16):
-                print ("Mismatch")
+            #TO DO -- Map all packets to parameter structs
                 
-            else:    
-                cmd_pkt['sequence_count'] = in_pkt['sequence_count']
-                sendPkts(cmd_pkt['sequence_count'], in_pkt['crc'])
-            
-        else:
+        if  currentSeq !=  ( prevSeq + 1) :
+            print ("There appears to be Sequence Error")
+            print (currentSeq)
+            print (prevSeq)
+        
+        #if (int.from_bytes(byteData[0:2], byteorder='little') - PrevSeq ) == 1 :
+        in_pkt['sequence_count']=int.from_bytes(byteData[0:2], byteorder='little')
+        in_pkt['packet_version']=int.from_bytes(byteData[2:3], byteorder='little')
+        in_pkt['mode_value']=int.from_bytes(byteData[3:4], byteorder='little')
+        in_pkt['crc']=int.from_bytes(byteData[68:70], byteorder='little')
+        
+        print ('Received SEQ and CRC:')
+        print (in_pkt['sequence_count'])
+        print (in_pkt['crc'])
+        calcRcvCRC = crccitt(byteData[0:68].hex())
+        print("Calculated CRC:")
+        print (int(calcRcvCRC, 16))
+        if in_pkt['crc'] != int(calcRcvCRC,16):
+            print ("Mismatch")
             error_count = error_count + 1
+            ValidPkt += ValidPkt
             print ('Dropped packets count ' + str(error_count))
             print ('Valid packets count ' + str(ValidPkt))
+            
+        else:    
+            cmd_pkt['sequence_count'] = in_pkt['sequence_count']
+            sendPkts(cmd_pkt['sequence_count'], in_pkt['crc'])
+        
+    
+        # error_count = error_count + 1
+        # print ('Dropped packets count ' + str(error_count))
+        # print ('Valid packets count ' + str(ValidPkt))
         
 
 def sendPkts(seq_cnt, crc):
