@@ -33,6 +33,6 @@ jobs:
       run: python3 -m pip list | grep -F pyqtgraph
 
     - name: Download Dependency (PyQt5)
-      run: apt install python3-pyqt5
+      run: sudo apt install python3-pyqt5
     - name: Dependency Install Check (PyQt5)
       run: python3 -m pip list | grep -F PyQt5
