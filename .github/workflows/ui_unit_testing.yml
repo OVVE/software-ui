@@ -21,10 +21,6 @@ jobs:
     # Download Python Dependencies and Check
     - name: Download Python Package Dependencies
       run: python3 -m pip install setuptools
-    - name: Download Dependency (PyQt5)
-      run: python3 -m pip install pyqt5
-    - name: Dependency Install Check (PyQt5)
-      run: python3 -m pip list | grep -F PyQt5
     
     - name: Download Dependency (numpy)
       run: python3 -m pip install numpy
@@ -35,3 +31,8 @@ jobs:
       run: python3 -m pip install pyqtgraph
     - name: Dependency Install Check (pyqtgraph)
       run: python3 -m pip list | grep -F pyqtgraph
+
+    - name: Download Dependency (PyQt5)
+      run: apt install python3-pyqt5
+    - name: Dependency Install Check (PyQt5)
+      run: python3 -m pip list | grep -F PyQt5
