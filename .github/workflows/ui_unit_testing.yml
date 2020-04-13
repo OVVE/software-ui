@@ -19,22 +19,17 @@ jobs:
     - uses: actions/checkout@v2
 
     # Download Python Dependencies and Check
-    - name: Download Initial Dependencies
-      run:
-        python3 -m pip install setuptools
-        sudo apt install python3-pyqt5
-    
-    - name: Download Dependency (numpy)
-      run:
-        python3 -m pip install numpy
-        python3 -m pip list | grep -F numpy
-      
-    - name: Download Dependency (pyqtgraph)
-      run:
-        python3 -m pip install pyqtgraph
-        python3 -m pip list | grep -F pyqtgraph
+    - name: Download Initial pip Dependencies
+      run: python3 -m pip install setuptools
 
-    - name: Download Dependency (PyQt5)
+    - name: Download Initial apt Dependencies
+      run: sudo apt install python3-pyqt5
+    
+    - name: Download Dependencies
+      run: python3 -m pip install pyqt5 numpy pyqtgraph
+
+    - name: Check Dependency Installation
       run:
-        python3 -m pip install pyqt5
-        python3 -m pip list | grep -F PyQt5
+        python3 -m pip list | grep -F PyQt5 &&
+        python3 -m pip list | grep -F numpy &&
+        python3 -m pip list | grep -F pyqtgraph
