@@ -27,10 +27,11 @@ jobs:
       run: sudo apt install python3-pyqt5
     
     - name: Download Other Package Dependencies
-      run: python3 -m pip install numpy pyqtgraph
+      run: python3 -m pip install numpy pyqtgraph crc16
 
     - name: Check Package Dependency Installation
       run:
         python3 -m pip list | grep -F numpy &&
         python3 -m pip list | grep -F pyqtgraph &&
+        python3 -m pip list | grep -F crc16 &&
         python3 -c "import PyQt5; print(PyQt5.__doc__)"
