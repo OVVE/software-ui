@@ -18,18 +18,19 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    # Download Python Dependencies and Check
-    - name: Download Initial pip Dependencies
+    # Download PyQt5's dependencies
+    - name: Download PyQt5 Dependencies
       run: python3 -m pip install setuptools
 
-    - name: Download Initial apt Dependencies
+    # Download our packages dependencies
+    - name: Download PyQt5
       run: sudo apt install python3-pyqt5
     
-    - name: Download Dependencies
-      run: python3 -m pip install pyqt5 numpy pyqtgraph
+    - name: Download Other Package Dependencies
+      run: python3 -m pip install numpy pyqtgraph
 
-    - name: Check Dependency Installation
+    - name: Check Package Dependency Installation
       run:
-        python3 -m pip list | grep -F PyQt5 &&
         python3 -m pip list | grep -F numpy &&
-        python3 -m pip list | grep -F pyqtgraph
+        python3 -m pip list | grep -F pyqtgraph &&
+        python3 -c "import PyQt5; print(PyQt5.__doc__)"
