@@ -301,7 +301,7 @@ def initializeRespiratoryRateWidget(window) -> None:
                                        page_settings.unitColor + ";}")
     resp_rate_unit_label.setAlignment(Qt.AlignCenter)
 
-    resp_rate_decrement_button = window.makeSimpleDisplayButton(
+    window.resp_rate_decrement_button = window.makeSimpleDisplayButton(
         "-",
         size=(50, 50),
         button_settings=SimpleButtonSettings(
@@ -310,7 +310,15 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    resp_rate_increment_button = window.makeSimpleDisplayButton(
+    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy()
+    resp_rate_decrement_size_policy.setRetainSizeWhenHidden(True)
+    window.resp_rate_decrement_button.setSizePolicy(resp_rate_decrement_size_policy)
+
+    if window.local_settings.resp_rate - window.ranges._ranges["resp_rate_increment"] \
+            < window.ranges._ranges["min_resp_rate"]:
+        window.resp_rate_decrement_button.hide()
+
+    window.resp_rate_increment_button = window.makeSimpleDisplayButton(
         "+",
         size=(50, 50),
         button_settings=SimpleButtonSettings(
@@ -319,6 +327,14 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
+    resp_rate_increment_size_policy = window.resp_rate_increment_button.sizePolicy()
+    resp_rate_increment_size_policy.setRetainSizeWhenHidden(True)
+    window.resp_rate_increment_button.setSizePolicy(resp_rate_increment_size_policy)
+
+    if window.local_settings.resp_rate + window.ranges._ranges["resp_rate_increment"] \
+            > window.ranges._ranges["max_resp_rate"]:
+        window.resp_rate_increment_button.hide()
+
     resp_rate_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
@@ -326,6 +342,7 @@ def initializeRespiratoryRateWidget(window) -> None:
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
             valueColor=page_settings.commitColor))
+
     resp_rate_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
@@ -334,17 +351,18 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.cancelSetting,
             valueColor=page_settings.cancelColor))
 
-    resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
-    resp_rate_increment_button.clicked.connect(window.incrementRespRate)
+    window.resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
+    window.resp_rate_increment_button.clicked.connect(window.incrementRespRate)
+
     resp_rate_apply.clicked.connect(window.commitRespRate)
     resp_rate_cancel.clicked.connect(window.cancelChange)
 
     h_box_1.addWidget(resp_rate_title_label)
-    h_box_2.addWidget(resp_rate_decrement_button)
+    h_box_2.addWidget(window.resp_rate_decrement_button)
     h_box_2.addWidget(window.resp_rate_page_value_label)
     window.resp_rate_page_value_label.setFixedWidth(
         page_settings.valueLabelWidth)
-    h_box_2.addWidget(resp_rate_increment_button)
+    h_box_2.addWidget( window.resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
     h_box_4.addWidget(resp_rate_apply)
     h_box_4.addWidget(resp_rate_cancel)
@@ -353,6 +371,8 @@ def initializeRespiratoryRateWidget(window) -> None:
     v_box.addLayout(h_box_2)
     v_box.addLayout(h_box_3)
     v_box.addLayout(h_box_4)
+
+
 
     window.page["3"].setLayout(v_box)
 
@@ -378,8 +398,7 @@ def initializeTidalVolumeWidget(window: MainWindow):
     tv_title_label.setAlignment(Qt.AlignCenter)
     tv_title_label.setStyleSheet("QLabel {color: #000000 ;}")
 
-
-    window.tv_page_value_label = QLabel(str(window.local_settings.resp_rate))
+    window.tv_page_value_label = QLabel(str(window.local_settings.tv))
     window.tv_page_value_label.setFont(page_settings.valueFont)
     window.tv_page_value_label.setStyleSheet("QLabel {color: " +
                                              page_settings.valueColor + ";}")
@@ -392,7 +411,7 @@ def initializeTidalVolumeWidget(window: MainWindow):
                                 ";}")
     tv_unit_label.setAlignment(Qt.AlignCenter)
 
-    tv_decrement_button = window.makeSimpleDisplayButton(
+    window.tv_decrement_button = window.makeSimpleDisplayButton(
         "-",
         size=(50, 50),
         button_settings=SimpleButtonSettings(
@@ -401,7 +420,15 @@ def initializeTidalVolumeWidget(window: MainWindow):
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    tv_increment_button = window.makeSimpleDisplayButton(
+    tv_decrement_size_policy = window.tv_decrement_button.sizePolicy()
+    tv_decrement_size_policy.setRetainSizeWhenHidden(True)
+    window.tv_decrement_button.setSizePolicy(tv_decrement_size_policy)
+
+    if window.local_settings.tv - window.ranges._ranges["tv_increment"] \
+            < window.ranges._ranges["min_tv"]:
+        window.tv_decrement_button.hide()
+
+    window.tv_increment_button = window.makeSimpleDisplayButton(
         "+",
         size=(50, 50),
         button_settings=SimpleButtonSettings(
@@ -409,6 +436,14 @@ def initializeTidalVolumeWidget(window: MainWindow):
             borderColor=page_settings.changeButtonBorderColor,
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
+
+    tv_increment_size_policy = window.tv_increment_button.sizePolicy()
+    tv_increment_size_policy.setRetainSizeWhenHidden(True)
+    window.tv_increment_button.setSizePolicy(tv_increment_size_policy)
+
+    if window.local_settings.tv + window.ranges._ranges["tv_increment"] \
+            > window.ranges._ranges["max_tv"]:
+        window.tv_increment_button.hide()
 
     tv_apply = window.makeSimpleDisplayButton(
         "APPLY",
@@ -425,15 +460,15 @@ def initializeTidalVolumeWidget(window: MainWindow):
             valueSetting=page_settings.cancelSetting,
             valueColor=page_settings.cancelColor))
 
-    tv_decrement_button.clicked.connect(window.decrementTidalVol)
-    tv_increment_button.clicked.connect(window.incrementTidalVol)
+    window.tv_decrement_button.clicked.connect(window.decrementTidalVol)
+    window.tv_increment_button.clicked.connect(window.incrementTidalVol)
     tv_apply.clicked.connect(window.commitTidalVol)
     tv_cancel.clicked.connect(window.cancelChange)
 
     h_box_1.addWidget(tv_title_label)
-    h_box_2.addWidget(tv_decrement_button)
+    h_box_2.addWidget(window.tv_decrement_button)
     h_box_2.addWidget(window.tv_page_value_label)
-    h_box_2.addWidget(tv_increment_button)
+    h_box_2.addWidget(window.tv_increment_button)
 
     h_box_3.addWidget(tv_unit_label)
     h_box_4.addWidget(tv_apply)

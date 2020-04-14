@@ -33,7 +33,7 @@ from utils.alarms import Alarms
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.logger import Logger
-
+from utils.ranges import Ranges
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
@@ -43,6 +43,7 @@ class MainWindow(QWidget):
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
+        self.ranges = Ranges()
         
         
         self.fullscreen = False
@@ -52,9 +53,6 @@ class MainWindow(QWidget):
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
-
-        self.resp_rate_increment = 1
-        self.tv_increment = 25
 
         # Example 1 (changes color of Fancy numbers to red)
         # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
@@ -273,22 +271,39 @@ class MainWindow(QWidget):
             self.get_mode_display(self.local_settings.mode))
 
     def incrementRespRate(self) -> None:
-        self.local_settings.resp_rate += self.resp_rate_increment
+        self.local_settings.resp_rate += self.ranges._ranges["resp_rate_increment"]
         self.resp_rate_page_value_label.setText(
             str(self.local_settings.resp_rate))
+        if self.local_settings.resp_rate + self.ranges._ranges["resp_rate_increment"] \
+            > self.ranges._ranges["max_resp_rate"]:
+            self.resp_rate_increment_button.hide()
+        self.resp_rate_decrement_button.show()
+
 
     def decrementRespRate(self) -> None:
-        self.local_settings.resp_rate -= self.resp_rate_increment
+        self.local_settings.resp_rate -= self.ranges._ranges["resp_rate_increment"]
         self.resp_rate_page_value_label.setText(
             str(self.local_settings.resp_rate))
+        if self.local_settings.resp_rate - self.ranges._ranges["resp_rate_increment"] \
+            < self.ranges._ranges["min_resp_rate"]:
+            self.resp_rate_decrement_button.hide()
+        self.resp_rate_increment_button.show()
 
     def incrementTidalVol(self) -> None:
-        self.local_settings.tv += self.tv_increment
+        self.local_settings.tv += self.ranges._ranges["tv_increment"]
         self.tv_page_value_label.setText(str(self.local_settings.tv))
+        if self.local_settings.tv + self.ranges._ranges["tv_increment"] \
+            > self.ranges._ranges["max_tv"]:
+            self.tv_increment_button.hide()
+        self.tv_decrement_button.show()
 
     def decrementTidalVol(self) -> None:
-        self.local_settings.tv -= self.tv_increment
+        self.local_settings.tv -= self.ranges._ranges["tv_increment"]
         self.tv_page_value_label.setText(str(self.local_settings.tv))
+        if self.local_settings.tv - self.ranges._ranges["tv_increment"] \
+            < self.ranges._ranges["min_tv"]:
+            self.tv_decrement_button.hide()
+        self.tv_increment_button.show()
 
     def incrementIERatio(self) -> None:
         self.local_settings.ie_ratio += 1
