@@ -36,8 +36,8 @@ class CommsLink(QThread):
         self.ser = 0
         self.crcFailCnt = 0
         self.setting_lock = Lock()
-        # self in_pkt = None
-        # self cmd_pkt = None 
+        self.runState_fromECU = 0
+ 
         self.cmd_pkt = {'sequence_count': 0,               # bytes 0 - 1 - rpi unsigned short int
                     'packet_version': 1,                         # byte 2      - rpi unsigned char
                     'mode_value': 0,                             # byte 3      - rpi unsigned char
@@ -81,12 +81,13 @@ class CommsLink(QThread):
     #This function processes the serial data from Arduino and sends ACK
 
     def calculate_runstate(self, mode_value):
-        VC_CMV_NON_ASSISTED_OFF = 0
-        VC_CMV_NON_ASSISTED_ON = 1
-        VC_CMV_ASSISTED_OFF = 2
-        VC_CMV_ASSISTED_OFF = 3
-        SIMV_OFF = 4
-        SIMV_ON = 5
+        # VC_CMV_NON_ASSISTED_OFF = 0
+        # VC_CMV_NON_ASSISTED_ON = 1
+        # VC_CMV_ASSISTED_OFF = 2
+        # VC_CMV_ASSISTED_OFF = 3
+        # SIMV_OFF = 4
+        # SIMV_ON = 5
+        
         startBit = None
 
         if mode_value == 0:
@@ -187,42 +188,49 @@ class CommsLink(QThread):
                 self.in_pkt['reserved']=int.from_bytes(byteData[62:64], byteorder='little')
                 self.in_pkt['alarm_bits']=int.from_bytes(byteData[64:68], byteorder='little')
                 self.in_pkt['crc']=int.from_bytes(byteData[68:], byteorder='little')
-
+                # is there a need for this by the UI
+                self.runState_fromECU = self.calculate_runstate(self.in_pkt['mode_value'] )
                 # DEBUG
                 print ('Received SEQ and CRC:')
                 print (self.in_pkt['sequence_count'])
                 print (self.in_pkt['crc'])
+                print('current runstate  from ECU: ' + str(self.runState_fromECU))
                 #END DEBUG
 
                 # Needed for the return packet
                 self.cmd_pkt['sequence_count'] = self.in_pkt['sequence_count']
                 # ENDIF
-            # Watchdog to be implemented later
-            # wd = Watchdog(100)
-            # try:
-
-
-
+            
             # Lock to prevent settings from being written in the middle of
             # creating the packet.
             self.settings_lock.acquire()
-            # get the updates from settings TODO: Make this event driven and only when callbackis called
-            self.cmd_pkt['mode_value'] = self.settings.mode
+            # get the updates from settings 
+            # Set the mode value byte which also includes start bit
+            if self.settings.mode == 0 and self.settings.run_state == 0:
+                self.cmd_pkt['mode_value'] = 0
+            elif self.settings.mode == 0 and self.settings.run_state == 1:
+                self.cmd_pkt['mode_value'] = 1
+            elif self.settings.mode == 1 and self.settings.run_state == 0:
+                self.cmd_pkt['mode_value'] = 2
+            elif self.settings.mode == 1 and self.settings.run_state == 1:
+                self.cmd_pkt['mode_value'] = 3
+            elif self.settings.mode == 2 and self.settings.run_state == 0:
+                self.cmd_pkt['mode_value'] = 4
+            elif self.settings.mode == 2 and self.settings.run_state == 1:
+                self.cmd_pkt['mode_value'] = 5
+            else:
+                self.cmd_pkt['mode_value'] = 0
+
             self.cmd_pkt['respiratory_rate_set'] = self.settings.resp_rate
             self.cmd_pkt['tidal_volume_set'] = self.settings.tv
             self.cmd_pkt['ie_ratio_set'] = self.settings.ie_ratio
-
+            # release lock
             self.settings_lock.release()
 
-            self.settings.run_state = self.calculate_runstate(self.cmd_pkt['mode_value'] )
-
             self.sendPkts(self.cmd_pkt['sequence_count'], self.in_pkt['crc'])
-
-
-
             #Update dict only if there is valid data
             if validData == True:
-                # any settings set will not retunr correctly yet until Arduino sets set values correctly
+                # any settings set will not return correctly yet until Arduino sets set values correctly
                 # We can use the settings values like in simulator if so desired or maybe compare them
                 # RE: Run_state, we still need to implment getting this from Arduino. Currently I am just getting zero
                 # When done, this will MSB off self.in_pkt['mode_value']
@@ -248,7 +256,6 @@ class CommsLink(QThread):
                 params_dict['battery_level'] = self.in_pkt['battery_level']
                 self.new_params.emit(params_dict)
 
-           # self.settings_lock.release()
 
     def init_serial(self) -> False:
 
@@ -342,8 +349,8 @@ class CommsLink(QThread):
                 # DEBUG
                 # print('length of CMD Pkt:')
                 # print (len(bytearray(cmd_byteData)))
-                # print ("Packet Written:")
-                # print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+                print ("Packet Written:")
+                print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
                 print("Sent back SEQ and CRC: ")
                 print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
                 print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
