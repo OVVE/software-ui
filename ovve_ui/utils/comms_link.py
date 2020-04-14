@@ -30,8 +30,8 @@ class CommsLink(QThread):
         self.packet_version = 1
         self.BAUD = 38400
         self.PORT = "/dev/ttyUSB0"
-        self.SER_TIMEOUT = 0.070
-        self.SER_WRITE_TIMEOUT = 0.005
+        self.SER_TIMEOUT = 0.065
+        self.SER_WRITE_TIMEOUT = 0.03
         self.SER_INTER_TIMEOUT = 0.01
         self.ser = 0
         self.crcFailCnt = 0
@@ -81,10 +81,29 @@ class CommsLink(QThread):
     #This function processes the serial data from Arduino and sends ACK
 
     def calculate_runstate(self, mode_value):
-        VC_CMV_ASSITED_OFF = 0
-        VC_CMV_ASSITED_ON = 1
-        VC_CMV_NON_ASSITED_OFF = 2
-        pass
+        VC_CMV_NON_ASSISTED_OFF = 0
+        VC_CMV_NON_ASSISTED_ON = 1
+        VC_CMV_ASSISTED_OFF = 2
+        VC_CMV_ASSISTED_OFF = 3
+        SIMV_OFF = 4
+        SIMV_ON = 5
+        startBit = None
+
+        if mode_value == 0:
+            startBit = 0
+        elif mode_value == 1:
+            startBit = 1
+        elif mode_value == 2:
+            startBit = 0
+        elif mode_value == 3:
+            startBit == 1
+        elif mode_value == 4:
+            startBit == 0
+        elif mode_value == 5:
+            startBit = 1
+        else:
+            startBit = 0
+        return startBit
 
     def process_SerialData(self) -> None:
         params = Params()
@@ -195,9 +214,9 @@ class CommsLink(QThread):
 
             self.settings_lock.release()
 
-            self.calculate_runstate(self.cmd_pkt['mode_value'] )
+            self.settings.run_state = self.calculate_runstate(self.cmd_pkt['mode_value'] )
 
-            self.sendPkts()
+            self.sendPkts(self.cmd_pkt['sequence_count'], self.in_pkt['crc'])
 
 
 
@@ -283,7 +302,7 @@ class CommsLink(QThread):
         #port.reset_input_buffer()
         return read_buffer
 
-    def sendPkts(self):
+    def sendPkts(self, seq_cnt, crc):
 
         # create the return packet
         endian = "little"
@@ -315,30 +334,29 @@ class CommsLink(QThread):
             #self.ser.write_timeout = (0.30)
             try:
                 i = 0
+                
                 for i in range(len(cmd_byteData)):
                     self.ser.write(cmd_byteData[i:i+1])
-                self.ser.write(cmd_byteData)
+                # END DEBUG
+                                #self.ser.write(cmd_byteData)
+                # DEBUG
+                # print('length of CMD Pkt:')
+                # print (len(bytearray(cmd_byteData)))
+                # print ("Packet Written:")
+                # print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+                print("Sent back SEQ and CRC: ")
+                print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
+                print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
+                self.ser.reset_output_buffer()
                 return True
-                #self.ser.reset_output_buffer()
+                    
             except serial.SerialException:
                 print('Serial write error')
                 return False
         else:
             print ('Data packet too long')
 
-
-        CRCtoSend = None
-        return True
-
-        # DEBUG
-        # print('length of CMD Pkt:')
-        # print (len(bytearray(cmd_byteData)))
-        # print ("Packet Written:")
-        # print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
-        print("Sent back SEQ and CRC: ")
-        print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
-        print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
-        # END DEBUG
+        
 
     def run(self) -> None:
         self.done = False
