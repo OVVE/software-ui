@@ -96,9 +96,9 @@ class MainWindow(QWidget):
 
 
         if not is_sim:
-            self.comms_handler = CommsLink()
+            self.comms_handler = CommsLink(self.logger)
         else:
-            self.comms_handler = CommsSimulator()
+            self.comms_handler = CommsSimulator(self.logger)
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
@@ -173,17 +173,16 @@ class MainWindow(QWidget):
     def display(self, i):
         self.stack.setCurrentIndex(i)
 
-    def update_ui_params(self, params_dict: dict) -> None:
-        self.params = Params()
-        self.params.from_dict(params_dict)
-        self.logger.log("params", self.params.to_JSON())
+    def update_ui_params(self, params: Params) -> None:
+        self.params = params
+        #self.logger.log("params", self.params.to_JSON())
         self.updateMainDisplays()
         self.updateGraphs()
 
     def update_ui_alarms(self, alarms_dict: dict) -> None:
         self.alarms = Alarms()
         self.alarms.from_dict(alarms_dict)
-        self.logger.log("alarms", self.alarms.to_JSON())
+        #self.logger.log("alarms", self.alarms.to_JSON())
 
         #TODO: Implement UI alarm handling
 
@@ -448,7 +447,7 @@ class MainWindow(QWidget):
     def passChanges(self) -> None:
         #self.settings_callback(self.settings)
         settings_str = self.settings.to_JSON()
-        self.logger.log("settings,", settings_str)
+        #self.logger.log("settings,", settings_str)
         j = json.loads(settings_str)
         self.new_settings_signal.emit(j)
 
