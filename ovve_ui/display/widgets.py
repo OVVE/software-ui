@@ -54,16 +54,12 @@ def initializeHomeScreenWidget(
     )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
 
-    window.alarm_button_main = window.makeSimpleDisplayButton(
-        "ALARM",
-        button_settings=SimpleButtonSettings(borderColor="#FF0000",
-                                             fillColor='#FFFFFF',
-                                             valueColor='#FF0000'),
-    )
-    window.alarm_button_main.clicked.connect(window.alarmButtonClicked)
+    window.start_stop_button_main = window.makeSimpleDisplayButton("START")
+    window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
-    window.start_button_main = window.makeSimpleDisplayButton("START", )
-    window.start_button_main.clicked.connect(window.changeStartStop)
+    window.settings_button_main = window.makeSimpleDisplayButton("SETTINGS")
+    window.settings_button_main.clicked.connect(lambda: window.display(6))
+
 
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
@@ -103,8 +99,9 @@ def initializeHomeScreenWidget(
     h_box_11.addWidget(window.resp_rate_button_main)
     h_box_11.addWidget(window.tv_button_main)
     h_box_11.addWidget(window.ie_button_main)
-    h_box_11.addWidget(window.alarm_button_main)
-    h_box_11.addWidget(window.start_button_main)
+    h_box_11.addWidget(window.start_stop_button_main)
+    h_box_11.addWidget(window.settings_button_main)
+
 
     v_box_11left.addWidget(window.resp_rate_display_main)
     v_box_11left.addWidget(window.tv_insp_display_main)
@@ -598,3 +595,29 @@ def initializeAlarmWidget(window: MainWindow):  #Alarm
     v_box_6.addLayout(h_box_6bottom)
 
     window.page["6"].setLayout(v_box_6)
+
+
+def initializeSettingsWidget(window: MainWindow):
+    v_box_7 = QVBoxLayout()
+    h_box_7top = QHBoxLayout()
+    h_box_7bottom = QHBoxLayout()
+
+    h_box_7top.setAlignment(Qt.AlignCenter)
+    h_box_7bottom.setAlignment(Qt.AlignCenter)
+
+    settings_page_label = QLabel("Settings")
+    settings_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+
+    settings_page_label.setAlignment(Qt.AlignCenter)
+
+    settings_shutdown_button = window.makeSimpleDisplayButton("Emergency Shutdown", button_settings = SimpleButtonSettings(fillColor = window.ui_settings.page_settings.cancelColor))
+
+    settings_shutdown_button.clicked.connect(lambda: window.emergencyShutdown())
+
+    h_box_7top.addWidget(settings_page_label)
+    h_box_7bottom.addWidget(settings_shutdown_button)
+    v_box_7.addLayout(h_box_7top)
+    v_box_7.addLayout(h_box_7bottom)
+
+    window.page["7"].setLayout(v_box_7)
+

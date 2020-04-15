@@ -26,7 +26,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
-                             initializeGraphWidget)
+                             initializeGraphWidget, initializeSettingsWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -75,6 +75,7 @@ class MainWindow(QWidget):
             "4": QWidget(),
             "5": QWidget(),
             "6": QWidget(),
+            "7": QWidget(),
         }
 
         self.initalizeAndAddStackWidgets()
@@ -171,6 +172,7 @@ class MainWindow(QWidget):
         initializeTidalVolumeWidget(self)
         initializeIERatioWidget(self)
         initializeAlarmWidget(self)
+        initializeSettingsWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -200,7 +202,6 @@ class MainWindow(QWidget):
             if list(alarms_dict.items())[i][1]: #TODO: Revisit this for multi alarm handling
                 self.showAlarm(i)
                 self.alarm_state = True
-                self.alarm_button_main.updateValue("SILENCE")
                 self.alarmBackgroundFlash = QPropertyAnimation(self, b"color")
                 self.alarmBackgroundFlash.setDuration(2500)
                 self.alarmBackgroundFlash.setLoopCount(-1)
@@ -330,8 +331,8 @@ class MainWindow(QWidget):
     def changeStartStop(self):
         if self.settings.run_state == 0:
             self.settings.run_state = 1
-            self.start_button_main.updateValue("STOP")
-            self.start_button_main.button_settings = SimpleButtonSettings(
+            self.start_stop_button_main.updateValue("STOP")
+            self.start_stop_button_main.button_settings = SimpleButtonSettings(
                 fillColor="#ff0000")
             self.passChanges()
 
@@ -373,10 +374,9 @@ class MainWindow(QWidget):
         alarms_dict = self.alarms.to_dict()
         alarms_items = list(alarms_dict.items())
         alarms_dict[alarms_items[code][0]] = False
-        print(f'Setting{alarms_items[code][0]} to False')
         self.alarms.from_dict(alarms_dict)
         self.comms_handler.new_alarms
-        # print(self.alarms.to_dict())
+        self.alarmBackgroundFlash.stop()
         d.reject()
 
 
@@ -433,8 +433,8 @@ class MainWindow(QWidget):
     def stopVentilation(self, d: QDialog):
         d.reject()
         self.settings.run_state = 0
-        self.start_button_main.updateValue("START")
-        self.start_button_main.button_settings = SimpleButtonSettings()
+        self.start_stop_button_main.updateValue("START")
+        self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
 
     # TODO: Finish all of these for each var
@@ -571,6 +571,14 @@ class MainWindow(QWidget):
 
         elif event.key() == QtCore.Qt.Key_I:
             self.comms_handler.fireAlarm(6)
+
+
+    def emergencyShutdown(self):
+        if self.settings.run_state == 0:
+            os.system("sudo shutdown -h")
+        else:
+            print("Cannot emergency shutdown, vent. is running")
+            #TODO: Show a dialog or something
 
 
 def main() -> None:
