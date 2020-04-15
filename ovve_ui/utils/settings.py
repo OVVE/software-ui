@@ -11,8 +11,9 @@ class Settings():
         self.mode: int = 0
 
         self.mode_switcher: dict = {
-            0: "AC",
-            1: "SIMV",
+            0: 'NAC',
+            1: 'AC',
+            2: 'SIMV'
         }
 
         self.resp_rate: int = 20
