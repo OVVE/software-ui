@@ -1,7 +1,9 @@
 from utils.params import Params
+from utils.logger import Logger
 
 class InPacket():
-    def __init__(self):
+    def __init__(self, logger: Logger) -> None:
+        self.logger = logger
         self.data={'sequence_count': 0,            # bytes  0- 1 - rpi unsigned short int
                     'packet_version': 0,             # byte 2      - rpi unsigned char
                     'mode_value': 0,                 # byte 3      - rpi unsigned char
@@ -23,11 +25,13 @@ class InPacket():
                     'battery_level': 0,              # byte 61
                     'reserved': 0,                  # bytes 62 - 63 - rpi unsigned int
                     'alarm_bits': 0,                # bytes 64 - 67
-                    'crc': 0 }                      # bytes 68 - 69 
+                    'crc': 0,                       # bytes 68 - 69 
+                    'run_state': 0                  # Calculated from mode value
+                    }                     
 
 
     # byteData must have already been checked for proper length and crc
-    def from_bytes(byteData: bytes) -> None:
+    def from_bytes(self, byteData: bytes) -> None:
         self.data['sequence_count']=int.from_bytes(byteData[0:2], byteorder='little')
         self.data['packet_version']=byteData[2]
         self.data['mode_value']=byteData[3]
@@ -50,10 +54,12 @@ class InPacket():
         self.data['reserved']=int.from_bytes(byteData[62:64], byteorder='little')
         self.data['alarm_bits']=int.from_bytes(byteData[64:68], byteorder='little')
         self.data['crc']=int.from_bytes(byteData[68:], byteorder='little')
+        self.data['run_state'] = self.calculate_runstate(self.data['mode_value'])
 
 
-    def to_params() -> Params:
+    def to_params(self) -> Params:
         params = Params()
+        params.run_state = self.data['run_state']
         params.seq_num = self.data['sequence_count']
         params.packet_version = self.data['packet_version']
         params.mode = self.data['mode_value']
@@ -61,8 +67,8 @@ class InPacket():
         params.resp_rate_set = self.data['respiratory_rate_set']
         params.tv_meas = self.data['tidal_volume_measured']
         params.tv_set = self.data['tidal_volume_set']
-        params.ie_ratio_meas = in_self.data['ie_ratio_measured']
-        params.ie_ratio_set = in_self.data['ie_ratio_set']
+        params.ie_ratio_meas = self.data['ie_ratio_measured']
+        params.ie_ratio_set = self.data['ie_ratio_set']
         params.peep = self.data['peep_value_measured']
         params.ppeak = self.data['peak_pressure_measured']
         params.pplat = self.data['plateau_value_measurement']
@@ -73,3 +79,30 @@ class InPacket():
         params.battery_level = self.data['battery_level']
 
         return params
+
+
+    def calculate_runstate(self, mode_value):
+        # VC_CMV_NON_ASSISTED_OFF = 0
+        # VC_CMV_NON_ASSISTED_ON = 1
+        # VC_CMV_ASSISTED_OFF = 2
+        # VC_CMV_ASSISTED_OFF = 3
+        # SIMV_OFF = 4
+        # SIMV_ON = 5
+        
+        startBit = None
+
+        if mode_value == 0:
+            startBit = 0
+        elif mode_value == 1:
+            startBit = 1
+        elif mode_value == 2:
+            startBit = 0
+        elif mode_value == 3:
+            startBit == 1
+        elif mode_value == 4:
+            startBit == 0
+        elif mode_value == 5:
+            startBit = 1
+        else:
+            startBit = 0
+        return startBit

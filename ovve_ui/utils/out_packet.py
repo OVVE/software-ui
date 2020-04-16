@@ -1,7 +1,12 @@
-from utils import crc
+from utils.crc import CRC
+from utils.logger import Logger
+import struct
+
 
 class OutPacket():
-    def __init__():
+    def __init__(self, logger: Logger) -> None:
+        self.logger = logger
+        self.crc = CRC(logger)
         self.data = {'sequence_count': 0,               # bytes 0 - 1 - rpi unsigned short int
             'packet_version': 1,                         # byte 2      - rpi unsigned char
             'mode_value': 0,                             # byte 3      - rpi unsigned char
@@ -27,15 +32,37 @@ class OutPacket():
         cmd_byteData += bytes(self.data['alarm_bits'].to_bytes(4, endian))
 
         #Get CRC
-        calcCRC = Crc().crccitt(cmd_byteData.hex())
+        calcCRC = self.crc.crccitt(cmd_byteData.hex())
         # flip the bits - note that this will be 32 bit hex - do we will only send the first 2 later
         CRCtoSend = struct.pack('<Q', int(calcCRC, base=16))
-        print ('CALC CRC HEX and byte: ')
 
-        print(calcCRC)
-        print (CRCtoSend)
         #send only 2 bytes
         cmd_byteData += CRCtoSend[0:2]
 
         return cmd_byteData
-         
+        
+    def calculate_mode(self, in_mode, run_state) -> int:
+         # VC_CMV_NON_ASSISTED_OFF = 0
+        # VC_CMV_NON_ASSISTED_ON = 1
+        # VC_CMV_ASSISTED_OFF = 2
+        # VC_CMV_ASSISTED_OFF = 3
+        # SIMV_OFF = 4
+        # SIMV_ON = 5
+
+        mode = 0
+        # get the updates from settings 
+        # Set the mode value byte which also includes start bit
+        if in_mode == 0 and run_state == 0:
+            return 0
+        elif in_mode == 0 and run_state == 1:
+            mode =  1
+        elif in_mode == 1 and run_state == 0:
+            mode =  2
+        elif in_mode == 1 and run_state == 1:
+            mode = 3
+        elif in_mode == 2 and run_state == 0:
+            mode = 4
+        elif in_mode == 2 and run_state == 1:
+            mode = 5
+        
+        return mode
