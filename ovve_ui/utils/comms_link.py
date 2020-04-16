@@ -134,15 +134,16 @@ class CommsLink(QThread):
             else:
                 print ('Data packet too long')
    
-            # DEBUG
-            # print('length of CMD Pkt:')
-            # print (len(bytearray(cmd_byteData)))
-            # print ("Packet Written:")
-            # print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
-            print("Sent back SEQ and CRC: ")
-            print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
-            print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
-            # END DEBUG
+            if debug:
+                # DEBUG
+                # print('length of CMD Pkt:')
+                # print (len(bytearray(cmd_byteData)))
+                # print ("Packet Written:")
+                # print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+                print("Sent back SEQ and CRC: ")
+                print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
+                print (int.from_bytes(cmd_byteData[20:], byteorder='little'))
+                # END DEBUG
 
             #Update dict only if there is valid data
             if validData:
