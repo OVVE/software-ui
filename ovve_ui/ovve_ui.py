@@ -202,14 +202,14 @@ class MainWindow(QWidget):
             if list(alarms_dict.items())[i][1]: #TODO: Revisit this for multi alarm handling
                 self.showAlarm(i)
                 self.alarm_state = True
-                self.alarmBackgroundFlash = QPropertyAnimation(self, b"color")
-                self.alarmBackgroundFlash.setDuration(2500)
-                self.alarmBackgroundFlash.setLoopCount(-1)
-                self.alarmBackgroundFlash.setStartValue(QColor(255,0,0))
-                self.alarmBackgroundFlash.setKeyValueAt(0.499, QColor(255, 0, 0))
-                self.alarmBackgroundFlash.setKeyValueAt(0.501, QColor(255,255 , 255))
-                self.alarmBackgroundFlash.setEndValue(QColor(255,255,255))
-                self.alarmBackgroundFlash.start()
+                # self.alarmBackgroundFlash = QPropertyAnimation(self, b"color")
+                # self.alarmBackgroundFlash.setDuration(2500)
+                # self.alarmBackgroundFlash.setLoopCount(-1)
+                # self.alarmBackgroundFlash.setStartValue(QColor(255,0,0))
+                # self.alarmBackgroundFlash.setKeyValueAt(0.499, QColor(255, 0, 0))
+                # self.alarmBackgroundFlash.setKeyValueAt(0.501, QColor(255,255 , 255))
+                # self.alarmBackgroundFlash.setEndValue(QColor(255,255,255))
+                # self.alarmBackgroundFlash.start()
         #TODO: Implement UI alarm handling
 
     def updateMainDisplays(self) -> None:
@@ -352,7 +352,7 @@ class MainWindow(QWidget):
         d_label.setWordWrap(True)
         d_label.setAlignment(Qt.AlignCenter)
 
-        d_ack = QPushButton("Cancel")
+        d_ack = QPushButton("Silence") #TODO: Add Silence for different amounts of time
         d_ack.clicked.connect(lambda: self.dismissAlarmPopup(code, d))
         d_ack.setFont(self.ui_settings.simple_button_settings.valueFont)
         d_ack.setStyleSheet("QPushButton {background-color: " +
@@ -376,19 +376,17 @@ class MainWindow(QWidget):
         alarms_dict[alarms_items[code][0]] = False
         self.alarms.from_dict(alarms_dict)
         self.comms_handler.new_alarms
-        self.alarmBackgroundFlash.stop()
         d.reject()
 
 
-    #TODO: Potentially rethink this: it clears all alarms at once so may not work well for simultaneous alarms
-    def alarmButtonClicked(self):
-        if self.alarm_state:
-            self.alarm_state = False
-            self.alarm_button_main.updateValue("ALARM")
-            self.alarmBackgroundFlash.stop()
-        else:
-            self.display(5)
-            #TODO: Do something else here?
+    # #TODO: Potentially rethink this: it clears all alarms at once so may not work well for simultaneous alarms
+    # def alarmButtonClicked(self):
+    #     if self.alarm_state:
+    #         self.alarm_state = False
+    #         self.alarm_button_main.updateValue("ALARM")
+    #     else:
+    #         self.display(5)
+    #         #TODO: Do something else here?
 
     def showStartStopConfirm(self):
         d = QDialog()
