@@ -46,8 +46,8 @@ class MainWindow(QWidget):
         self.ranges = Ranges()
         
         
-        self.fullscreen = False
-        # self.fullscreen = True #TODO: Change back
+        # self.fullscreen = False
+        self.fullscreen = True
 
         self.alarm_state = False
 
@@ -587,7 +587,10 @@ def main() -> None:
 
     app = QApplication(sys.argv)
     window = MainWindow(args.sim)
-    window.showNormal()
+    if window.fullscreen:
+        window.showFullScreen()
+    else:
+        window.showNormal()
     app.exec_()
     sys.exit()
 
