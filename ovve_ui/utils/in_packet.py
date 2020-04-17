@@ -91,17 +91,29 @@ class InPacket():
         
         startBit = None
 
+        # if mode_value == 0:
+        #     startBit = 0
+        # elif mode_value == 1:
+        #     startBit = 1
+        # elif mode_value == 2:
+        #     startBit = 0
+        # elif mode_value == 3:
+        #     startBit == 1
+        # elif mode_value == 4:
+        #     startBit == 0
+        # elif mode_value == 5:
+        #     startBit = 1
         if mode_value == 0:
-            startBit = 0
-        elif mode_value == 1:
+                startBit = 0
+        elif mode_value == 128:
             startBit = 1
-        elif mode_value == 2:
+        elif mode_value == 1:
             startBit = 0
-        elif mode_value == 3:
+        elif mode_value == 129:
             startBit == 1
-        elif mode_value == 4:
+        elif mode_value == 2:
             startBit == 0
-        elif mode_value == 5:
+        elif mode_value == 130:
             startBit = 1
         else:
             startBit = 0
