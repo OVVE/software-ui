@@ -83,38 +83,15 @@ class InPacket():
 
     def calculate_runstate(self, mode_value):
         # VC_CMV_NON_ASSISTED_OFF = 0
-        # VC_CMV_NON_ASSISTED_ON = 1
+        # VC_CMV_NON_ASSISTED_ON = 128
         # VC_CMV_ASSISTED_OFF = 2
-        # VC_CMV_ASSISTED_OFF = 3
-        # SIMV_OFF = 4
-        # SIMV_ON = 5
+        # VC_CMV_ASSISTED_OFF = 129
+        # SIMV_OFF = 3
+        # SIMV_ON = 130
         
-        startBit = None
-
-        # if mode_value == 0:
-        #     startBit = 0
-        # elif mode_value == 1:
-        #     startBit = 1
-        # elif mode_value == 2:
-        #     startBit = 0
-        # elif mode_value == 3:
-        #     startBit == 1
-        # elif mode_value == 4:
-        #     startBit == 0
-        # elif mode_value == 5:
-        #     startBit = 1
-        if mode_value == 0:
-                startBit = 0
-        elif mode_value == 128:
-            startBit = 1
-        elif mode_value == 1:
-            startBit = 0
-        elif mode_value == 129:
-            startBit == 1
-        elif mode_value == 2:
-            startBit == 0
-        elif mode_value == 130:
+        if mode_value & ( 1 << 7):
             startBit = 1
         else:
             startBit = 0
+
         return startBit
