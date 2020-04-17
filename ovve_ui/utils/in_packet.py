@@ -88,10 +88,6 @@ class InPacket():
         # VC_CMV_ASSISTED_OFF = 129
         # SIMV_OFF = 3
         # SIMV_ON = 130
-        
-        if mode_value & ( 1 << 7):
-            startBit = 1
-        else:
-            startBit = 0
+        # get MSB but 7
 
-        return startBit
+        return mode_value & ( 1 << 7)
