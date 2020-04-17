@@ -52,21 +52,21 @@ class OutPacket():
         mode = 0
         # get the updates from settings 
         # Set the mode value byte which also includes start bit
-        # self.cmd_pkt['mode_value'] = (self.settings.mode & 0x7f) | ((self.settings.run_state << 7) & 0x80)
-        # mode = (in_mode & 0x7f) | ((run_state << 7) & 0x80)
-        if in_mode == 0 and run_state == 0:
-            return 0
-        elif in_mode == 0 and run_state == 1:
-            mode =  128
-        elif in_mode == 1 and run_state == 0:
-            mode =  1
-        elif in_mode == 1 and run_state == 1:
-            mode = 129
-        elif in_mode == 2 and run_state == 0:
-            mode = 2
-        elif in_mode == 2 and run_state == 1:
-            mode = 130
-        else:
-            mode = 0
+
+        mode = in_mode & 0x7f | (run_state << 7) & 0x80
+        # if in_mode == 0 and run_state == 0:
+        #     return 0
+        # elif in_mode == 0 and run_state == 1:
+        #     mode =  128
+        # elif in_mode == 1 and run_state == 0:
+        #     mode =  1
+        # elif in_mode == 1 and run_state == 1:
+        #     mode = 129
+        # elif in_mode == 2 and run_state == 0:
+        #     mode = 2
+        # elif in_mode == 2 and run_state == 1:
+        #     mode = 130
+        # else:
+        #     mode = 0
         
         return mode
