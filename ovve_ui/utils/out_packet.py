@@ -43,26 +43,14 @@ class OutPacket():
         
     def calculate_mode(self, in_mode, run_state) -> int:
          # VC_CMV_NON_ASSISTED_OFF = 0
-        # VC_CMV_NON_ASSISTED_ON = 1
-        # VC_CMV_ASSISTED_OFF = 2
-        # VC_CMV_ASSISTED_OFF = 3
-        # SIMV_OFF = 4
-        # SIMV_ON = 5
-
-        mode = 0
+        # VC_CMV_NON_ASSISTED_ON = 128
+        # VC_CMV_ASSISTED_OFF = 1
+        # VC_CMV_ASSISTED_OFF = 129
+        # SIMV_OFF = 3
+        # SIMV_ON = 130
         # get the updates from settings 
         # Set the mode value byte which also includes start bit
-        if in_mode == 0 and run_state == 0:
-            return 0
-        elif in_mode == 0 and run_state == 1:
-            mode =  1
-        elif in_mode == 1 and run_state == 0:
-            mode =  2
-        elif in_mode == 1 and run_state == 1:
-            mode = 3
-        elif in_mode == 2 and run_state == 0:
-            mode = 4
-        elif in_mode == 2 and run_state == 1:
-            mode = 5
-        
-        return mode
+    
+
+        return  (in_mode & 0x7f | (run_state << 7) & 0x80)
+
