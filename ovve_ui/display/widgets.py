@@ -646,7 +646,8 @@ def initializeSettingsWidget(window: MainWindow):
         "System Shutdown",
         button_settings=SimpleButtonSettings(
             valueSetting = window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.cancelColor))
+            fillColor=window.ui_settings.page_settings.cancelColor),
+        size = (200,65) )
     settings_sys_shutdown_button.clicked.connect(
         lambda: window.systemShutdown())
 
