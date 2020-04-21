@@ -60,7 +60,6 @@ def initializeHomeScreenWidget(
     window.settings_button_main = window.makeSimpleDisplayButton("SETTINGS")
     window.settings_button_main.clicked.connect(lambda: window.display(6))
 
-
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
         window.params.resp_rate_meas,
@@ -101,7 +100,6 @@ def initializeHomeScreenWidget(
     h_box_11.addWidget(window.ie_button_main)
     h_box_11.addWidget(window.start_stop_button_main)
     h_box_11.addWidget(window.settings_button_main)
-
 
     v_box_11left.addWidget(window.resp_rate_display_main)
     v_box_11left.addWidget(window.tv_insp_display_main)
@@ -283,7 +281,6 @@ def initializeRespiratoryRateWidget(window) -> None:
     resp_rate_title_label.setAlignment(Qt.AlignCenter)
     resp_rate_title_label.setStyleSheet("QLabel {color: #000000 ;}")
 
-
     window.resp_rate_page_value_label = QLabel(
         str(window.local_settings.resp_rate))
     window.resp_rate_page_value_label.setFont(page_settings.valueFont)
@@ -307,9 +304,11 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy()
+    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy(
+    )
     resp_rate_decrement_size_policy.setRetainSizeWhenHidden(True)
-    window.resp_rate_decrement_button.setSizePolicy(resp_rate_decrement_size_policy)
+    window.resp_rate_decrement_button.setSizePolicy(
+        resp_rate_decrement_size_policy)
 
     if window.local_settings.resp_rate - window.ranges._ranges["resp_rate_increment"] \
             < window.ranges._ranges["min_resp_rate"]:
@@ -324,9 +323,11 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    resp_rate_increment_size_policy = window.resp_rate_increment_button.sizePolicy()
+    resp_rate_increment_size_policy = window.resp_rate_increment_button.sizePolicy(
+    )
     resp_rate_increment_size_policy.setRetainSizeWhenHidden(True)
-    window.resp_rate_increment_button.setSizePolicy(resp_rate_increment_size_policy)
+    window.resp_rate_increment_button.setSizePolicy(
+        resp_rate_increment_size_policy)
 
     if window.local_settings.resp_rate + window.ranges._ranges["resp_rate_increment"] \
             > window.ranges._ranges["max_resp_rate"]:
@@ -359,7 +360,7 @@ def initializeRespiratoryRateWidget(window) -> None:
     h_box_2.addWidget(window.resp_rate_page_value_label)
     window.resp_rate_page_value_label.setFixedWidth(
         page_settings.valueLabelWidth)
-    h_box_2.addWidget( window.resp_rate_increment_button)
+    h_box_2.addWidget(window.resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
     h_box_4.addWidget(resp_rate_apply)
     h_box_4.addWidget(resp_rate_cancel)
@@ -368,8 +369,6 @@ def initializeRespiratoryRateWidget(window) -> None:
     v_box.addLayout(h_box_2)
     v_box.addLayout(h_box_3)
     v_box.addLayout(h_box_4)
-
-
 
     window.page["3"].setLayout(v_box)
 
@@ -501,7 +500,6 @@ def initializeIERatioWidget(window: MainWindow):
     ie_ratio_title_label.setAlignment(Qt.AlignCenter)
     ie_ratio_title_label.setStyleSheet("QLabel {color: #000000 ;}")
 
-
     window.ie_ratio_page_value_label = QLabel(
         window.get_ie_ratio_display(window.local_settings.ie_ratio))
     window.ie_ratio_page_value_label.setFont(page_settings.textValueFont)
@@ -578,7 +576,7 @@ def initializeAlarmWidget(window: MainWindow):  #Alarm
     alarm_ack = window.makeSimpleDisplayButton("Set")
     alarm_cancel = window.makeSimpleDisplayButton("Cancel")
 
-    # Acknowledge alarm stops the alarm   
+    # Acknowledge alarm stops the alarm
     alarm_ack.clicked.connect(lambda: window.commitAlarm())
     alarm_cancel.clicked.connect(window.cancelChange)
 
@@ -610,13 +608,16 @@ def initializeSettingsWidget(window: MainWindow):
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
-    settings_e_shutdown_button = window.makeSimpleDisplayButton("Emergency Shutdown", button_settings = SimpleButtonSettings(fillColor = window.ui_settings.page_settings.cancelColor))
-    settings_e_shutdown_button.clicked.connect(lambda: window.emergencyShutdown())
+    settings_sys_shutdown_button = window.makeSimpleDisplayButton(
+        "System Shutdown",
+        button_settings=SimpleButtonSettings(
+            fillColor=window.ui_settings.page_settings.cancelColor))
+    settings_sys_shutdown_button.clicked.connect(
+        lambda: window.systemShutdown())
 
     h_box_7top.addWidget(settings_page_label)
-    h_box_7bottom.addWidget(settings_e_shutdown_button)
+    h_box_7bottom.addWidget(settings_sys_shutdown_button)
     v_box_7.addLayout(h_box_7top)
     v_box_7.addLayout(h_box_7bottom)
 
     window.page["7"].setLayout(v_box_7)
-

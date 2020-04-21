@@ -569,7 +569,7 @@ class MainWindow(QWidget):
             self.comms_handler.fireAlarm(6)
 
 
-    def emergencyShutdown(self):
+    def systemShutdown(self):
         if self.settings.run_state == 0:
             os.system("sudo shutdown -h")
         else:
@@ -578,7 +578,8 @@ class MainWindow(QWidget):
             d.setFixedHeight(300)
 
             d_v_box = QVBoxLayout()
-            d_label = QLabel("Cannot emergency shutdown, vent. is running")
+            d_label = QLabel("Cannot shutdown system while ventilation is running. "
+                             "Please stop ventilation before emergency shutting down.")
             d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
             d_label.setWordWrap(True)
             d_label.setAlignment(Qt.AlignCenter)
@@ -590,7 +591,7 @@ class MainWindow(QWidget):
             d_v_box.addWidget(d_ack)
 
             d.setLayout(d_v_box)
-            d.setWindowTitle("Cannot emergency shutdown")
+            d.setWindowTitle("Shutdown system")
             d.setWindowModality(Qt.ApplicationModal)
             d.exec_()
 

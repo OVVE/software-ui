@@ -17,8 +17,7 @@ class TextSetting:
 class FancyButtonSettings:
     def __init__(self,
                  labelSetting: TextSetting = TextSetting("Arial", 8, True),
-                 valueSetting: TextSetting = TextSetting(
-                     "Arial", 24, True),
+                 valueSetting: TextSetting = TextSetting("Arial", 24, True),
                  unitSetting: TextSetting = TextSetting("Arial", 8, False),
                  fillColor: str = '#f2fff0',
                  borderColor: str = '#c5c5c5',
