@@ -26,7 +26,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
-                             initializeGraphWidget, initializeSettingsWidget)
+                             initializeGraphWidget, initializeSettingsWidget,
+                             initializeSystemShutdownWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -76,6 +77,7 @@ class MainWindow(QWidget):
             "5": QWidget(),
             "6": QWidget(),
             "7": QWidget(),
+            "8": QWidget(),
         }
         self.alarms = Alarms()
         self.shownAlarmCode = None
@@ -109,7 +111,6 @@ class MainWindow(QWidget):
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
-
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -172,6 +173,7 @@ class MainWindow(QWidget):
         initializeIERatioWidget(self)
         initializeAlarmWidget(self)
         initializeSettingsWidget(self)
+        initializeSystemShutdownWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -391,7 +393,6 @@ class MainWindow(QWidget):
         self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
 
-    # TODO: Finish all of these for each var
     def commitMode(self):
         self.logChange(
             Change(
@@ -531,27 +532,7 @@ class MainWindow(QWidget):
         if self.settings.run_state == 0:
             os.system("sudo shutdown -h")
         else:
-            d = QDialog()
-            d.setFixedWidth(600)
-            d.setFixedHeight(300)
-
-            d_v_box = QVBoxLayout()
-            d_label = QLabel("Cannot shutdown system while ventilation is running. "
-                             "Please stop ventilation before emergency shutting down.")
-            d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
-            d_label.setWordWrap(True)
-            d_label.setAlignment(Qt.AlignCenter)
-
-            d_ack = QPushButton("Acknowledge")
-            d_ack.clicked.connect(lambda: d.reject())
-            d_ack.setFont(self.ui_settings.simple_button_settings.valueFont)
-            d_v_box.addWidget(d_label)
-            d_v_box.addWidget(d_ack)
-
-            d.setLayout(d_v_box)
-            d.setWindowTitle("Shutdown system")
-            d.setWindowModality(Qt.ApplicationModal)
-            d.exec_()
+            self.display(7)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='User interface for OVVE')

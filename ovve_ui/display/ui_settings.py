@@ -12,8 +12,6 @@ class TextSetting:
         else:
             self.font = QFont(fontName, fontSize)
 
-
-#TODO: Abstract text placement
 class FancyButtonSettings:
     def __init__(self,
                  labelSetting: TextSetting = TextSetting("Arial", 8, True),

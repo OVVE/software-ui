@@ -586,25 +586,31 @@ def initializeAlarmWidget(window: MainWindow):  #Alarm
     window.alarm_display_label.setAlignment(Qt.AlignCenter)
     window.alarm_display_label.setWordWrap(True)
 
-
     alarm_silence_short_button = window.makeSimpleDisplayButton(
-        f"Silence for {window.settings.silence_short} minutes.",
+        f"Silence for {window.settings.silence_short} min.",
         button_settings=SimpleButtonSettings(
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
+        size=(130, 65))
     alarm_silence_short_button.clicked.connect(
         lambda: window.silenceAlarm(0))
 
     alarm_silence_med_button = window.makeSimpleDisplayButton(
-        f"Silence for {window.settings.silence_med} minutes.",
+        f"Silence for {window.settings.silence_med} min.",
         button_settings=SimpleButtonSettings(
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
+        size=(130, 65))
     alarm_silence_med_button.clicked.connect(
         lambda: window.silenceAlarm(1))
 
     alarm_silence_long_button = window.makeSimpleDisplayButton(
-        f"Silence for {window.settings.silence_long} minutes.",
+        f"Silence for {window.settings.silence_long} min.",
         button_settings=SimpleButtonSettings(
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
+        size = (130,65))
+
     alarm_silence_long_button.clicked.connect(
         lambda: window.silenceAlarm(2))
 
@@ -614,12 +620,11 @@ def initializeAlarmWidget(window: MainWindow):  #Alarm
     h_box_6bottom.addWidget(alarm_silence_med_button)
     h_box_6bottom.addWidget(alarm_silence_long_button)
 
-    h_box_6bottom.setSpacing(50)
+    h_box_6bottom.setSpacing(10)
 
     v_box_6.addLayout(h_box_6top)
     v_box_6.addLayout(h_box_6mid)
     v_box_6.addLayout(h_box_6bottom)
-    v_box_6.update()
 
     window.page["6"].setLayout(v_box_6)
 
@@ -640,6 +645,7 @@ def initializeSettingsWidget(window: MainWindow):
     settings_sys_shutdown_button = window.makeSimpleDisplayButton(
         "System Shutdown",
         button_settings=SimpleButtonSettings(
+            valueSetting = window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.cancelColor))
     settings_sys_shutdown_button.clicked.connect(
         lambda: window.systemShutdown())
@@ -650,3 +656,33 @@ def initializeSettingsWidget(window: MainWindow):
     v_box_7.addLayout(h_box_7bottom)
 
     window.page["7"].setLayout(v_box_7)
+
+def initializeSystemShutdownWidget(window: MainWindow):
+    v_box_8 = QVBoxLayout()
+    h_box_8top = QHBoxLayout()
+    h_box_8bottom = QHBoxLayout()
+
+    h_box_8top.setAlignment(Qt.AlignCenter)
+    h_box_8bottom.setAlignment(Qt.AlignCenter)
+
+    system_shutdown_page_label = \
+        QLabel("Cannot shut down system while ventilation is running. "
+                             "Please stop ventilation before shutting down.")
+    system_shutdown_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    system_shutdown_page_label.setAlignment(Qt.AlignCenter)
+    system_shutdown_page_label.setWordWrap(True)
+    system_shutdown_page_label.setMaximumWidth(400)
+
+    ack_system_shutdown_button = window.makeSimpleDisplayButton(
+        "Acknowledge",
+        button_settings=SimpleButtonSettings(
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
+    ack_system_shutdown_button.clicked.connect(
+        lambda: window.display(0))
+
+    h_box_8top.addWidget(system_shutdown_page_label)
+    h_box_8bottom.addWidget(ack_system_shutdown_button)
+    v_box_8.addLayout(h_box_8top)
+    v_box_8.addLayout(h_box_8bottom)
+
+    window.page["8"].setLayout(v_box_8)
