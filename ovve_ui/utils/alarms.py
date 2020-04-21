@@ -7,7 +7,7 @@ from copy import deepcopy
 
 class Alarms():
     """
-    Params defined in serialpacketv0.26.pptx
+    Alarms defined in serialpacketv0.26.pptx
     """
     def __init__(self) -> None:
         self._alarms: dict = {
