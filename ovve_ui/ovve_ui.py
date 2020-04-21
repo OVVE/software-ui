@@ -87,8 +87,6 @@ class MainWindow(QWidget):
         # TODO: Set patient_id from the UI
         self.patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
         self.logpath = os.path.join("/tmp", "ovve_logs", self.patient_id)
-        #self.logfilename = str(datetime.datetime.now()) + ".log"
-        #self.logfullpath = os.path.join(self.logpath, self.logfilename)
 
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
@@ -105,7 +103,7 @@ class MainWindow(QWidget):
         fh = TimedRotatingFileHandler(self.logfileroot, 
             when='H', interval=1, backupCount=336)
  
-        # Set filehandler to log raw packets, warnings, and higher
+        # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
         fh.setLevel(25)
 
