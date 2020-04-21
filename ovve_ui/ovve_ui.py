@@ -44,14 +44,12 @@ class MainWindow(QWidget):
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
         self.ranges = Ranges()
-        
-        
-        #self.fullscreen = False
-        self.fullscreen = True
 
-        is_sim = True #TODO: Change Back
 
-        self.alarm_state = False
+        self.fullscreen = False #TODO: Change Back
+        #self.fullscreen = True
+
+        is_sim = True #TODO: Delete
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -79,6 +77,8 @@ class MainWindow(QWidget):
             "6": QWidget(),
             "7": QWidget(),
         }
+        self.alarms = Alarms()
+        self.shownAlarmCode = None
 
         self.initalizeAndAddStackWidgets()
 
@@ -103,12 +103,13 @@ class MainWindow(QWidget):
         if not is_sim:
             self.comms_handler = CommsLink(self.logger)
         else:
-            self.comms_handler = CommsSimulator(self.logger) #TODO change back
+            self.comms_handler = CommsSimulator(self.logger)
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
+
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -199,16 +200,7 @@ class MainWindow(QWidget):
         for i in range(len(alarms_dict)):
             if list(alarms_dict.items())[i][1]: #TODO: Revisit this for multi alarm handling
                 self.showAlarm(i)
-                self.alarm_state = True
-                # self.alarmBackgroundFlash = QPropertyAnimation(self, b"color")
-                # self.alarmBackgroundFlash.setDuration(2500)
-                # self.alarmBackgroundFlash.setLoopCount(-1)
-                # self.alarmBackgroundFlash.setStartValue(QColor(255,0,0))
-                # self.alarmBackgroundFlash.setKeyValueAt(0.499, QColor(255, 0, 0))
-                # self.alarmBackgroundFlash.setKeyValueAt(0.501, QColor(255,255 , 255))
-                # self.alarmBackgroundFlash.setEndValue(QColor(255,255,255))
-                # self.alarmBackgroundFlash.start()
-        #TODO: Implement UI alarm handling
+
 
     def updateMainDisplays(self) -> None:
         self.mode_button_main.updateValue(
@@ -337,54 +329,20 @@ class MainWindow(QWidget):
         elif self.settings.run_state == 1:
             self.showStartStopConfirm()
 
+    #TODO: doesn't support multiple alarms at once
     def showAlarm(self, code: int):
-        d = QDialog()
-        d.setFixedWidth(600)
-        d.setFixedHeight(300)
+        self.shownAlarmCode = code
+        self.alarm_display_label.setText(self.alarms.getDisplay(code))
+        self.display(5)
 
-        d_h_box_1 = QHBoxLayout()
-        d_h_box_2 = QHBoxLayout()
-        d_v_box = QVBoxLayout()
-        d_label = QLabel(list(self.alarms.to_dict().items())[code][0])
-        d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
-        d_label.setWordWrap(True)
-        d_label.setAlignment(Qt.AlignCenter)
-
-        d_ack = QPushButton("Silence") #TODO: Add Silence for different amounts of time
-        d_ack.clicked.connect(lambda: self.dismissAlarmPopup(code, d))
-        d_ack.setFont(self.ui_settings.simple_button_settings.valueFont)
-        d_ack.setStyleSheet("QPushButton {background-color: " +
-                               self.ui_settings.page_settings.cancelColor
-                               + ";}")
-
-        d_h_box_1.addWidget(d_label)
-        d_h_box_2.addWidget(d_ack)
-        d_h_box_2.setSpacing(100)
-        d_v_box.addLayout(d_h_box_1)
-        d_v_box.addLayout(d_h_box_2)
-
-        d.setLayout(d_v_box)
-        d.setWindowTitle("Confirm Stop")
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
-
-    def dismissAlarmPopup(self, code: int, d: QDialog):
+    def silenceAlarm(self, duration: int): #duration: 0 = short, 1 = med, 2 = long (NOT MINUTES, options)
         alarms_dict = self.alarms.to_dict()
         alarms_items = list(alarms_dict.items())
-        alarms_dict[alarms_items[code][0]] = False
+        alarms_dict[alarms_items[self.shownAlarmCode][0]] = False
         self.alarms.from_dict(alarms_dict)
-        self.comms_handler.new_alarms
-        d.reject()
-
-
-    # #TODO: Potentially rethink this: it clears all alarms at once so may not work well for simultaneous alarms
-    # def alarmButtonClicked(self):
-    #     if self.alarm_state:
-    #         self.alarm_state = False
-    #         self.alarm_button_main.updateValue("ALARM")
-    #     else:
-    #         self.display(5)
-    #         #TODO: Do something else here?
+        self.comms_handler.new_alarms #TODO complete this line, silence for given duration to Arduino
+        self.shownAlarmCode = None
+        self.display(0)
 
     def showStartStopConfirm(self):
         d = QDialog()
@@ -523,7 +481,7 @@ class MainWindow(QWidget):
     def logChange(self, change: Change) -> None:
         if change.old_val != change.new_val:
             print(change.display())
-        # TODO: Actually log the change in some data structure
+        # TODO: Can this be removed?
 
     def set_settings_callback(
             self, settings_callback: Callable[[Settings], None]) -> None:

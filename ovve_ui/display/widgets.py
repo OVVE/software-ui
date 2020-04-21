@@ -570,27 +570,56 @@ def initializeIERatioWidget(window: MainWindow):
 def initializeAlarmWidget(window: MainWindow):  #Alarm
     v_box_6 = QVBoxLayout()
     h_box_6top = QHBoxLayout()
-    #h_box_6middle = QHBoxLayout()
+    h_box_6mid = QHBoxLayout()
     h_box_6bottom = QHBoxLayout()
 
-    alarm_ack = window.makeSimpleDisplayButton("Set")
-    alarm_cancel = window.makeSimpleDisplayButton("Cancel")
+    h_box_6top.setAlignment(Qt.AlignCenter)
+    h_box_6mid.setAlignment(Qt.AlignCenter)
+    h_box_6bottom.setAlignment(Qt.AlignCenter)
 
-    # Acknowledge alarm stops the alarm
-    alarm_ack.clicked.connect(lambda: window.commitAlarm())
-    alarm_cancel.clicked.connect(window.cancelChange)
+    alarm_page_label = QLabel("Alarm")
+    alarm_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    alarm_page_label.setAlignment(Qt.AlignCenter)
 
-    window.alarm_page_rect = window.makeDisplayRect(
-        "Alarm", window.settings.get_alarm_display(), "", size=(400, 200))
+    window.alarm_display_label = QLabel()
+    window.alarm_display_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    window.alarm_display_label.setAlignment(Qt.AlignCenter)
+    window.alarm_display_label.setWordWrap(True)
 
-    h_box_6top.addWidget(window.alarm_page_rect)
-    #h_box_6middle.addWidget(alarm_toggle)
-    h_box_6bottom.addWidget(alarm_ack)
-    h_box_6bottom.addWidget(alarm_cancel)
+
+    alarm_silence_short_button = window.makeSimpleDisplayButton(
+        f"Silence for {window.settings.silence_short} minutes.",
+        button_settings=SimpleButtonSettings(
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
+    alarm_silence_short_button.clicked.connect(
+        lambda: window.silenceAlarm(0))
+
+    alarm_silence_med_button = window.makeSimpleDisplayButton(
+        f"Silence for {window.settings.silence_med} minutes.",
+        button_settings=SimpleButtonSettings(
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
+    alarm_silence_med_button.clicked.connect(
+        lambda: window.silenceAlarm(1))
+
+    alarm_silence_long_button = window.makeSimpleDisplayButton(
+        f"Silence for {window.settings.silence_long} minutes.",
+        button_settings=SimpleButtonSettings(
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
+    alarm_silence_long_button.clicked.connect(
+        lambda: window.silenceAlarm(2))
+
+    h_box_6top.addWidget(alarm_page_label)
+    h_box_6mid.addWidget(window.alarm_display_label)
+    h_box_6bottom.addWidget(alarm_silence_short_button)
+    h_box_6bottom.addWidget(alarm_silence_med_button)
+    h_box_6bottom.addWidget(alarm_silence_long_button)
+
+    h_box_6bottom.setSpacing(50)
 
     v_box_6.addLayout(h_box_6top)
-    #v_box_6.addLayout(h_box_6middle)
+    v_box_6.addLayout(h_box_6mid)
     v_box_6.addLayout(h_box_6bottom)
+    v_box_6.update()
 
     window.page["6"].setLayout(v_box_6)
 

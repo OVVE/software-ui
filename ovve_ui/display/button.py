@@ -93,6 +93,7 @@ class SimpleDisplayButton(QAbstractButton):
         self.layout.setSpacing(0)
         self.layout.setGeometry(QRect(0, 0, *self.size))
 
+        self.value_label.setWordWrap(True)
         self.value_label.setFont(self.button_settings.valueFont)
         self.value_label.setStyleSheet("QLabel {color: " +
                                        self.button_settings.valueColor + ";}")
