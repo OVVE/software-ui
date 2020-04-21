@@ -46,8 +46,10 @@ class MainWindow(QWidget):
         self.ranges = Ranges()
         
         
-        # self.fullscreen = False
+        #self.fullscreen = False
         self.fullscreen = True
+
+        is_sim = True #TODO: Change Back
 
         self.alarm_state = False
 
@@ -98,13 +100,11 @@ class MainWindow(QWidget):
         self.logger.path = os.path.join("/tmp", "ovve_logs", self.logger.patient_id)
         self.logger.filename = str(datetime.datetime.now()) + ".log.txt"
 
+        if not is_sim:
+            self.comms_handler = CommsLink(self.logger)
+        else:
+            self.comms_handler = CommsSimulator(self.logger) #TODO change back
 
-        # if not is_sim:
-        #     self.comms_handler = CommsLink()
-        # else:
-        #     self.comms_handler = CommsSimulator() #TODO change back
-
-        self.comms_handler = CommsSimulator()
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
