@@ -105,12 +105,10 @@ class MainWindow(QWidget):
         else:
             self.comms_handler = CommsSimulator(self.logger) #TODO change back
 
-
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
-
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -575,9 +573,26 @@ class MainWindow(QWidget):
         if self.settings.run_state == 0:
             os.system("sudo shutdown -h")
         else:
-            print("Cannot emergency shutdown, vent. is running")
-            #TODO: Show a dialog or something
+            d = QDialog()
+            d.setFixedWidth(600)
+            d.setFixedHeight(300)
 
+            d_v_box = QVBoxLayout()
+            d_label = QLabel("Cannot emergency shutdown, vent. is running")
+            d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
+            d_label.setWordWrap(True)
+            d_label.setAlignment(Qt.AlignCenter)
+
+            d_ack = QPushButton("Acknowledge")
+            d_ack.clicked.connect(lambda: d.reject())
+            d_ack.setFont(self.ui_settings.simple_button_settings.valueFont)
+            d_v_box.addWidget(d_label)
+            d_v_box.addWidget(d_ack)
+
+            d.setLayout(d_v_box)
+            d.setWindowTitle("Cannot emergency shutdown")
+            d.setWindowModality(Qt.ApplicationModal)
+            d.exec_()
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='User interface for OVVE')

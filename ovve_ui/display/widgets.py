@@ -610,12 +610,11 @@ def initializeSettingsWidget(window: MainWindow):
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
-    settings_shutdown_button = window.makeSimpleDisplayButton("Emergency Shutdown", button_settings = SimpleButtonSettings(fillColor = window.ui_settings.page_settings.cancelColor))
-
-    settings_shutdown_button.clicked.connect(lambda: window.emergencyShutdown())
+    settings_e_shutdown_button = window.makeSimpleDisplayButton("Emergency Shutdown", button_settings = SimpleButtonSettings(fillColor = window.ui_settings.page_settings.cancelColor))
+    settings_e_shutdown_button.clicked.connect(lambda: window.emergencyShutdown())
 
     h_box_7top.addWidget(settings_page_label)
-    h_box_7bottom.addWidget(settings_shutdown_button)
+    h_box_7bottom.addWidget(settings_e_shutdown_button)
     v_box_7.addLayout(h_box_7top)
     v_box_7.addLayout(h_box_7bottom)
 
