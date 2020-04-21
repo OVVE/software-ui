@@ -1,11 +1,11 @@
 
 import crc16
 import binascii
-from utils.logger import Logger
+import logging
 
 class CRC():
-    def __init__(self, logger: Logger) -> None:
-        self.logger = logger
+    def __init__(self) -> None:
+        self.logger = logging.getLogger()
         pass
     
     def check_crc(self, byteData: bytes) -> bool: 
@@ -15,8 +15,8 @@ class CRC():
         calcRcvCRC = self.crccitt(byteData[0:68].hex())
         calcRcvCRC = int(calcRcvCRC, 16)
         if calcRcvCRC != rcvdCRC:
-            self.logger.log("debug", str(byteData))
-            self.logger.log("debug", "CRC check failed! rcvd: " + 
+            self.logger.warning(str(byteData))
+            self.logger.warning("CRC check failed! rcvd: " + 
                 str(rcvdCRC) + " calc: " + str(calcRcvCRC))
             return False
         

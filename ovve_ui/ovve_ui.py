@@ -1,9 +1,11 @@
 import argparse
 import datetime
 import json
+import logging
 import os
 import sys
 from copy import deepcopy
+from logging.handlers import TimedRotatingFileHandler
 from random import randint
 from typing import Union, Optional, Tuple
 
@@ -32,13 +34,12 @@ from utils.settings import Settings
 from utils.alarms import Alarms
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
-from utils.logger import Logger
 from utils.ranges import Ranges
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
-    def __init__(self, is_sim: bool=False) -> None:
+    def __init__(self, port: str, is_sim: bool=False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
@@ -83,22 +84,50 @@ class MainWindow(QWidget):
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
 
-        # Instantiate the single logger for the UI
-        self.logger = Logger()
-        self.logger.enable_console = True
-        self.logger.enable_file = True
-        self.logger.write_buffer_len = 100
-
         # TODO: Set patient_id from the UI
-        self.logger.patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
-        self.logger.path = os.path.join("/tmp", "ovve_logs", self.logger.patient_id)
-        self.logger.filename = str(datetime.datetime.now()) + ".log.txt"
+        self.patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
+        self.logpath = os.path.join("/tmp", "ovve_logs", self.patient_id)
+        #self.logfilename = str(datetime.datetime.now()) + ".log"
+        #self.logfullpath = os.path.join(self.logpath, self.logfilename)
 
+        # Create all directories in the log path
+        if not os.path.exists(self.logpath):
+                os.makedirs(self.logpath)
+                
+        self.logger = logging.getLogger()
+        self.logger.setLevel(logging.DEBUG)
+
+        self.logfileroot = os.path.join(self.logpath, self.patient_id + ".log")
+
+       
+        # The TimedRotatingFileHandler will write a new file each hour
+        # After two weeks, the oldest logs will start being deleted
+        fh = TimedRotatingFileHandler(self.logfileroot, 
+            when='H', interval=1, backupCount=336)
+ 
+        # Set filehandler to log raw packets, warnings, and higher
+        # Raw packets are logged at custom log level 25, just above INFO
+        fh.setLevel(25)
+
+        # Log to console with human-readable output
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+
+        # TODO: Create a custom handler for Ignition
+
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        
+        # add the handlers to the logger
+        self.logger.addHandler(fh)
+        self.logger.addHandler(ch)
 
         if not is_sim:
-            self.comms_handler = CommsLink(self.logger)
+             self.comms_handler = CommsLink(port)
         else:
-            self.comms_handler = CommsSimulator(self.logger)
+            self.comms_handler = CommsSimulator()
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
@@ -175,14 +204,14 @@ class MainWindow(QWidget):
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
-        #self.logger.log("params", self.params.to_JSON())
+        self.logger.info(self.params.to_JSON())
         self.updateMainDisplays()
         self.updateGraphs()
 
     def update_ui_alarms(self, alarms_dict: dict) -> None:
         self.alarms = Alarms()
         self.alarms.from_dict(alarms_dict)
-        #self.logger.log("alarms", self.alarms.to_JSON())
+        self.logger.info(self.alarms.to_JSON())
 
         #TODO: Implement UI alarm handling
 
@@ -447,7 +476,7 @@ class MainWindow(QWidget):
     def passChanges(self) -> None:
         #self.settings_callback(self.settings)
         settings_str = self.settings.to_JSON()
-        #self.logger.log("settings,", settings_str)
+        self.logger.info(settings_str)
         j = json.loads(settings_str)
         self.new_settings_signal.emit(j)
 
@@ -482,10 +511,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description='User interface for OVVE')
     parser.add_argument('-s', "--sim", action='store_true', 
                         help='Run with simulated data')
+    parser.add_argument('-p', "--port", default='/dev/ttyUSB0', 
+                        help='Serial port for communication with MCU')
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-    window = MainWindow(args.sim)
+    window = MainWindow(args.port, args.sim)
     window.showFullScreen()
     app.exec_()
     sys.exit()

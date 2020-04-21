@@ -6,7 +6,6 @@ from threading import Thread, Lock
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
-from utils.logger import Logger
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -16,9 +15,8 @@ class CommsSimulator(QThread):
     new_params = pyqtSignal(Params)
     new_alarms = pyqtSignal(dict)
 
-    def __init__(self, logger: Logger) -> None:
+    def __init__(self) -> None:
         QThread.__init__(self)
-        self.logger = logger
         self.done = False
         self.settings = Settings()
         self.seqnum = 0

@@ -1,12 +1,10 @@
-from utils.crc import CRC
-from utils.logger import Logger
 import struct
 
+from utils.crc import CRC
 
 class OutPacket():
-    def __init__(self, logger: Logger) -> None:
-        self.logger = logger
-        self.crc = CRC(logger)
+    def __init__(self) -> None:
+        self.crc = CRC()
         self.data = {'sequence_count': 0,               # bytes 0 - 1 - rpi unsigned short int
             'packet_version': 1,                         # byte 2      - rpi unsigned char
             'mode_value': 0,                             # byte 3      - rpi unsigned char
