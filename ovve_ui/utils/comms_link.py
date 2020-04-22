@@ -1,4 +1,5 @@
 import json
+import logging
 import random
 import time
 from threading import Thread, Lock
@@ -13,7 +14,6 @@ from utils.settings import Settings
 from utils.serial_watchdog import Watchdog
 from utils.in_packet import InPacket
 from utils.out_packet import OutPacket
-from utils.logger import Logger
 from utils.crc import CRC
 from PyQt5.QtCore import QThread, pyqtSignal
 
@@ -22,29 +22,27 @@ class CommsLink(QThread):
     new_params = pyqtSignal(Params)
     new_alarms = pyqtSignal(dict)
 
-    def __init__(self, logger: Logger) -> None:
+    def __init__(self, port: str) -> None:
         QThread.__init__(self)
-        self.logger = logger
+        self.logger = logging.getLogger()
         self.settings = Settings()
         self.settings_lock = Lock()
         self.packet_version = 1
         self.BAUD = 38400
-        self.PORT = "/dev/ttyUSB0"
+        self.PORT = port
         self.SER_TIMEOUT = 0.065
         self.SER_WRITE_TIMEOUT = 0.03
         self.SER_INTER_TIMEOUT = 0.01
         self.SER_MAX_REREADS = 30
         self.ser = 0
-        self.debug = False
         
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
         self.settings.from_dict(settings_dict)
         self.settings_lock.release()
-        if self.debug:
-            self.logger.log("debug", "Got updated settings from UI")
-            self.logger.log("debug", self.settings.to_JSON())
+        self.logger.debug("Got updated settings from UI")
+        self.logger.debug(self.settings.to_JSON())
 
 
     def get_bytes_from_serial(self) -> str:
@@ -52,15 +50,11 @@ class CommsLink(QThread):
         rereadCount = 0
         while len(bytearray(byteData)) != 70 and rereadCount < self.SER_MAX_REREADS:
             byteData = self.read_all(self.ser, 70)
-            if len(bytearray(byteData)) < 70 and self.debug:
-                self.logger.log("debug", "reread " + str(rereadCount))
+            if len(bytearray(byteData)) < 70:
+                self.logger.debug("reread " + str(rereadCount))
             rereadCount += 1
 
-        self.ser.flush()
-
-        if self.debug:
-            self.logger.log("debug", len(bytearray(byteData)))
-           
+        self.ser.flush()   
         return byteData
 
 
@@ -73,9 +67,8 @@ class CommsLink(QThread):
             currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
                 
         if  currentSeq !=  ( prevSeq + 1) :
-            if self.debug:
-                self.logger.log("debug", "Sequence Error! cur:" + 
-                    str(self.currentSeq) + " prev:" + str(self.prevSeq))
+            self.logger.warning("Sequence Error! cur:" + 
+                str(self.currentSeq) + " prev:" + str(self.prevSeq))
             seqOK = False
         else:
             seqOK = True
@@ -107,9 +100,9 @@ class CommsLink(QThread):
         error_count = 0
         validData = False
         
-        self.in_pkt = InPacket(self.logger)
-        self.cmd_pkt = OutPacket(self.logger)
-        self.crc = CRC(self.logger)
+        self.in_pkt = InPacket()
+        self.cmd_pkt = OutPacket()
+        self.crc = CRC()
 
         self.ser.reset_input_buffer()
 
@@ -121,20 +114,33 @@ class CommsLink(QThread):
             seqOK = self.check_sequence(byteData)
             crcOK = self.crc.check_crc(byteData)
         
+            inpkt = {}
+            inpkt['type'] = "inpkt"
+            inpkt['bytes'] = str(byteData)
             if crcOK and seqOK:
+                # Log raw packet data at a level betwen INFO and WARNING so that
+                # we can log only raw packets in production
+                self.logger.log(25, json.dumps(inpkt))
                 self.in_pkt.from_bytes(byteData)
+                
                 self.new_params.emit(self.in_pkt.to_params())
 
                 self.create_cmd_pkt()
-                self.sendPkts()
+                cmd_byteData = self.cmd_pkt.to_bytes()
+                outpkt = {}
+                outpkt['type'] = "outpkt"
+                outpkt['bytes'] = str(cmd_byteData)
+                self.logger.log(25, json.dumps(outpkt))
+                self.sendPkts(cmd_byteData)
                 valid_pkt_count += 1
             else:
+                self.logger.warning("BAD PACKET: " + json.dumps(inpkt))
                 error_count += 1
 
-            if self.debug:
-                self.logger.log("debug", 'Dropped packets count ' + str(error_count))
-                self.logger.log("debug", 'Valid packets count ' + str(valid_pkt_count))
-           
+            
+            self.logger.debug('Dropped packets count ' + str(error_count))
+            self.logger.debug('Valid packets count ' + str(valid_pkt_count))
+        
 
            
     def init_serial(self) -> False:
@@ -149,17 +155,17 @@ class CommsLink(QThread):
             
             if self.ser == None:
                 self.ser.open()
-                self.logger.log("debug", "Successfully connected to port %r." % self.ser.port)
+                self.logger.debug("Successfully connected to port %r." % self.ser.port)
                 
                 return True
             else:
                 if self.ser.isOpen():
                     self.ser.close()
-                    self.logger.log("debug", "Disconnected current connection.")
+                    self.logger.debug("Disconnected current connection.")
                     return False
                 else:
                     self.ser.open()
-                    self.logger.log("debug", "Connected to port %r." % self.ser.port)
+                    self.logger.debug("Connected to port %r." % self.ser.port)
                     return True
         except serial.SerialException:
             return False
@@ -185,10 +191,7 @@ class CommsLink(QThread):
         #port.reset_input_buffer()
         return read_buffer
 
-    def sendPkts(self):
-
-        cmd_byteData = self.cmd_pkt.to_bytes()
-        
+    def sendPkts(self, cmd_byteData: bytes) -> None:        
         # Write to serial port
         # TO DO put in separate function
         if (len(bytearray(cmd_byteData))) == 22:
@@ -199,29 +202,28 @@ class CommsLink(QThread):
                 for i in range(len(cmd_byteData)):
                     self.ser.write(cmd_byteData[i:i+1])
                 
-                if self.debug:
-                    self.logger.log("debug", "Packet Written:")
-                    self.logger.log("debug", ''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
-                    self.logger.log("debug", "Sent back SEQ and CRC: ")
-                    self.logger.log("debug", int.from_bytes(cmd_byteData[0:2], byteorder='little'))
-                    self.logger.log("debug", int.from_bytes(cmd_byteData[20:], byteorder='little'))
+                self.logger.debug("Packet Written:")
+                self.logger.debug(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+                self.logger.debug("Sent back SEQ and CRC: ")
+                self.logger.debug(int.from_bytes(cmd_byteData[0:2], byteorder='little'))
+                self.logger.debug(int.from_bytes(cmd_byteData[20:], byteorder='little'))
                 self.ser.reset_output_buffer()
                 return True
                     
             except serial.SerialException:
-                self.logger.log("debug", 'Serial write error')
+                self.logger.exception('Serial write error')
                 return False
         else:
-            self.logger.log("debug", 'Data packet too long')
+            self.logger.warning('Data packet too long')
 
         
 
     def run(self) -> None:
         if self.init_serial():
             sleep(1)
-            self.logger.log("debug", 'Serial Init Successful')
+            self.logger.debug('Serial Init Successful')
         else:
-            self.logger.log("debug", 'Serial Initialization failed')
+            self.logger.error('Serial Initialization failed')
             # When the alarm infrastructure is done this would trigger an alarm
             return
         self.process_SerialData()

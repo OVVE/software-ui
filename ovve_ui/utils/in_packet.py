@@ -1,9 +1,7 @@
 from utils.params import Params
-from utils.logger import Logger
 
 class InPacket():
-    def __init__(self, logger: Logger) -> None:
-        self.logger = logger
+    def __init__(self) -> None:
         self.data={'sequence_count': 0,            # bytes  0- 1 - rpi unsigned short int
                     'packet_version': 0,             # byte 2      - rpi unsigned char
                     'mode_value': 0,                 # byte 3      - rpi unsigned char
