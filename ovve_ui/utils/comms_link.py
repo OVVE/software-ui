@@ -152,21 +152,14 @@ class CommsLink(QThread):
         self.ser.write_timeout = self.SER_WRITE_TIMEOUT
         
         try:
-            
-            if self.ser == None:
-                self.ser.open()
-                self.logger.debug("Successfully connected to port %r." % self.ser.port)
-                
-                return True
+            if self.ser.is_open:
+                self.ser.close()
+                self.logger.info("Disconnected current connection.")
+                return False
             else:
-                if self.ser.isOpen():
-                    self.ser.close()
-                    self.logger.debug("Disconnected current connection.")
-                    return False
-                else:
-                    self.ser.open()
-                    self.logger.debug("Connected to port %r." % self.ser.port)
-                    return True
+                self.ser.open()
+                self.logger.info("Successfully connected to port %r." % self.ser.port)
+                return True
         except serial.SerialException:
             return False
 
