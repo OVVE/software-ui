@@ -250,11 +250,6 @@ class MainWindow(QWidget):
         self.volume_data[-1] = self.params.tv_meas
         self.volume_graph_line.setData(self.volume_data)
 
-        self.ptr += 1
-        self.flow_graph_line.setPos(self.ptr, 0)
-        self.pressure_graph_line.setPos(self.ptr, 0)
-        self.volume_graph_line.setPos(self.ptr, 0)
-
         QtGui.QApplication.processEvents()
 
     # TODO: Finish all of these for each var
