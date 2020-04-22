@@ -148,6 +148,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph.setMouseEnabled(False, False)
     flow_graph_left_axis = window.flow_graph.getAxis("left")
     flow_graph_left_axis.setLabel("Flow", **axisStyle)
+    window.flow_graph.getPlotItem().hideAxis('bottom')
 
     window.pressure_data = np.linspace(0, 0, graph_width)
     window.pressure_graph_ptr = -graph_width
@@ -159,6 +160,8 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph.setMouseEnabled(False, False)
     pressure_graph_left_axis = window.pressure_graph.getAxis("left")
     pressure_graph_left_axis.setLabel("Pressure", **axisStyle)
+    window.pressure_graph.getPlotItem().hideAxis('bottom')
+
 
     window.volume_data = np.linspace(0, 0, graph_width)
     window.volume_graph_ptr = -graph_width
@@ -170,12 +173,16 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph.setMouseEnabled(False, False)
     volume_graph_left_axis = window.volume_graph.getAxis("left")
     volume_graph_left_axis.setLabel("Volume", **axisStyle)
+    window.volume_graph.getPlotItem().hideAxis('bottom')
+
 
     v_box.addWidget(window.flow_graph)
     v_box.addWidget(window.pressure_graph)
     v_box.addWidget(window.volume_graph)
 
     window.page["1"].setLayout(v_box)
+
+
 
 
 def initializeModeWidget(window: MainWindow) -> None:
