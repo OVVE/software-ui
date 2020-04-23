@@ -651,8 +651,17 @@ def initializeSettingsWidget(window: MainWindow):
     settings_sys_shutdown_button.clicked.connect(
         lambda: window.systemShutdown())
 
+    settings_back_button = window.makeSimpleDisplayButton(
+        "Back",
+        button_settings=SimpleButtonSettings(
+            valueSetting = window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
+        size = (200,65) )
+    settings_back_button.clicked.connect(lambda: window.display(0))
+
     h_box_7top.addWidget(settings_page_label)
     h_box_7bottom.addWidget(settings_sys_shutdown_button)
+    h_box_7bottom.addWidget(settings_back_button)
     v_box_7.addLayout(h_box_7top)
     v_box_7.addLayout(h_box_7bottom)
 
