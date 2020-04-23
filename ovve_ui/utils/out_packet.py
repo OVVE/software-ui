@@ -24,7 +24,7 @@ class OutPacket():
         cmd_byteData += bytes(self.data['packet_version'].to_bytes(1, endian))
         cmd_byteData += bytes(self.data['mode_value'].to_bytes(1, endian))
         cmd_byteData += bytes(self.data['respiratory_rate_set'].to_bytes(4, endian))
-        cmd_byteData += bytes(self.data['tidal_volume_set'].to_bytes(4, endian))
+        cmd_byteData += bytes(self.data['tidal_volume_set'].to_bytes(4, endian, signed=True))
         cmd_byteData += bytes(self.data['ie_ratio_set'].to_bytes(4, endian))
         # TO DO set alarmbits correctly if sequence or CRC failed
         cmd_byteData += bytes(self.data['alarm_bits'].to_bytes(4, endian))

@@ -15,6 +15,7 @@ from utils.serial_watchdog import Watchdog
 from utils.in_packet import InPacket
 from utils.out_packet import OutPacket
 from utils.crc import CRC
+from utils.units import Units
 from PyQt5.QtCore import QThread, pyqtSignal
 
 
@@ -85,7 +86,7 @@ class CommsLink(QThread):
             )
         self.cmd_pkt.data['sequence_count'] = self.in_pkt.data['sequence_count']
         self.cmd_pkt.data['respiratory_rate_set'] = self.settings.resp_rate
-        self.cmd_pkt.data['tidal_volume_set'] = self.settings.tv
+        self.cmd_pkt.data['tidal_volume_set'] = Units.ml_to_ecu(self.settings.tv)
         self.cmd_pkt.data['ie_ratio_set'] = self.settings.ie_ratio
 
         self.settings_lock.release()
@@ -220,4 +221,3 @@ class CommsLink(QThread):
             # When the alarm infrastructure is done this would trigger an alarm
             return
         self.process_SerialData()
-       
