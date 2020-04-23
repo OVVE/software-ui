@@ -252,7 +252,6 @@ class MainWindow(QWidget):
         self.tv_page_value_label.setText(str(self.settings.tv))
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.settings.ie_ratio))
-        self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
@@ -344,8 +343,7 @@ class MainWindow(QWidget):
 
     def changeAlarm(self, new_val):
         self.local_settings.alarm_mode = new_val
-        self.alarm_page_rect.updateValue(
-            self.local_settings.get_alarm_display())
+
 
     def changeStartStop(self):
         if self.settings.run_state == 0:
