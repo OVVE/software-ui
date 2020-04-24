@@ -39,14 +39,14 @@ from utils.ranges import Ranges
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
-    def __init__(self, port: str, is_sim: bool = False, fullscreen: bool = True, dev_mode: bool = False) -> None:
+    def __init__(self, port: str, is_sim: bool = False, windowed: bool = False, dev_mode: bool = False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
         self.ranges = Ranges()
 
-        self.fullscreen = fullscreen
+        self.windowed = windowed
         self.dev_mode = dev_mode
 
         # you can pass new settings for different object classes here
@@ -464,15 +464,17 @@ class MainWindow(QWidget):
     def keyPressEvent(self, event):
         if self.dev_mode:
             if event.key() == QtCore.Qt.Key_F:
-                if self.fullscreen:
-                    self.hide()
-                    self.showNormal()
-                    self.fullscreen = False
-
-                elif not self.fullscreen:
+                if self.windowed:
+                    print("working")
                     self.hide()
                     self.showFullScreen()
-                    self.fullscreen = True
+                    self.windowed = False
+
+                elif not self.windowed:
+                    print("reached")
+                    self.hide()
+                    self.showNormal()
+                    self.windowed = True
 
             if event.key() == QtCore.Qt.Key_Q:
                 self.close()
@@ -523,11 +525,11 @@ def main() -> None:
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-    window = MainWindow(args.port, args.sim, not args.windowed, args.dev_mode)
-    if window.fullscreen:
-        window.showFullScreen()
-    else:
+    window = MainWindow(args.port, args.sim, args.windowed, args.dev_mode)
+    if window.windowed:
         window.showNormal()
+    else:
+        window.showFullScreen()
     app.exec_()
     sys.exit()
 
