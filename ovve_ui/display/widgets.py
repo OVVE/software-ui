@@ -1,5 +1,5 @@
 """
-Widgets used to initialze the the OVVE UI
+Widgets used to initialize the the OVVE UI
 """
 from random import randint
 from typing import TypeVar
@@ -54,16 +54,11 @@ def initializeHomeScreenWidget(
     )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
 
-    window.alarm_button_main = window.makeSimpleDisplayButton(
-        "ALARM",
-        button_settings=SimpleButtonSettings(borderColor="#FF0000",
-                                             fillColor='#FFFFFF',
-                                             valueColor='#FF0000'),
-    )
-    window.alarm_button_main.clicked.connect(lambda: window.display(5))
+    window.start_stop_button_main = window.makeSimpleDisplayButton("START")
+    window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
-    window.start_button_main = window.makeSimpleDisplayButton("START", )
-    window.start_button_main.clicked.connect(window.changeStartStop)
+    window.settings_button_main = window.makeSimpleDisplayButton("SETTINGS")
+    window.settings_button_main.clicked.connect(lambda: window.display(6))
 
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
@@ -103,8 +98,8 @@ def initializeHomeScreenWidget(
     h_box_11.addWidget(window.resp_rate_button_main)
     h_box_11.addWidget(window.tv_button_main)
     h_box_11.addWidget(window.ie_button_main)
-    h_box_11.addWidget(window.alarm_button_main)
-    h_box_11.addWidget(window.start_button_main)
+    h_box_11.addWidget(window.start_stop_button_main)
+    h_box_11.addWidget(window.settings_button_main)
 
     v_box_11left.addWidget(window.resp_rate_display_main)
     v_box_11left.addWidget(window.tv_insp_display_main)
@@ -168,7 +163,6 @@ def initializeGraphWidget(window: MainWindow) -> None:
     pressure_graph_left_axis.setLabel("Pressure", **axisStyle)
     window.pressure_graph.getPlotItem().hideAxis('bottom')
 
-
     window.volume_data = np.linspace(0, 0, graph_width)
     window.volume_graph_ptr = -graph_width
     window.volume_graph = pg.PlotWidget()
@@ -184,14 +178,11 @@ def initializeGraphWidget(window: MainWindow) -> None:
     volume_graph_left_axis.setLabel("Volume", **axisStyle)
     window.volume_graph.getPlotItem().hideAxis('bottom')
 
-
     v_box.addWidget(window.flow_graph)
     v_box.addWidget(window.pressure_graph)
     v_box.addWidget(window.volume_graph)
 
     window.page["1"].setLayout(v_box)
-
-
 
 
 def initializeModeWidget(window: MainWindow) -> None:
@@ -302,7 +293,6 @@ def initializeRespiratoryRateWidget(window) -> None:
     resp_rate_title_label.setAlignment(Qt.AlignCenter)
     resp_rate_title_label.setStyleSheet("QLabel {color: #000000 ;}")
 
-
     window.resp_rate_page_value_label = QLabel(
         str(window.local_settings.resp_rate))
     window.resp_rate_page_value_label.setFont(page_settings.valueFont)
@@ -326,9 +316,11 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy()
+    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy(
+    )
     resp_rate_decrement_size_policy.setRetainSizeWhenHidden(True)
-    window.resp_rate_decrement_button.setSizePolicy(resp_rate_decrement_size_policy)
+    window.resp_rate_decrement_button.setSizePolicy(
+        resp_rate_decrement_size_policy)
 
     if window.local_settings.resp_rate - window.ranges._ranges["resp_rate_increment"] \
             < window.ranges._ranges["min_resp_rate"]:
@@ -343,9 +335,11 @@ def initializeRespiratoryRateWidget(window) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    resp_rate_increment_size_policy = window.resp_rate_increment_button.sizePolicy()
+    resp_rate_increment_size_policy = window.resp_rate_increment_button.sizePolicy(
+    )
     resp_rate_increment_size_policy.setRetainSizeWhenHidden(True)
-    window.resp_rate_increment_button.setSizePolicy(resp_rate_increment_size_policy)
+    window.resp_rate_increment_button.setSizePolicy(
+        resp_rate_increment_size_policy)
 
     if window.local_settings.resp_rate + window.ranges._ranges["resp_rate_increment"] \
             > window.ranges._ranges["max_resp_rate"]:
@@ -378,7 +372,7 @@ def initializeRespiratoryRateWidget(window) -> None:
     h_box_2.addWidget(window.resp_rate_page_value_label)
     window.resp_rate_page_value_label.setFixedWidth(
         page_settings.valueLabelWidth)
-    h_box_2.addWidget( window.resp_rate_increment_button)
+    h_box_2.addWidget(window.resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
     h_box_4.addWidget(resp_rate_apply)
     h_box_4.addWidget(resp_rate_cancel)
@@ -388,12 +382,10 @@ def initializeRespiratoryRateWidget(window) -> None:
     v_box.addLayout(h_box_3)
     v_box.addLayout(h_box_4)
 
-
-
     window.page["3"].setLayout(v_box)
 
 
-def initializeTidalVolumeWidget(window: MainWindow):
+def initializeTidalVolumeWidget(window: MainWindow) -> None:
     """ Creates Tidal Volume Widget """
     page_settings = window.ui_settings.page_settings
     v_box = QVBoxLayout()
@@ -498,7 +490,7 @@ def initializeTidalVolumeWidget(window: MainWindow):
     window.page["4"].setLayout(v_box)
 
 
-def initializeIERatioWidget(window: MainWindow):
+def initializeIERatioWidget(window: MainWindow) -> None:
     """ Creates i/e Ratio Widget """
     page_settings = window.ui_settings.page_settings
     v_box = QVBoxLayout()
@@ -519,7 +511,6 @@ def initializeIERatioWidget(window: MainWindow):
     ie_ratio_title_label.setFont(page_settings.mainLabelFont)
     ie_ratio_title_label.setAlignment(Qt.AlignCenter)
     ie_ratio_title_label.setStyleSheet("QLabel {color: #000000 ;}")
-
 
     window.ie_ratio_page_value_label = QLabel(
         window.get_ie_ratio_display(window.local_settings.ie_ratio))
@@ -588,29 +579,73 @@ def initializeIERatioWidget(window: MainWindow):
     window.page["5"].setLayout(v_box)
 
 
-def initializeAlarmWidget(window: MainWindow):  #Alarm
+def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
     v_box_6 = QVBoxLayout()
     h_box_6top = QHBoxLayout()
-    #h_box_6middle = QHBoxLayout()
+    h_box_6mid = QHBoxLayout()
     h_box_6bottom = QHBoxLayout()
 
-    alarm_ack = window.makeSimpleDisplayButton("Set")
-    alarm_cancel = window.makeSimpleDisplayButton("Cancel")
+    h_box_6top.setAlignment(Qt.AlignCenter)
+    h_box_6mid.setAlignment(Qt.AlignCenter)
+    h_box_6bottom.setAlignment(Qt.AlignCenter)
 
-    # Acknowledge alarm stops the alarm   
-    alarm_ack.clicked.connect(lambda: window.commitAlarm())
-    alarm_cancel.clicked.connect(window.cancelChange)
+    alarm_page_label = QLabel("Alarm")
+    alarm_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    alarm_page_label.setAlignment(Qt.AlignCenter)
 
-    window.alarm_page_rect = window.makeDisplayRect(
-        "Alarm", window.settings.get_alarm_display(), "", size=(400, 200))
+    window.alarm_display_label = QLabel()
+    window.alarm_display_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+    window.alarm_display_label.setAlignment(Qt.AlignCenter)
+    window.alarm_display_label.setWordWrap(True)
 
-    h_box_6top.addWidget(window.alarm_page_rect)
-    #h_box_6middle.addWidget(alarm_toggle)
-    h_box_6bottom.addWidget(alarm_ack)
-    h_box_6bottom.addWidget(alarm_cancel)
+    alarm_silence_button = window.makeSimpleDisplayButton(
+        f"Silence for {window.settings.silence_time} min.",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(130, 65))
+    alarm_silence_button.clicked.connect(lambda: window.silenceAlarm())
+
+    h_box_6top.addWidget(alarm_page_label)
+    h_box_6mid.addWidget(window.alarm_display_label)
+    h_box_6bottom.addWidget(alarm_silence_button)
+
+    h_box_6bottom.setSpacing(10)
 
     v_box_6.addLayout(h_box_6top)
-    #v_box_6.addLayout(h_box_6middle)
+    v_box_6.addLayout(h_box_6mid)
     v_box_6.addLayout(h_box_6bottom)
 
     window.page["6"].setLayout(v_box_6)
+
+
+def initializeSettingsWidget(window: MainWindow) -> None:
+    v_box_7 = QVBoxLayout()
+    h_box_7top = QHBoxLayout()
+    h_box_7bottom = QHBoxLayout()
+
+    h_box_7top.setAlignment(Qt.AlignCenter)
+    h_box_7bottom.setAlignment(Qt.AlignCenter)
+
+    settings_page_label = QLabel("Settings")
+    settings_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+
+    settings_page_label.setAlignment(Qt.AlignCenter)
+
+    settings_back_button = window.makeSimpleDisplayButton(
+        "Back",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
+    settings_back_button.clicked.connect(lambda: window.display(0))
+
+    h_box_7top.addWidget(settings_page_label)
+    h_box_7bottom.addWidget(settings_back_button)
+    v_box_7.addLayout(h_box_7top)
+    v_box_7.addLayout(h_box_7bottom)
+
+    window.page["7"].setLayout(v_box_7)

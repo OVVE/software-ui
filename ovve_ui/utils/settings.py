@@ -10,15 +10,13 @@ class Settings():
         self.run_state: int = 0
         self.mode: int = 0
 
-        self.mode_switcher: dict = {
-            0: 'NAC',
-            1: 'AC',
-            2: 'SIMV'
-        }
+        self.mode_switcher: dict = {0: 'NAC', 1: 'AC', 2: 'SIMV'}
 
         self.resp_rate: int = 20
         self.tv: int = 475
         self.ie_ratio: int = 0
+
+        self.silence_time: int = 1  #Number of minutes for which alarm is silenced
 
         self.ie_ratio_switcher: dict = {
             0: "1:1",

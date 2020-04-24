@@ -34,18 +34,22 @@ class DisplayRect(QWidget):
 
         self.label_label.setFont(self.rect_settings.labelFont)
         self.label_label.setAlignment(Qt.AlignCenter)
-        self.label_label.setStyleSheet("QLabel {color: " + self.rect_settings.labelColor + "; margin-top: 6px;}")
+        self.label_label.setStyleSheet("QLabel {color: " +
+                                       self.rect_settings.labelColor +
+                                       "; margin-top: 6px;}")
         self.layout.addWidget(self.label_label)
 
         self.value_label.setFont(self.rect_settings.valueFont)
         self.value_label.setAlignment(Qt.AlignCenter)
         self.value_label.setMargin(-10)
-        self.value_label.setStyleSheet("QLabel {color: " + self.rect_settings.valueColor + ";}")
+        self.value_label.setStyleSheet("QLabel {color: " +
+                                       self.rect_settings.valueColor + ";}")
         self.layout.addWidget(self.value_label)
 
         self.unit_label.setFont(self.rect_settings.unitFont)
         self.unit_label.setAlignment(Qt.AlignCenter)
-        self.unit_label.setStyleSheet("QLabel {color: " + self.rect_settings.unitColor + ";}")
+        self.unit_label.setStyleSheet("QLabel {color: " +
+                                      self.rect_settings.unitColor + ";}")
         self.layout.addWidget(self.unit_label)
 
         self.layout.setSpacing(0)

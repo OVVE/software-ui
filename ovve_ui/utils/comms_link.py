@@ -36,7 +36,6 @@ class CommsLink(QThread):
         self.SER_INTER_TIMEOUT = 0.01
         self.SER_MAX_REREADS = 30
         self.ser = 0
-        
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
@@ -45,53 +44,49 @@ class CommsLink(QThread):
         self.logger.debug("Got updated settings from UI")
         self.logger.debug(self.settings.to_JSON())
 
-
     def get_bytes_from_serial(self) -> str:
         byteData = b''
         rereadCount = 0
-        while len(bytearray(byteData)) != 70 and rereadCount < self.SER_MAX_REREADS:
+        while len(bytearray(
+                byteData)) != 70 and rereadCount < self.SER_MAX_REREADS:
             byteData = self.read_all(self.ser, 70)
             if len(bytearray(byteData)) < 70:
                 self.logger.debug("reread " + str(rereadCount))
             rereadCount += 1
 
-        self.ser.flush()   
+        self.ser.flush()
         return byteData
-
 
     def check_sequence(self, byteData) -> bool:
         if byteData[0:2] == b'\x00\x00':
-            prevSeq = -1 
+            prevSeq = -1
             currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
         else:
             prevSeq = (int.from_bytes(byteData[0:2], byteorder='little') - 1)
             currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
-                
-        if  currentSeq !=  ( prevSeq + 1) :
-            self.logger.warning("Sequence Error! cur:" + 
-                str(self.currentSeq) + " prev:" + str(self.prevSeq))
+
+        if currentSeq != (prevSeq + 1):
+            self.logger.warning("Sequence Error! cur:" + str(self.currentSeq) +
+                                " prev:" + str(self.prevSeq))
             seqOK = False
         else:
             seqOK = True
-        
-        return seqOK
 
+        return seqOK
 
     def create_cmd_pkt(self):
         self.settings_lock.acquire()
 
         self.cmd_pkt.data['mode_value'] = self.cmd_pkt.calculate_mode(
-                self.settings.mode, 
-                self.settings.run_state
-            )
-        self.cmd_pkt.data['sequence_count'] = self.in_pkt.data['sequence_count']
+            self.settings.mode, self.settings.run_state)
+        self.cmd_pkt.data['sequence_count'] = self.in_pkt.data[
+            'sequence_count']
         self.cmd_pkt.data['respiratory_rate_set'] = self.settings.resp_rate
-        self.cmd_pkt.data['tidal_volume_set'] = Units.ml_to_ecu(self.settings.tv)
+        self.cmd_pkt.data['tidal_volume_set'] = Units.ml_to_ecu(
+            self.settings.tv)
         self.cmd_pkt.data['ie_ratio_set'] = self.settings.ie_ratio
 
         self.settings_lock.release()
-                
-
 
     #This function processes the serial data from Arduino and sends ACK
     def process_SerialData(self) -> None:
@@ -100,7 +95,7 @@ class CommsLink(QThread):
         params_dict = json.loads(params_str)
         error_count = 0
         validData = False
-        
+
         self.in_pkt = InPacket()
         self.cmd_pkt = OutPacket()
         self.crc = CRC()
@@ -110,11 +105,11 @@ class CommsLink(QThread):
         validData = False
         valid_pkt_count = 0
 
-        while True:        
+        while True:
             byteData = self.get_bytes_from_serial()
             seqOK = self.check_sequence(byteData)
             crcOK = self.crc.check_crc(byteData)
-        
+
             inpkt = {}
             inpkt['type'] = "inpkt"
             inpkt['bytes'] = str(byteData)
@@ -123,7 +118,7 @@ class CommsLink(QThread):
                 # we can log only raw packets in production
                 self.logger.log(25, json.dumps(inpkt))
                 self.in_pkt.from_bytes(byteData)
-                
+
                 self.new_params.emit(self.in_pkt.to_params())
 
                 self.create_cmd_pkt()
@@ -138,20 +133,17 @@ class CommsLink(QThread):
                 self.logger.warning("BAD PACKET: " + json.dumps(inpkt))
                 error_count += 1
 
-            
             self.logger.debug('Dropped packets count ' + str(error_count))
             self.logger.debug('Valid packets count ' + str(valid_pkt_count))
-        
 
-           
     def init_serial(self) -> False:
 
         self.ser = serial.Serial()
         self.ser.baudrate = self.BAUD
-        self.ser.port = self.PORT 
+        self.ser.port = self.PORT
         self.ser.timeout = self.SER_TIMEOUT
         self.ser.write_timeout = self.SER_WRITE_TIMEOUT
-        
+
         try:
             if self.ser.is_open:
                 self.ser.close()
@@ -159,16 +151,16 @@ class CommsLink(QThread):
                 return False
             else:
                 self.ser.open()
-                self.logger.info("Successfully connected to port %r." % self.ser.port)
+                self.logger.info("Successfully connected to port %r." %
+                                 self.ser.port)
                 return True
         except serial.SerialException:
             return False
 
-
     def read_all(self, port, chunk_size=200):
         """Read all characters on the serial port and return them."""
         if not port.isOpen():
-            raise SerialException('Serial is diconnected') 
+            raise SerialException('Serial is diconnected')
         if not port.timeout:
             raise TypeError('Port needs to have a timeout set!')
 
@@ -185,32 +177,33 @@ class CommsLink(QThread):
         #port.reset_input_buffer()
         return read_buffer
 
-    def sendPkts(self, cmd_byteData: bytes) -> None:        
+    def sendPkts(self, cmd_byteData: bytes) -> None:
         # Write to serial port
         # TO DO put in separate function
         if (len(bytearray(cmd_byteData))) == 22:
             #self.ser.write_timeout = (0.30)
             try:
                 i = 0
-                
+
                 for i in range(len(cmd_byteData)):
-                    self.ser.write(cmd_byteData[i:i+1])
-                
+                    self.ser.write(cmd_byteData[i:i + 1])
+
                 self.logger.debug("Packet Written:")
-                self.logger.debug(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+                self.logger.debug(''.join(r'\x' + hex(letter)[2:]
+                                          for letter in cmd_byteData))
                 self.logger.debug("Sent back SEQ and CRC: ")
-                self.logger.debug(int.from_bytes(cmd_byteData[0:2], byteorder='little'))
-                self.logger.debug(int.from_bytes(cmd_byteData[20:], byteorder='little'))
+                self.logger.debug(
+                    int.from_bytes(cmd_byteData[0:2], byteorder='little'))
+                self.logger.debug(
+                    int.from_bytes(cmd_byteData[20:], byteorder='little'))
                 self.ser.reset_output_buffer()
                 return True
-                    
+
             except serial.SerialException:
                 self.logger.exception('Serial write error')
                 return False
         else:
             self.logger.warning('Data packet too long')
-
-        
 
     def run(self) -> None:
         if self.init_serial():

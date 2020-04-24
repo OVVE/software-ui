@@ -27,7 +27,26 @@ class Alarms():
             "tidal_volume_value_mismatch": False,
             "ie_ratio_mismatch": False,
         }
-        
+
+    #TODO: Update to display proper name that clinicians would recognize
+    def getDisplay(self, index: int) -> str: #Returns properly named string for given alarm number
+        #TODO: Change to dict using same keys as alarm names
+        display = ["Power Loss",
+            "Low Battery",
+            "Loss of Breathing Circuit Integrity",
+            "High Airway Pressure",
+            "Low Airway Pressure",
+            "Low Delivered Tidal Volume",
+            "Apnea",
+            "CRC Error",
+            "Dropped Packet",
+            "Serial Communications Error",
+            "Packet Version Unsupported",
+            "Mode Value Mismatch",
+            "Respiratory Rate Set Point Mismatch",
+            "Tidal Volume Value Mismatch",
+            "I/E Ratio Mismatch"]
+        return display[index]
     
     def to_JSON(self) -> str:
         """ Convert OVVE UI Params to JSON file """

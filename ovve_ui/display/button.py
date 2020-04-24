@@ -31,7 +31,7 @@ class FancyDisplayButton(QAbstractButton):
 
         self.layout = QVBoxLayout()
         self.layout.setSpacing(0)
-        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
         self.label_label = QLabel(self.label)
         self.value_label = QLabel(str(self.value))
@@ -39,21 +39,24 @@ class FancyDisplayButton(QAbstractButton):
 
         self.label_label.setFont(self.button_settings.labelFont)
         self.label_label.setAlignment(Qt.AlignCenter)
-        self.label_label.setStyleSheet("QLabel {color: " + self.button_settings.labelColor + ";}")
+        self.label_label.setStyleSheet("QLabel {color: " +
+                                       self.button_settings.labelColor + ";}")
         self.label_label.setMargin(0)
         self.layout.addWidget(self.label_label)
 
         self.value_label.setFont(self.button_settings.valueFont)
         self.value_label.setAlignment(Qt.AlignCenter)
-        self.value_label.setStyleSheet("QLabel {color: " + self.button_settings.valueColor + ";}")
+        self.value_label.setStyleSheet("QLabel {color: " +
+                                       self.button_settings.valueColor + ";}")
         self.value_label.setMargin(-10)
         self.layout.addWidget(self.value_label)
 
         self.unit_label.setFont(self.button_settings.unitFont)
         self.unit_label.setAlignment(Qt.AlignCenter)
-        self.unit_label.setStyleSheet("QLabel {color: " + self.button_settings.unitColor + "; margin-top: -100px;}")
+        self.unit_label.setStyleSheet("QLabel {color: " +
+                                      self.button_settings.unitColor +
+                                      "; margin-top: -100px;}")
         self.layout.addWidget(self.unit_label)
-
 
         self.setLayout(self.layout)
 
@@ -63,7 +66,6 @@ class FancyDisplayButton(QAbstractButton):
         painter.setPen(self.button_settings.getBorderPen())
         painter.setBrush(self.button_settings.getFillBrush())
         painter.drawRect(0, 0, *self.size)
-
 
     def sizeHint(self) -> QSize:
         return QSize(*self.size)
@@ -87,12 +89,14 @@ class SimpleDisplayButton(QAbstractButton):
 
         self.value_label = QLabel(value)
         self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
-        self.layout.setGeometry(QRect(0,0, *self.size))
+        self.layout.setGeometry(QRect(0, 0, *self.size))
 
         self.value_label.setFont(self.button_settings.valueFont)
-        self.value_label.setStyleSheet("QLabel {color: " + self.button_settings.valueColor + ";}")
+        self.value_label.setStyleSheet("QLabel {color: " +
+                                       self.button_settings.valueColor + ";}")
+        self.value_label.setAlignment(Qt.AlignCenter)
 
         self.layout.addWidget(self.value_label)
         self.layout.setAlignment(Qt.AlignCenter)
@@ -105,7 +109,6 @@ class SimpleDisplayButton(QAbstractButton):
         painter.setBrush(self.button_settings.getFillBrush())
         painter.setPen(self.button_settings.getBorderPen())
         painter.drawRect(0, 0, *self.size)
-
 
     def sizeHint(self) -> QSize:
         return QSize(*self.size)

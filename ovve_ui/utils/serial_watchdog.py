@@ -1,5 +1,6 @@
 from threading import Timer
 
+
 class Watchdog:
     def __init__(self, timeout, userHandler=None):  # timeout in seconds
         self.timeout = timeout

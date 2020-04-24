@@ -19,7 +19,6 @@ from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QWidget, QMessageBox, QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton
-from display.change import Change
 from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
                                  SimpleButtonSettings, TextSetting, UISettings)
@@ -28,7 +27,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
-                             initializeGraphWidget)
+                             initializeGraphWidget, initializeSettingsWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -36,18 +35,19 @@ from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 
+
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
-    def __init__(self, port: str, is_sim: bool=False) -> None:
+    def __init__(self, port: str, is_sim: bool = False, windowed: bool = False, dev_mode: bool = False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
         self.ranges = Ranges()
-        
-        
-        self.fullscreen = False
+
+        self.windowed = windowed
+        self.dev_mode = dev_mode
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -73,14 +73,16 @@ class MainWindow(QWidget):
             "4": QWidget(),
             "5": QWidget(),
             "6": QWidget(),
+            "7": QWidget(),
         }
+        self.alarms = Alarms()
+        self.shownAlarmCode = None
 
         self.initalizeAndAddStackWidgets()
 
         layout.setContentsMargins(10, 10, 10, 10)
         self.setLayout(layout)
         palette = QtGui.QPalette()
-        palette.setColor(QtGui.QPalette.Background, QtCore.Qt.blue)
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
 
@@ -90,19 +92,20 @@ class MainWindow(QWidget):
 
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
-                os.makedirs(self.logpath)
-                
+            os.makedirs(self.logpath)
+
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
 
         self.logfileroot = os.path.join(self.logpath, self.patient_id + ".log")
 
-       
         # The TimedRotatingFileHandler will write a new file each hour
         # After two weeks, the oldest logs will start being deleted
-        fh = TimedRotatingFileHandler(self.logfileroot, 
-            when='H', interval=1, backupCount=336)
- 
+        fh = TimedRotatingFileHandler(self.logfileroot,
+                                      when='H',
+                                      interval=1,
+                                      backupCount=336)
+
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
         fh.setLevel(25)
@@ -114,16 +117,17 @@ class MainWindow(QWidget):
         # TODO: Create a custom handler for Ignition
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
-        
+
         # add the handlers to the logger
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
 
         if not is_sim:
-             self.comms_handler = CommsLink(port)
+            self.comms_handler = CommsLink(port)
         else:
             self.comms_handler = CommsSimulator()
 
@@ -131,7 +135,6 @@ class MainWindow(QWidget):
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
-
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -193,11 +196,12 @@ class MainWindow(QWidget):
         initializeTidalVolumeWidget(self)
         initializeIERatioWidget(self)
         initializeAlarmWidget(self)
+        initializeSettingsWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
 
-    def display(self, i):
+    def display(self, i) -> None:
         self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
@@ -211,7 +215,10 @@ class MainWindow(QWidget):
         self.alarms.from_dict(alarms_dict)
         self.logger.info(self.alarms.to_JSON())
 
-        #TODO: Implement UI alarm handling
+        for i in range(len(alarms_dict)):
+            if list(alarms_dict.items()
+                    )[i][1]:  #TODO: Revisit this for multi alarm handling
+                self.showAlarm(i)
 
     def updateMainDisplays(self) -> None:
         self.mode_button_main.updateValue(
@@ -234,7 +241,6 @@ class MainWindow(QWidget):
         self.tv_page_value_label.setText(str(self.settings.tv))
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.settings.ie_ratio))
-        self.alarm_page_rect.updateValue(self.settings.get_alarm_display())
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
@@ -252,7 +258,6 @@ class MainWindow(QWidget):
 
         QtGui.QApplication.processEvents()
 
-    # TODO: Finish all of these for each var
     def incrementMode(self) -> None:
         self.local_settings.mode += 1
         if self.local_settings.mode >= len(self.settings.mode_switcher):
@@ -268,7 +273,8 @@ class MainWindow(QWidget):
             self.get_mode_display(self.local_settings.mode))
 
     def incrementRespRate(self) -> None:
-        self.local_settings.resp_rate += self.ranges._ranges["resp_rate_increment"]
+        self.local_settings.resp_rate += self.ranges._ranges[
+            "resp_rate_increment"]
         self.resp_rate_page_value_label.setText(
             str(self.local_settings.resp_rate))
         if self.local_settings.resp_rate + self.ranges._ranges["resp_rate_increment"] \
@@ -276,9 +282,9 @@ class MainWindow(QWidget):
             self.resp_rate_increment_button.hide()
         self.resp_rate_decrement_button.show()
 
-
     def decrementRespRate(self) -> None:
-        self.local_settings.resp_rate -= self.ranges._ranges["resp_rate_increment"]
+        self.local_settings.resp_rate -= self.ranges._ranges[
+            "resp_rate_increment"]
         self.resp_rate_page_value_label.setText(
             str(self.local_settings.resp_rate))
         if self.local_settings.resp_rate - self.ranges._ranges["resp_rate_increment"] \
@@ -319,22 +325,34 @@ class MainWindow(QWidget):
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio))
 
-    def changeAlarm(self, new_val):
+    def changeAlarm(self, new_val) -> None:
         self.local_settings.alarm_mode = new_val
-        self.alarm_page_rect.updateValue(
-            self.local_settings.get_alarm_display())
 
-    def changeStartStop(self):
+    def changeStartStop(self) -> None:
         if self.settings.run_state == 0:
             self.settings.run_state = 1
-            self.start_button_main.updateValue("STOP")
-            self.start_button_main.button_settings = SimpleButtonSettings(
+            self.start_stop_button_main.updateValue("STOP")
+            self.start_stop_button_main.button_settings = SimpleButtonSettings(
                 fillColor="#ff0000")
             self.passChanges()
 
         elif self.settings.run_state == 1:
             self.showStartStopConfirm()
 
+    #TODO: doesn't support multiple alarms at once
+    def showAlarm(self, code: int) -> None:
+        self.shownAlarmCode = code
+        self.alarm_display_label.setText(self.alarms.getDisplay(code))
+        self.display(5)
+
+    def silenceAlarm(self):
+        alarms_dict = self.alarms.to_dict()
+        alarms_items = list(alarms_dict.items())
+        alarms_dict[alarms_items[self.shownAlarmCode][0]] = False
+        self.alarms.from_dict(alarms_dict)
+        self.comms_handler.new_alarms  #TODO complete this line, silence for given duration to Arduino
+        self.shownAlarmCode = None
+        self.display(0)
 
     def showStartStopConfirm(self):
         d = QDialog()
@@ -354,16 +372,15 @@ class MainWindow(QWidget):
         d_cancel.clicked.connect(lambda: d.reject())
         d_cancel.setFont(self.ui_settings.simple_button_settings.valueFont)
         d_cancel.setStyleSheet("QPushButton {background-color: " +
-                               self.ui_settings.page_settings.cancelColor
-                               + ";}")
-
+                               self.ui_settings.page_settings.cancelColor +
+                               ";}")
 
         d_confirm = QPushButton("Confirm")
         d_confirm.clicked.connect(lambda: self.stopVentilation(d))
         d_confirm.setFont(self.ui_settings.simple_button_settings.valueFont)
         d_confirm.setStyleSheet("QPushButton {background-color: " +
-                               self.ui_settings.page_settings.commitColor
-                               + ";}")
+                                self.ui_settings.page_settings.commitColor +
+                                ";}")
 
         d_h_box_1.addWidget(d_label)
         d_h_box_2.addWidget(d_cancel)
@@ -377,23 +394,14 @@ class MainWindow(QWidget):
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
-
     def stopVentilation(self, d: QDialog):
         d.reject()
         self.settings.run_state = 0
-        self.start_button_main.updateValue("START")
-        self.start_button_main.button_settings = SimpleButtonSettings()
+        self.start_stop_button_main.updateValue("START")
+        self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
 
-    # TODO: Finish all of these for each var
     def commitMode(self):
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "Mode",
-                self.get_mode_display(self.settings.mode),
-                self.get_mode_display(self.local_settings.mode),
-            ))
         self.settings.mode = self.local_settings.mode
         self.mode_button_main.updateValue(
             self.get_mode_display(self.settings.mode))
@@ -402,14 +410,6 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitRespRate(self) -> None:
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "Resp. Rate",
-                self.settings.resp_rate,
-                self.local_settings.resp_rate,
-            ))
-
         self.settings.resp_rate = self.local_settings.resp_rate
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.display(0)
@@ -418,13 +418,6 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitTidalVol(self) -> None:
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "Tidal Vol",
-                self.settings.tv,
-                self.local_settings.tv,
-            ))
         self.settings.tv = self.local_settings.tv
         self.tv_button_main.updateValue(self.settings.tv)
         self.display(0)
@@ -433,13 +426,6 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitIERatio(self) -> None:
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "I/E Ratio",
-                self.get_ie_ratio_display(self.settings.ie_ratio),
-                self.get_ie_ratio_display(self.local_settings.ie_ratio),
-            ))
         self.settings.ie_ratio = self.local_settings.ie_ratio
         self.ie_button_main.updateValue(
             self.get_ie_ratio_display(self.settings.ie_ratio))
@@ -449,16 +435,11 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitAlarm(self):
-        self.logChange(
-            Change(datetime.datetime.now(), "Alarm acknowledged",
-                   self.settings.get_alarm_display(),
-                   self.local_settings.get_alarm_display()))
         self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.display(0)
         self.passChanges()
         self.updatePageDisplays()
-        #TODO: Modify some equivalent of local settings for alarms? Not sure how this works
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
@@ -473,11 +454,6 @@ class MainWindow(QWidget):
         j = json.loads(settings_str)
         self.new_settings_signal.emit(j)
 
-    def logChange(self, change: Change) -> None:
-        if change.old_val != change.new_val:
-            print(change.display())
-        # TODO: Actually log the change in some data structure
-
     def set_settings_callback(
             self, settings_callback: Callable[[Settings], None]) -> None:
         self.settings_callback = settings_callback
@@ -486,31 +462,72 @@ class MainWindow(QWidget):
         self.comms_handler.terminate()
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_F:
-            if self.fullscreen:
-                self.hide()
-                self.showNormal()
-                self.fullscreen = False
+        if self.dev_mode:
+            if event.key() == QtCore.Qt.Key_F:
+                self.windowed = not self.windowed
 
-            elif not self.fullscreen:
-                self.hide()
-                self.showFullScreen()
-                self.fullscreen = True
+                if self.windowed:
+                    self.hide()
+                    self.showNormal()
 
-        if event.key() == QtCore.Qt.Key_Q:
-            self.close()
+                else:
+                    self.hide()
+                    self.showFullScreen()
+
+            if event.key() == QtCore.Qt.Key_Q:
+                self.close()
+
+            elif event.key() == QtCore.Qt.Key_W:
+                self.comms_handler.fireAlarm(0)
+
+            elif event.key() == QtCore.Qt.Key_E:
+                self.comms_handler.fireAlarm(1)
+
+            elif event.key() == QtCore.Qt.Key_R:
+                self.comms_handler.fireAlarm(2)
+
+            elif event.key() == QtCore.Qt.Key_T:
+                self.comms_handler.fireAlarm(3)
+
+            elif event.key() == QtCore.Qt.Key_Y:
+                self.comms_handler.fireAlarm(4)
+
+            elif event.key() == QtCore.Qt.Key_U:
+                self.comms_handler.fireAlarm(5)
+
+            elif event.key() == QtCore.Qt.Key_I:
+                self.comms_handler.fireAlarm(6)
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='User interface for OVVE')
-    parser.add_argument('-s', "--sim", action='store_true', 
+    parser.add_argument('-s',
+                        "--sim",
+                        action='store_true',
                         help='Run with simulated data')
-    parser.add_argument('-p', "--port", default='/dev/ttyUSB0', 
+
+    parser.add_argument('-w',
+                        "--windowed",
+                        action='store_true',
+                        help='Run in windowed mode (fullscreen default)')
+
+    parser.add_argument('-d',
+                        "--dev_mode",
+                        action='store_true',
+                        help='Run in developer mode (alarm hotkeys enabled (w,e,r, etc.) , toggle fullscreen (f) enabled)')
+
+    parser.add_argument('-p',
+                        "--port",
+                        default='/dev/ttyUSB0',
                         help='Serial port for communication with MCU')
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-    window = MainWindow(args.port, args.sim)
-    window.showFullScreen()
+    window = MainWindow(args.port, args.sim, args.windowed, args.dev_mode)
+    if window.windowed:
+        window.showNormal()
+    else:
+        window.showFullScreen()
     app.exec_()
     sys.exit()
 
