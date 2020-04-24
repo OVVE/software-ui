@@ -163,7 +163,6 @@ def initializeGraphWidget(window: MainWindow) -> None:
     pressure_graph_left_axis.setLabel("Pressure", **axisStyle)
     window.pressure_graph.getPlotItem().hideAxis('bottom')
 
-
     window.volume_data = np.linspace(0, 0, graph_width)
     window.volume_graph_ptr = -graph_width
     window.volume_graph = pg.PlotWidget()
@@ -179,14 +178,11 @@ def initializeGraphWidget(window: MainWindow) -> None:
     volume_graph_left_axis.setLabel("Volume", **axisStyle)
     window.volume_graph.getPlotItem().hideAxis('bottom')
 
-
     v_box.addWidget(window.flow_graph)
     v_box.addWidget(window.pressure_graph)
     v_box.addWidget(window.volume_graph)
 
     window.page["1"].setLayout(v_box)
-
-
 
 
 def initializeModeWidget(window: MainWindow) -> None:
@@ -389,7 +385,7 @@ def initializeRespiratoryRateWidget(window) -> None:
     window.page["3"].setLayout(v_box)
 
 
-def initializeTidalVolumeWidget(window: MainWindow):
+def initializeTidalVolumeWidget(window: MainWindow) -> None:
     """ Creates Tidal Volume Widget """
     page_settings = window.ui_settings.page_settings
     v_box = QVBoxLayout()
@@ -494,7 +490,7 @@ def initializeTidalVolumeWidget(window: MainWindow):
     window.page["4"].setLayout(v_box)
 
 
-def initializeIERatioWidget(window: MainWindow):
+def initializeIERatioWidget(window: MainWindow) -> None:
     """ Creates i/e Ratio Widget """
     page_settings = window.ui_settings.page_settings
     v_box = QVBoxLayout()
@@ -583,7 +579,7 @@ def initializeIERatioWidget(window: MainWindow):
     window.page["5"].setLayout(v_box)
 
 
-def initializeAlarmWidget(window: MainWindow):  #Alarm
+def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
     v_box_6 = QVBoxLayout()
     h_box_6top = QHBoxLayout()
     h_box_6mid = QHBoxLayout()
@@ -598,43 +594,23 @@ def initializeAlarmWidget(window: MainWindow):  #Alarm
     alarm_page_label.setAlignment(Qt.AlignCenter)
 
     window.alarm_display_label = QLabel()
-    window.alarm_display_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    window.alarm_display_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
     window.alarm_display_label.setAlignment(Qt.AlignCenter)
     window.alarm_display_label.setWordWrap(True)
 
-    alarm_silence_short_button = window.makeSimpleDisplayButton(
-        f"Silence for {window.settings.silence_short} min.",
+    alarm_silence_button = window.makeSimpleDisplayButton(
+        f"Silence for {window.settings.silence_time} min.",
         button_settings=SimpleButtonSettings(
             valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
         size=(130, 65))
-    alarm_silence_short_button.clicked.connect(
-        lambda: window.silenceAlarm(0))
-
-    alarm_silence_med_button = window.makeSimpleDisplayButton(
-        f"Silence for {window.settings.silence_med} min.",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
-        size=(130, 65))
-    alarm_silence_med_button.clicked.connect(
-        lambda: window.silenceAlarm(1))
-
-    alarm_silence_long_button = window.makeSimpleDisplayButton(
-        f"Silence for {window.settings.silence_long} min.",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
-        size = (130,65))
-
-    alarm_silence_long_button.clicked.connect(
-        lambda: window.silenceAlarm(2))
+    alarm_silence_button.clicked.connect(lambda: window.silenceAlarm())
 
     h_box_6top.addWidget(alarm_page_label)
     h_box_6mid.addWidget(window.alarm_display_label)
-    h_box_6bottom.addWidget(alarm_silence_short_button)
-    h_box_6bottom.addWidget(alarm_silence_med_button)
-    h_box_6bottom.addWidget(alarm_silence_long_button)
+    h_box_6bottom.addWidget(alarm_silence_button)
 
     h_box_6bottom.setSpacing(10)
 
@@ -645,7 +621,7 @@ def initializeAlarmWidget(window: MainWindow):  #Alarm
     window.page["6"].setLayout(v_box_6)
 
 
-def initializeSettingsWidget(window: MainWindow):
+def initializeSettingsWidget(window: MainWindow) -> None:
     v_box_7 = QVBoxLayout()
     h_box_7top = QHBoxLayout()
     h_box_7bottom = QHBoxLayout()
@@ -658,13 +634,13 @@ def initializeSettingsWidget(window: MainWindow):
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
-
     settings_back_button = window.makeSimpleDisplayButton(
         "Back",
         button_settings=SimpleButtonSettings(
-            valueSetting = window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor),
-        size = (200,65) )
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
     settings_back_button.clicked.connect(lambda: window.display(0))
 
     h_box_7top.addWidget(settings_page_label)

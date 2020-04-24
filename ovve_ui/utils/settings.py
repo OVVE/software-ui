@@ -20,10 +20,7 @@ class Settings():
         self.tv: int = 475
         self.ie_ratio: int = 0
 
-        self.silence_short: int = 2 #Number of minutes for which alarm is silenced on shortest option
-        self.silence_med: int = 5
-        self.silence_long: int = 10
-
+        self.silence_time: int = 1 #Number of minutes for which alarm is silenced
 
         self.ie_ratio_switcher: dict = {
             0: "1:1",

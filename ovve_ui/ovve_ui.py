@@ -36,21 +36,21 @@ from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 
+
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
-    def __init__(self, port: str, is_sim: bool=False) -> None:
+    def __init__(self, port: str, is_sim: bool = False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
         self.ranges = Ranges()
 
-
-        self.fullscreen = False #TODO: Change Back
+        self.fullscreen = False  #TODO: Change Back
         #self.fullscreen = True
 
-        is_sim = True #TODO: Delete
+        is_sim = True  #TODO: Delete
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -95,18 +95,19 @@ class MainWindow(QWidget):
 
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
-                os.makedirs(self.logpath)
+            os.makedirs(self.logpath)
 
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
 
         self.logfileroot = os.path.join(self.logpath, self.patient_id + ".log")
 
-
         # The TimedRotatingFileHandler will write a new file each hour
         # After two weeks, the oldest logs will start being deleted
         fh = TimedRotatingFileHandler(self.logfileroot,
-            when='H', interval=1, backupCount=336)
+                                      when='H',
+                                      interval=1,
+                                      backupCount=336)
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
@@ -119,7 +120,8 @@ class MainWindow(QWidget):
         # TODO: Create a custom handler for Ignition
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s')
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
@@ -128,7 +130,7 @@ class MainWindow(QWidget):
         self.logger.addHandler(ch)
 
         if not is_sim:
-             self.comms_handler = CommsLink(port)
+            self.comms_handler = CommsLink(port)
         else:
             self.comms_handler = CommsSimulator()
 
@@ -202,7 +204,7 @@ class MainWindow(QWidget):
         for i in self.page:
             self.stack.addWidget(self.page[i])
 
-    def display(self, i):
+    def display(self, i) -> None:
         self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
@@ -211,22 +213,15 @@ class MainWindow(QWidget):
         self.updateMainDisplays()
         self.updateGraphs()
 
-    def _flash_background_color(self, col: QColor):
-        palette = self.palette()
-        palette.setColor(QtGui.QPalette.Background, col)
-        self.setPalette(palette)
-
-    color = pyqtProperty(QColor, fset=_flash_background_color)
-
     def update_ui_alarms(self, alarms_dict: dict) -> None:
         self.alarms = Alarms()
         self.alarms.from_dict(alarms_dict)
         self.logger.info(self.alarms.to_JSON())
 
         for i in range(len(alarms_dict)):
-            if list(alarms_dict.items())[i][1]: #TODO: Revisit this for multi alarm handling
+            if list(alarms_dict.items()
+                    )[i][1]:  #TODO: Revisit this for multi alarm handling
                 self.showAlarm(i)
-
 
     def updateMainDisplays(self) -> None:
         self.mode_button_main.updateValue(
@@ -282,7 +277,8 @@ class MainWindow(QWidget):
             self.get_mode_display(self.local_settings.mode))
 
     def incrementRespRate(self) -> None:
-        self.local_settings.resp_rate += self.ranges._ranges["resp_rate_increment"]
+        self.local_settings.resp_rate += self.ranges._ranges[
+            "resp_rate_increment"]
         self.resp_rate_page_value_label.setText(
             str(self.local_settings.resp_rate))
         if self.local_settings.resp_rate + self.ranges._ranges["resp_rate_increment"] \
@@ -290,9 +286,9 @@ class MainWindow(QWidget):
             self.resp_rate_increment_button.hide()
         self.resp_rate_decrement_button.show()
 
-
     def decrementRespRate(self) -> None:
-        self.local_settings.resp_rate -= self.ranges._ranges["resp_rate_increment"]
+        self.local_settings.resp_rate -= self.ranges._ranges[
+            "resp_rate_increment"]
         self.resp_rate_page_value_label.setText(
             str(self.local_settings.resp_rate))
         if self.local_settings.resp_rate - self.ranges._ranges["resp_rate_increment"] \
@@ -333,11 +329,10 @@ class MainWindow(QWidget):
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio))
 
-    def changeAlarm(self, new_val):
+    def changeAlarm(self, new_val) -> None:
         self.local_settings.alarm_mode = new_val
 
-
-    def changeStartStop(self):
+    def changeStartStop(self) -> None:
         if self.settings.run_state == 0:
             self.settings.run_state = 1
             self.start_stop_button_main.updateValue("STOP")
@@ -349,17 +344,17 @@ class MainWindow(QWidget):
             self.showStartStopConfirm()
 
     #TODO: doesn't support multiple alarms at once
-    def showAlarm(self, code: int):
+    def showAlarm(self, code: int) -> None:
         self.shownAlarmCode = code
         self.alarm_display_label.setText(self.alarms.getDisplay(code))
         self.display(5)
 
-    def silenceAlarm(self, duration: int): #duration: 0 = short, 1 = med, 2 = long (NOT MINUTES, options)
+    def silenceAlarm(self):
         alarms_dict = self.alarms.to_dict()
         alarms_items = list(alarms_dict.items())
         alarms_dict[alarms_items[self.shownAlarmCode][0]] = False
         self.alarms.from_dict(alarms_dict)
-        self.comms_handler.new_alarms #TODO complete this line, silence for given duration to Arduino
+        self.comms_handler.new_alarms  #TODO complete this line, silence for given duration to Arduino
         self.shownAlarmCode = None
         self.display(0)
 
@@ -381,15 +376,15 @@ class MainWindow(QWidget):
         d_cancel.clicked.connect(lambda: d.reject())
         d_cancel.setFont(self.ui_settings.simple_button_settings.valueFont)
         d_cancel.setStyleSheet("QPushButton {background-color: " +
-                               self.ui_settings.page_settings.cancelColor
-                               + ";}")
+                               self.ui_settings.page_settings.cancelColor +
+                               ";}")
 
         d_confirm = QPushButton("Confirm")
         d_confirm.clicked.connect(lambda: self.stopVentilation(d))
         d_confirm.setFont(self.ui_settings.simple_button_settings.valueFont)
         d_confirm.setStyleSheet("QPushButton {background-color: " +
-                               self.ui_settings.page_settings.commitColor
-                               + ";}")
+                                self.ui_settings.page_settings.commitColor +
+                                ";}")
 
         d_h_box_1.addWidget(d_label)
         d_h_box_2.addWidget(d_cancel)
@@ -544,11 +539,16 @@ class MainWindow(QWidget):
         elif event.key() == QtCore.Qt.Key_I:
             self.comms_handler.fireAlarm(6)
 
+
 def main() -> None:
     parser = argparse.ArgumentParser(description='User interface for OVVE')
-    parser.add_argument('-s', "--sim", action='store_true', 
+    parser.add_argument('-s',
+                        "--sim",
+                        action='store_true',
                         help='Run with simulated data')
-    parser.add_argument('-p', "--port", default='/dev/ttyUSB0',
+    parser.add_argument('-p',
+                        "--port",
+                        default='/dev/ttyUSB0',
                         help='Serial port for communication with MCU')
     args = parser.parse_args()
 

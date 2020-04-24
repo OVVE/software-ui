@@ -12,6 +12,7 @@ class TextSetting:
         else:
             self.font = QFont(fontName, fontSize)
 
+
 class FancyButtonSettings:
     def __init__(self,
                  labelSetting: TextSetting = TextSetting("Arial", 8, True),
