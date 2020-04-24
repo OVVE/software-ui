@@ -19,7 +19,6 @@ from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QWidget, QMessageBox, QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton
-from display.change import Change
 from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
                                  SimpleButtonSettings, TextSetting, UISettings)
@@ -40,17 +39,15 @@ from utils.ranges import Ranges
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
-    def __init__(self, port: str, is_sim: bool = False) -> None:
+    def __init__(self, port: str, is_sim: bool = False, fullscreen: bool = True, dev_mode: bool = False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
         self.ranges = Ranges()
 
-        self.fullscreen = False  #TODO: Change Back
-        #self.fullscreen = True
-
-        is_sim = True  #TODO: Delete
+        self.fullscreen = fullscreen
+        self.dev_mode = dev_mode
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -261,7 +258,6 @@ class MainWindow(QWidget):
 
         QtGui.QApplication.processEvents()
 
-    # TODO: Finish all of these for each var
     def incrementMode(self) -> None:
         self.local_settings.mode += 1
         if self.local_settings.mode >= len(self.settings.mode_switcher):
@@ -406,13 +402,6 @@ class MainWindow(QWidget):
         self.passChanges()
 
     def commitMode(self):
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "Mode",
-                self.get_mode_display(self.settings.mode),
-                self.get_mode_display(self.local_settings.mode),
-            ))
         self.settings.mode = self.local_settings.mode
         self.mode_button_main.updateValue(
             self.get_mode_display(self.settings.mode))
@@ -421,14 +410,6 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitRespRate(self) -> None:
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "Resp. Rate",
-                self.settings.resp_rate,
-                self.local_settings.resp_rate,
-            ))
-
         self.settings.resp_rate = self.local_settings.resp_rate
         self.resp_rate_button_main.updateValue(self.settings.resp_rate)
         self.display(0)
@@ -437,13 +418,6 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitTidalVol(self) -> None:
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "Tidal Vol",
-                self.settings.tv,
-                self.local_settings.tv,
-            ))
         self.settings.tv = self.local_settings.tv
         self.tv_button_main.updateValue(self.settings.tv)
         self.display(0)
@@ -452,13 +426,6 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitIERatio(self) -> None:
-        self.logChange(
-            Change(
-                datetime.datetime.now(),
-                "I/E Ratio",
-                self.get_ie_ratio_display(self.settings.ie_ratio),
-                self.get_ie_ratio_display(self.local_settings.ie_ratio),
-            ))
         self.settings.ie_ratio = self.local_settings.ie_ratio
         self.ie_button_main.updateValue(
             self.get_ie_ratio_display(self.settings.ie_ratio))
@@ -468,10 +435,6 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitAlarm(self):
-        self.logChange(
-            Change(datetime.datetime.now(), "Alarm acknowledged",
-                   self.settings.get_alarm_display(),
-                   self.local_settings.get_alarm_display()))
         self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.display(0)
@@ -491,11 +454,6 @@ class MainWindow(QWidget):
         j = json.loads(settings_str)
         self.new_settings_signal.emit(j)
 
-    def logChange(self, change: Change) -> None:
-        if change.old_val != change.new_val:
-            print(change.display())
-        # TODO: Can this be removed?
-
     def set_settings_callback(
             self, settings_callback: Callable[[Settings], None]) -> None:
         self.settings_callback = settings_callback
@@ -504,40 +462,41 @@ class MainWindow(QWidget):
         self.comms_handler.terminate()
 
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_F:
-            if self.fullscreen:
-                self.hide()
-                self.showNormal()
-                self.fullscreen = False
+        if self.dev_mode:
+            if event.key() == QtCore.Qt.Key_F:
+                if self.fullscreen:
+                    self.hide()
+                    self.showNormal()
+                    self.fullscreen = False
 
-            elif not self.fullscreen:
-                self.hide()
-                self.showFullScreen()
-                self.fullscreen = True
+                elif not self.fullscreen:
+                    self.hide()
+                    self.showFullScreen()
+                    self.fullscreen = True
 
-        elif event.key() == QtCore.Qt.Key_Q:
-            self.close()
+            if event.key() == QtCore.Qt.Key_Q:
+                self.close()
 
-        elif event.key() == QtCore.Qt.Key_W:
-            self.comms_handler.fireAlarm(0)
+            elif event.key() == QtCore.Qt.Key_W:
+                self.comms_handler.fireAlarm(0)
 
-        elif event.key() == QtCore.Qt.Key_E:
-            self.comms_handler.fireAlarm(1)
+            elif event.key() == QtCore.Qt.Key_E:
+                self.comms_handler.fireAlarm(1)
 
-        elif event.key() == QtCore.Qt.Key_R:
-            self.comms_handler.fireAlarm(2)
+            elif event.key() == QtCore.Qt.Key_R:
+                self.comms_handler.fireAlarm(2)
 
-        elif event.key() == QtCore.Qt.Key_T:
-            self.comms_handler.fireAlarm(3)
+            elif event.key() == QtCore.Qt.Key_T:
+                self.comms_handler.fireAlarm(3)
 
-        elif event.key() == QtCore.Qt.Key_Y:
-            self.comms_handler.fireAlarm(4)
+            elif event.key() == QtCore.Qt.Key_Y:
+                self.comms_handler.fireAlarm(4)
 
-        elif event.key() == QtCore.Qt.Key_U:
-            self.comms_handler.fireAlarm(5)
+            elif event.key() == QtCore.Qt.Key_U:
+                self.comms_handler.fireAlarm(5)
 
-        elif event.key() == QtCore.Qt.Key_I:
-            self.comms_handler.fireAlarm(6)
+            elif event.key() == QtCore.Qt.Key_I:
+                self.comms_handler.fireAlarm(6)
 
 
 def main() -> None:
@@ -546,6 +505,17 @@ def main() -> None:
                         "--sim",
                         action='store_true',
                         help='Run with simulated data')
+
+    parser.add_argument('-w',
+                        "--windowed",
+                        action='store_true',
+                        help='Run in windowed mode (fullscreen default)')
+
+    parser.add_argument('-d',
+                        "--dev_mode",
+                        action='store_true',
+                        help='Run in developer mode (alarm hotkeys enabled, toggle fullscreen enabled)')
+
     parser.add_argument('-p',
                         "--port",
                         default='/dev/ttyUSB0',
@@ -553,7 +523,7 @@ def main() -> None:
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
-    window = MainWindow(args.sim)
+    window = MainWindow(args.port, args.sim, not args.windowed, args.dev_mode)
     if window.fullscreen:
         window.showFullScreen()
     else:
