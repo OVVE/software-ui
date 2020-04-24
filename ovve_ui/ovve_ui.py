@@ -516,7 +516,7 @@ def main() -> None:
     parser.add_argument('-d',
                         "--dev_mode",
                         action='store_true',
-                        help='Run in developer mode (alarm hotkeys enabled, toggle fullscreen enabled)')
+                        help='Run in developer mode (alarm hotkeys enabled (w,e,r, etc.) , toggle fullscreen (f) enabled)')
 
     parser.add_argument('-p',
                         "--port",
