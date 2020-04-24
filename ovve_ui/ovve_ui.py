@@ -465,15 +465,14 @@ class MainWindow(QWidget):
         if self.dev_mode:
             if event.key() == QtCore.Qt.Key_F:
                 self.windowed = not self.windowed
-                if not self.windowed:
-                    print("working")
-                    self.hide()
-                    self.showFullScreen()
 
-                elif self.windowed:
-                    print("reached")
+                if self.windowed:
                     self.hide()
                     self.showNormal()
+
+                else:
+                    self.hide()
+                    self.showFullScreen()
 
             if event.key() == QtCore.Qt.Key_Q:
                 self.close()
