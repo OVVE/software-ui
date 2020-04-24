@@ -15,6 +15,7 @@ from utils.serial_watchdog import Watchdog
 from utils.in_packet import InPacket
 from utils.out_packet import OutPacket
 from utils.crc import CRC
+from utils.units import Units
 from PyQt5.QtCore import QThread, pyqtSignal
 
 
@@ -85,7 +86,7 @@ class CommsLink(QThread):
             )
         self.cmd_pkt.data['sequence_count'] = self.in_pkt.data['sequence_count']
         self.cmd_pkt.data['respiratory_rate_set'] = self.settings.resp_rate
-        self.cmd_pkt.data['tidal_volume_set'] = self.settings.tv
+        self.cmd_pkt.data['tidal_volume_set'] = Units.ml_to_ecu(self.settings.tv)
         self.cmd_pkt.data['ie_ratio_set'] = self.settings.ie_ratio
 
         self.settings_lock.release()
@@ -152,21 +153,14 @@ class CommsLink(QThread):
         self.ser.write_timeout = self.SER_WRITE_TIMEOUT
         
         try:
-            
-            if self.ser == None:
-                self.ser.open()
-                self.logger.debug("Successfully connected to port %r." % self.ser.port)
-                
-                return True
+            if self.ser.is_open:
+                self.ser.close()
+                self.logger.info("Disconnected current connection.")
+                return False
             else:
-                if self.ser.isOpen():
-                    self.ser.close()
-                    self.logger.debug("Disconnected current connection.")
-                    return False
-                else:
-                    self.ser.open()
-                    self.logger.debug("Connected to port %r." % self.ser.port)
-                    return True
+                self.ser.open()
+                self.logger.info("Successfully connected to port %r." % self.ser.port)
+                return True
         except serial.SerialException:
             return False
 
@@ -227,4 +221,3 @@ class CommsLink(QThread):
             # When the alarm infrastructure is done this would trigger an alarm
             return
         self.process_SerialData()
-       

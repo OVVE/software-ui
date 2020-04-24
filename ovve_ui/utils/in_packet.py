@@ -1,4 +1,5 @@
 from utils.params import Params
+from utils.units import Units
 
 class InPacket():
     def __init__(self) -> None:
@@ -35,18 +36,18 @@ class InPacket():
         self.data['mode_value']=byteData[3]
         self.data['respiratory_rate_measured']=int.from_bytes(byteData[4:8], byteorder='little')
         self.data['respiratory_rate_set']=int.from_bytes(byteData[8:12], byteorder='little')
-        self.data['tidal_volume_measured']=int.from_bytes(byteData[12:16], byteorder='little')
-        self.data['tidal_volume_set']=int.from_bytes(byteData[16:20], byteorder='little')
+        self.data['tidal_volume_measured']=int.from_bytes(byteData[12:16], byteorder='little', signed=True)
+        self.data['tidal_volume_set']=int.from_bytes(byteData[16:20], byteorder='little', signed=True)
         self.data['ie_ratio_measured']=int.from_bytes(byteData[20:24], byteorder='little')
         self.data['ie_ratio_set']=int.from_bytes(byteData[24:28], byteorder='little')
-        self.data['peep_value_measured']=int.from_bytes(byteData[28:32], byteorder='little')
-        self.data['peak_pressure_measured']=int.from_bytes(byteData[32:36], byteorder='little')
-        self.data['plateau_value_measured']=int.from_bytes(byteData[36:40], byteorder='little')
-        self.data['pressure_measured']=int.from_bytes(byteData[40:44], byteorder='little')
-        self.data['flow_measured']=int.from_bytes(byteData[44:48], byteorder='little')
-        self.data['volume_in_measured']=int.from_bytes(byteData[48:52], byteorder='little')
-        self.data['volume_out_measured']=int.from_bytes(byteData[52:56], byteorder='little')
-        self.data['volume_rate_measured']=int.from_bytes(byteData[56:60], byteorder='little')
+        self.data['peep_value_measured']=int.from_bytes(byteData[28:32], byteorder='little', signed=True)
+        self.data['peak_pressure_measured']=int.from_bytes(byteData[32:36], byteorder='little', signed=True)
+        self.data['plateau_value_measured']=int.from_bytes(byteData[36:40], byteorder='little', signed=True)
+        self.data['pressure_measured']=int.from_bytes(byteData[40:44], byteorder='little', signed=True)
+        self.data['flow_measured']=int.from_bytes(byteData[44:48], byteorder='little', signed=True)
+        self.data['volume_in_measured']=int.from_bytes(byteData[48:52], byteorder='little', signed=True)
+        self.data['volume_out_measured']=int.from_bytes(byteData[52:56], byteorder='little', signed=True)
+        self.data['volume_rate_measured']=int.from_bytes(byteData[56:60], byteorder='little', signed=True)
         self.data['control_state']=byteData[60]
         self.data['battery_level']=byteData[61]
         self.data['reserved']=int.from_bytes(byteData[62:64], byteorder='little')
@@ -63,17 +64,17 @@ class InPacket():
         params.mode = self.data['mode_value']
         params.resp_rate_meas = self.data['respiratory_rate_measured']
         params.resp_rate_set = self.data['respiratory_rate_set']
-        params.tv_meas = self.data['tidal_volume_measured']
-        params.tv_set = self.data['tidal_volume_set']
+        params.tv_meas = Units.ecu_to_ml(self.data['tidal_volume_measured'])
+        params.tv_set = Units.ecu_to_ml(self.data['tidal_volume_set'])
         params.ie_ratio_meas = self.data['ie_ratio_measured']
         params.ie_ratio_set = self.data['ie_ratio_set']
-        params.peep = self.data['peep_value_measured']
-        params.ppeak = self.data['peak_pressure_measured']
-        params.pplat = self.data['plateau_value_measurement']
-        params.pressure= self.data['pressure_measured']
-        params.flow = self.data['volume_in_measured']
-        params.tv_exp = self.data['volume_out_measured']
-        params.tv_rate = self.data['volume_rate_measured']
+        params.peep = Units.ecu_to_cmh2o(self.data['peep_value_measured'])
+        params.ppeak = Units.ecu_to_cmh2o(self.data['peak_pressure_measured'])
+        params.pplat = Units.ecu_to_cmh2o(self.data['plateau_value_measurement'])
+        params.pressure= Units.ecu_to_cmh2o(self.data['pressure_measured'])
+        params.flow = Units.ecu_to_slm(self.data['flow_measured'])
+        params.tv_exp = Units.ecu_to_ml(self.data['volume_out_measured'])
+        params.tv_rate = Units.ecu_to_ml(self.data['volume_rate_measured'])
         params.battery_level = self.data['battery_level']
 
         return params

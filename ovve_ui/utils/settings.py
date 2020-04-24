@@ -79,4 +79,3 @@ class Settings():
             return "Alarm ON"
         else:
             return "Alarm OFF"
-            return "No Alarms"
