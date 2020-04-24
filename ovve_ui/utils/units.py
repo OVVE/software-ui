@@ -1,4 +1,3 @@
-
 class Units():
     # Unit converts between common units
 
@@ -28,4 +27,3 @@ class Units():
     @staticmethod
     def cmh2o_to_ecu(pres: float) -> int:
         return int(pres * 100)
-        

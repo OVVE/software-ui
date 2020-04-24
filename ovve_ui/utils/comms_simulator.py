@@ -88,6 +88,5 @@ class CommsSimulator(QThread):
                 alarms_dict = orig_alarms_dict
                 self.seqnum += 1
 
-
             self.settings_lock.release()
             self.sleep(1)
