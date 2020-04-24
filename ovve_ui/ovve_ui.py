@@ -28,8 +28,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
-                             initializeGraphWidget, initializeSettingsWidget,
-                             initializeSystemShutdownWidget)
+                             initializeGraphWidget, initializeSettingsWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -78,7 +77,6 @@ class MainWindow(QWidget):
             "5": QWidget(),
             "6": QWidget(),
             "7": QWidget(),
-            "8": QWidget(),
         }
         self.alarms = Alarms()
         self.shownAlarmCode = None
@@ -200,7 +198,6 @@ class MainWindow(QWidget):
         initializeIERatioWidget(self)
         initializeAlarmWidget(self)
         initializeSettingsWidget(self)
-        initializeSystemShutdownWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -546,13 +543,6 @@ class MainWindow(QWidget):
 
         elif event.key() == QtCore.Qt.Key_I:
             self.comms_handler.fireAlarm(6)
-
-
-    def systemShutdown(self):
-        if self.settings.run_state == 0:
-            os.system("sudo shutdown -h")
-        else:
-            self.display(7)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='User interface for OVVE')

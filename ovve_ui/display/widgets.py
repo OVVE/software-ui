@@ -1,5 +1,5 @@
 """
-Widgets used to initialze the the OVVE UI
+Widgets used to initialize the the OVVE UI
 """
 from random import randint
 from typing import TypeVar
@@ -658,14 +658,6 @@ def initializeSettingsWidget(window: MainWindow):
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
-    settings_sys_shutdown_button = window.makeSimpleDisplayButton(
-        "System Shutdown",
-        button_settings=SimpleButtonSettings(
-            valueSetting = window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.cancelColor),
-        size = (200,65) )
-    settings_sys_shutdown_button.clicked.connect(
-        lambda: window.systemShutdown())
 
     settings_back_button = window.makeSimpleDisplayButton(
         "Back",
@@ -676,39 +668,8 @@ def initializeSettingsWidget(window: MainWindow):
     settings_back_button.clicked.connect(lambda: window.display(0))
 
     h_box_7top.addWidget(settings_page_label)
-    h_box_7bottom.addWidget(settings_sys_shutdown_button)
     h_box_7bottom.addWidget(settings_back_button)
     v_box_7.addLayout(h_box_7top)
     v_box_7.addLayout(h_box_7bottom)
 
     window.page["7"].setLayout(v_box_7)
-
-def initializeSystemShutdownWidget(window: MainWindow):
-    v_box_8 = QVBoxLayout()
-    h_box_8top = QHBoxLayout()
-    h_box_8bottom = QHBoxLayout()
-
-    h_box_8top.setAlignment(Qt.AlignCenter)
-    h_box_8bottom.setAlignment(Qt.AlignCenter)
-
-    system_shutdown_page_label = \
-        QLabel("Cannot shut down system while ventilation is running. "
-                             "Please stop ventilation before shutting down.")
-    system_shutdown_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
-    system_shutdown_page_label.setAlignment(Qt.AlignCenter)
-    system_shutdown_page_label.setWordWrap(True)
-    system_shutdown_page_label.setMaximumWidth(400)
-
-    ack_system_shutdown_button = window.makeSimpleDisplayButton(
-        "Acknowledge",
-        button_settings=SimpleButtonSettings(
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor))
-    ack_system_shutdown_button.clicked.connect(
-        lambda: window.display(0))
-
-    h_box_8top.addWidget(system_shutdown_page_label)
-    h_box_8bottom.addWidget(ack_system_shutdown_button)
-    v_box_8.addLayout(h_box_8top)
-    v_box_8.addLayout(h_box_8bottom)
-
-    window.page["8"].setLayout(v_box_8)
