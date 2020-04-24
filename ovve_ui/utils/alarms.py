@@ -30,6 +30,7 @@ class Alarms():
 
     #TODO: Update to display proper name that clinicians would recognize
     def getDisplay(self, index: int) -> str: #Returns properly named string for given alarm number
+        #TODO: Change to dict using same keys as alarm names
         display = ["Power Loss",
             "Low Battery",
             "Loss of Breathing Circuit Integrity",
