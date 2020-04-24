@@ -222,11 +222,11 @@ class MainWindow(QWidget):
 
     def updateMainDisplays(self) -> None:
         self.mode_button_main.updateValue(
-            self.get_mode_display(self.settings.mode))
-        self.resp_rate_button_main.updateValue(self.settings.resp_rate)
-        self.tv_button_main.updateValue(self.settings.tv)
+            self.get_mode_display(self.params.mode))
+        self.resp_rate_button_main.updateValue(self.params.resp_rate_set)
+        self.tv_button_main.updateValue(self.params.tv_set)
         self.ie_button_main.updateValue(
-            self.get_ie_ratio_display(self.settings.ie_ratio))
+            self.get_ie_ratio_display(self.params.ie_ratio_set))
         self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
         self.peep_display_main.updateValue(self.params.peep)
         self.tv_insp_display_main.updateValue(self.params.tv_insp)
