@@ -40,7 +40,11 @@ from utils.ranges import Ranges
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
-    def __init__(self, port: str, is_sim: bool = False, windowed: bool = False, dev_mode: bool = False) -> None:
+    def __init__(self,
+                 port: str,
+                 is_sim: bool = False,
+                 windowed: bool = False,
+                 dev_mode: bool = False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
@@ -253,7 +257,7 @@ class MainWindow(QWidget):
         self.flow_graph_line.setData(self.flow_data)
         self.flow_data_cache = self.flow_data_cache[1:]
         self.flow_graph_cache_line.setData(self.flow_data_cache)
-        self.flow_graph_cache_line.setPos(self.graph_ptr,0)
+        self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
 
         self.pressure_data.append(self.params.pressure)
         self.pressure_graph_line.setData(self.flow_data)
@@ -540,10 +544,13 @@ def main() -> None:
                         action='store_true',
                         help='Run in windowed mode (fullscreen default)')
 
-    parser.add_argument('-d',
-                        "--dev_mode",
-                        action='store_true',
-                        help='Run in developer mode (alarm hotkeys enabled (w,e,r, etc.) , toggle fullscreen (f) enabled)')
+    parser.add_argument(
+        '-d',
+        "--dev_mode",
+        action='store_true',
+        help=
+        'Run in developer mode (alarm hotkeys enabled (w,e,r, etc.) , toggle fullscreen (f) enabled)'
+    )
 
     parser.add_argument('-p',
                         "--port",
