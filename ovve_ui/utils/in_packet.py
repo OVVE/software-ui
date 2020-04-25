@@ -42,7 +42,7 @@ class InPacket():
         self.data['ie_ratio_set']=int.from_bytes(byteData[24:28], byteorder='little')
         self.data['peep_value_measured']=int.from_bytes(byteData[28:32], byteorder='little', signed=True)
         self.data['peak_pressure_measured']=int.from_bytes(byteData[32:36], byteorder='little', signed=True)
-        self.data['plateau_value_measured']=int.from_bytes(byteData[36:40], byteorder='little', signed=True)
+        self.data['plateau_value_measurement']=int.from_bytes(byteData[36:40], byteorder='little', signed=True)
         self.data['pressure_measured']=int.from_bytes(byteData[40:44], byteorder='little', signed=True)
         self.data['flow_measured']=int.from_bytes(byteData[44:48], byteorder='little', signed=True)
         self.data['volume_in_measured']=int.from_bytes(byteData[48:52], byteorder='little', signed=True)
@@ -73,6 +73,7 @@ class InPacket():
         params.pplat = Units.ecu_to_cmh2o(self.data['plateau_value_measurement'])
         params.pressure= Units.ecu_to_cmh2o(self.data['pressure_measured'])
         params.flow = Units.ecu_to_slm(self.data['flow_measured'])
+        params.tv_insp = Units.ecu_to_ml(self.data['volume_in_measured'])
         params.tv_exp = Units.ecu_to_ml(self.data['volume_out_measured'])
         params.tv_rate = Units.ecu_to_ml(self.data['volume_rate_measured'])
         params.battery_level = self.data['battery_level']
