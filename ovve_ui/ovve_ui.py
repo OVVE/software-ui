@@ -244,17 +244,16 @@ class MainWindow(QWidget):
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
-        self.flow_data[:-1] = self.flow_data[1:]
-        self.flow_data[-1] = self.params.flow
+        self.flow_data[self.graph_ptr] = self.params.flow
         self.flow_graph_line.setData(self.flow_data)
-
-        self.pressure_data[:-1] = self.pressure_data[1:]
-        self.pressure_data[-1] = self.params.pressure
+        
+        self.pressure_data[self.graph_ptr] = self.params.pressure
         self.pressure_graph_line.setData(self.pressure_data)
 
-        self.volume_data[:-1] = self.volume_data[1:]
-        self.volume_data[-1] = self.params.tv_meas
+        self.volume_data[self.graph_ptr] = self.params.tv_meas
         self.volume_graph_line.setData(self.volume_data)
+
+        self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
         QtGui.QApplication.processEvents()
 
