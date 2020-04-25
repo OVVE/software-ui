@@ -124,25 +124,31 @@ def initializeHomeScreenWidget(
     return (layout, stack)
 
 
-# TODO: current graph system doesn't associate y values with x values.
 #TODO: Add Units
 def initializeGraphWidget(window: MainWindow) -> None:
     v_box = QVBoxLayout()
     axisStyle = {'color': 'black', 'font-size': '20pt'}
     window.new_graph_pen = pg.mkPen(width=2, color="b")
+    window.cache_graph_pen = pg.mkPen(width=2, color="r")
     # TODO: Adjust graph width for resp rate
     window.graph_width = 400
     window.graph_ptr = 0
 
-    window.flow_data = [0] * window.graph_width
+    window.flow_data = []
+    window.flow_data_cache = []
     window.flow_graph = pg.PlotWidget()
     window.flow_graph.setFixedWidth(window.graph_width)
     
     # TODO: Find good values for the ranges of flow, just use MIN and MAX from sensor for now
     window.flow_graph.setXRange(0, window.graph_width, padding=0)
     window.flow_graph.setYRange(-220, 220, padding=0)
+
+
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
+    window.flow_graph_cache_line = window.flow_graph.plot(window.flow_data_cache,
+                                                    pen=window.cache_graph_pen)
+    window.flow_graph_cache_line.hide()
     
     window.flow_graph.setBackground("w")
     window.flow_graph.setMouseEnabled(False, False)
