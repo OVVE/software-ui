@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import sys
+import time
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
 from random import randint
@@ -39,15 +40,20 @@ from utils.ranges import Ranges
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
-    def __init__(self, port: str, is_sim: bool = False, windowed: bool = False, dev_mode: bool = False) -> None:
+    def __init__(self,
+                 port: str,
+                 is_sim: bool = False,
+                 windowed: bool = False,
+                 dev_mode: bool = False) -> None:
         super().__init__()
         self.settings = Settings()
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
         self.ranges = Ranges()
-
         self.windowed = windowed
         self.dev_mode = dev_mode
+        self.last_main_update_time = 0
+        self.main_update_interval = 1.0
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -221,18 +227,21 @@ class MainWindow(QWidget):
                 self.showAlarm(i)
 
     def updateMainDisplays(self) -> None:
-        self.mode_button_main.updateValue(
-            self.get_mode_display(self.params.mode))
-        self.resp_rate_button_main.updateValue(self.params.resp_rate_set)
-        self.tv_button_main.updateValue(self.params.tv_set)
-        self.ie_button_main.updateValue(
-            self.get_ie_ratio_display(self.params.ie_ratio_set))
-        self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
-        self.peep_display_main.updateValue(self.params.peep)
-        self.tv_insp_display_main.updateValue(self.params.tv_insp)
-        self.tv_exp_display_main.updateValue(self.params.tv_exp)
-        self.ppeak_display_main.updateValue(self.params.ppeak)
-        self.pplat_display_main.updateValue(self.params.pplat)
+        t_now = time.time()
+        if (t_now - self.last_main_update_time) > self.main_update_interval:
+            self.last_main_update_time = t_now
+            self.mode_button_main.updateValue(
+                self.get_mode_display(self.params.mode))
+            self.resp_rate_button_main.updateValue(self.params.resp_rate_set)
+            self.tv_button_main.updateValue(self.params.tv_set)
+            self.ie_button_main.updateValue(
+                self.get_ie_ratio_display(self.params.ie_ratio_set))
+            self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
+            self.peep_display_main.updateValue(self.params.peep)
+            self.tv_insp_display_main.updateValue(self.params.tv_insp)
+            self.tv_exp_display_main.updateValue(self.params.tv_exp)
+            self.ppeak_display_main.updateValue(self.params.ppeak)
+            self.pplat_display_main.updateValue(self.params.pplat)
 
     def updatePageDisplays(self) -> None:
         self.mode_page_value_label.setText(
@@ -244,17 +253,41 @@ class MainWindow(QWidget):
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
-        self.flow_data[:-1] = self.flow_data[1:]
-        self.flow_data[-1] = self.params.flow
+        self.flow_data.append(self.params.flow)
         self.flow_graph_line.setData(self.flow_data)
+        self.flow_data_cache = self.flow_data_cache[1:]
+        self.flow_graph_cache_line.setData(self.flow_data_cache)
+        self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
 
-        self.pressure_data[:-1] = self.pressure_data[1:]
-        self.pressure_data[-1] = self.params.pressure
+        self.pressure_data.append(self.params.pressure)
         self.pressure_graph_line.setData(self.pressure_data)
+        self.pressure_data_cache = self.pressure_data_cache[1:]
+        self.pressure_graph_cache_line.setData(self.pressure_data_cache)
+        self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
 
-        self.volume_data[:-1] = self.volume_data[1:]
-        self.volume_data[-1] = self.params.tv_meas
+        self.volume_data.append(self.params.tv_meas)
         self.volume_graph_line.setData(self.volume_data)
+        self.volume_data_cache = self.volume_data_cache[1:]
+        self.volume_graph_cache_line.setData(self.volume_data_cache)
+        self.volume_graph_cache_line.setPos(self.graph_ptr, 0)
+
+        self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
+
+        if self.graph_ptr == 0:
+            self.flow_data_cache = self.flow_data
+            self.flow_graph_cache_line.setData(self.flow_data_cache)
+            self.flow_graph_cache_line.show()
+            self.flow_data = []
+
+            self.pressure_data_cache = self.pressure_data
+            self.pressure_graph_cache_line.setData(self.pressure_data_cache)
+            self.pressure_graph_cache_line.show()
+            self.pressure_data = []
+
+            self.volume_data_cache = self.volume_data
+            self.volume_graph_cache_line.setData(self.volume_data_cache)
+            self.volume_graph_cache_line.show()
+            self.volume_data = []
 
         QtGui.QApplication.processEvents()
 
@@ -511,10 +544,13 @@ def main() -> None:
                         action='store_true',
                         help='Run in windowed mode (fullscreen default)')
 
-    parser.add_argument('-d',
-                        "--dev_mode",
-                        action='store_true',
-                        help='Run in developer mode (alarm hotkeys enabled (w,e,r, etc.) , toggle fullscreen (f) enabled)')
+    parser.add_argument(
+        '-d',
+        "--dev_mode",
+        action='store_true',
+        help=
+        'Run in developer mode (alarm hotkeys enabled (w,e,r, etc.) , toggle fullscreen (f) enabled)'
+    )
 
     parser.add_argument('-p',
                         "--port",
