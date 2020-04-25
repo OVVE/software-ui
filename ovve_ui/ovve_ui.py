@@ -260,7 +260,7 @@ class MainWindow(QWidget):
         self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
 
         self.pressure_data.append(self.params.pressure)
-        self.pressure_graph_line.setData(self.flow_data)
+        self.pressure_graph_line.setData(self.pressure_data)
         self.pressure_data_cache = self.pressure_data_cache[1:]
         self.pressure_graph_cache_line.setData(self.pressure_data_cache)
         self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
