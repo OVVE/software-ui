@@ -4,8 +4,8 @@ from utils.units import Units
 class InPacket():
     def __init__(self) -> None:
         self.data={'sequence_count': 0,            # bytes  0- 1 - rpi unsigned short int
-                    'packet_version': 0,             # byte 2      - rpi unsigned char
-                    'mode_value': 0,                 # byte 3      - rpi unsigned char
+                    'packet_version': 0,            # byte 2      - rpi unsigned char
+                    'mode_value': 0,                # byte 3      - rpi unsigned char
                     'respiratory_rate_measured': 0, # bytes 4 - 7 - rpi unsigned int
                     'respiratory_rate_set': 0,      # bytes 8 - 11
                     'tidal_volume_measured': 0,     # bytes 12 - 15
@@ -14,14 +14,14 @@ class InPacket():
                     'ie_ratio_set': 0,              # bytes 24 - 27
                     'peep_value_measured': 0,       # bytes 28 - 31
                     'peak_pressure_measured': 0,    # bytes 32 - 35
-                    'plateau_value_measurement': 0, # bytes 36 - 39
+                    'plateau_value_measured': 0,    # bytes 36 - 39
                     'pressure_measured': 0,         # bytes 40 - 43
                     'flow_measured': 0,             # bytes 44 - 47
                     'volume_in_measured': 0,        # bytes 48 - 51
                     'volume_out_measured': 0,       # bytes 52 - 55
                     'volume_rate_measured': 0,      # bytes 56 - 59
-                    'control_state': 0,              # byte 60       - rpi unsigned char
-                    'battery_level': 0,              # byte 61
+                    'control_state': 0,             # byte 60       - rpi unsigned char
+                    'battery_level': 0,             # byte 61
                     'reserved': 0,                  # bytes 62 - 63 - rpi unsigned int
                     'alarm_bits': 0,                # bytes 64 - 67
                     'crc': 0,                       # bytes 68 - 69 
@@ -70,9 +70,10 @@ class InPacket():
         params.ie_ratio_set = self.data['ie_ratio_set']
         params.peep = Units.ecu_to_cmh2o(self.data['peep_value_measured'])
         params.ppeak = Units.ecu_to_cmh2o(self.data['peak_pressure_measured'])
-        params.pplat = Units.ecu_to_cmh2o(self.data['plateau_value_measurement'])
+        params.pplat = Units.ecu_to_cmh2o(self.data['plateau_value_measured'])
         params.pressure= Units.ecu_to_cmh2o(self.data['pressure_measured'])
         params.flow = Units.ecu_to_slm(self.data['flow_measured'])
+        params.tv_insp = Units.ecu_to_ml(self.data['volume_in_measured'])
         params.tv_exp = Units.ecu_to_ml(self.data['volume_out_measured'])
         params.tv_rate = Units.ecu_to_ml(self.data['volume_rate_measured'])
         params.battery_level = self.data['battery_level']

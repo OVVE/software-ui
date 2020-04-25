@@ -80,7 +80,7 @@ in_pkt={'sequence_count': 0,            # bytes  0- 1 - rpi unsigned short int
             'ie_ratio_set': 0,              # bytes 24 - 27
             'peep_value_measured': 0,       # bytes 28 - 31
             'peak_pressure_measured': 0,    # bytes 32 - 35
-            'plateau_value_measurement': 0, # bytes 36 - 39
+            'plateau_value_measured': 0,    # bytes 36 - 39
             'pressure_measured': 0,         # bytes 40 - 43
             'flow_measured': 0,             # bytes 44 - 47
             'volume_in_measured': 0,        # bytes 48 - 51
