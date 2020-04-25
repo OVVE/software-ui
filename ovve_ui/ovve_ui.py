@@ -255,12 +255,17 @@ class MainWindow(QWidget):
         self.flow_graph_cache_line.setData(self.flow_data_cache)
         self.flow_graph_cache_line.setPos(self.graph_ptr,0)
 
-        
-        self.pressure_data[self.graph_ptr] = self.params.pressure
-        self.pressure_graph_line.setData(self.pressure_data)
+        self.pressure_data.append(self.params.pressure)
+        self.pressure_graph_line.setData(self.flow_data)
+        self.pressure_data_cache = self.pressure_data_cache[1:]
+        self.pressure_graph_cache_line.setData(self.pressure_data_cache)
+        self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
 
-        self.volume_data[self.graph_ptr] = self.params.tv_meas
+        self.volume_data.append(self.params.tv_meas)
         self.volume_graph_line.setData(self.volume_data)
+        self.volume_data_cache = self.volume_data_cache[1:]
+        self.volume_graph_cache_line.setData(self.volume_data_cache)
+        self.volume_graph_cache_line.setPos(self.graph_ptr, 0)
 
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
@@ -269,6 +274,16 @@ class MainWindow(QWidget):
             self.flow_graph_cache_line.setData(self.flow_data_cache)
             self.flow_graph_cache_line.show()
             self.flow_data = []
+
+            self.pressure_data_cache = self.pressure_data
+            self.pressure_graph_cache_line.setData(self.pressure_data_cache)
+            self.pressure_graph_cache_line.show()
+            self.pressure_data = []
+
+            self.volume_data_cache = self.volume_data
+            self.volume_graph_cache_line.setData(self.volume_data_cache)
+            self.volume_graph_cache_line.show()
+            self.volume_data = []
 
         QtGui.QApplication.processEvents()
 

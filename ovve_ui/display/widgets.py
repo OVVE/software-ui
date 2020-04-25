@@ -129,7 +129,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     v_box = QVBoxLayout()
     axisStyle = {'color': 'black', 'font-size': '20pt'}
     window.new_graph_pen = pg.mkPen(width=2, color="b")
-    window.cache_graph_pen = pg.mkPen(width=2, color="r")
+    window.cache_graph_pen = pg.mkPen(width=2, color="k")
     # TODO: Adjust graph width for resp rate
     window.graph_width = 400
     window.graph_ptr = 0
@@ -143,7 +143,6 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph.setXRange(0, window.graph_width, padding=0)
     window.flow_graph.setYRange(-220, 220, padding=0)
 
-
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
     window.flow_graph_cache_line = window.flow_graph.plot(window.flow_data_cache,
@@ -156,21 +155,29 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph_left_axis.setLabel("Flow", **axisStyle)
     window.flow_graph.getPlotItem().hideAxis('bottom')
 
-    window.pressure_data = [0] * window.graph_width
+    window.pressure_data = []
+    window.pressure_data_cache = []
     window.pressure_graph = pg.PlotWidget()
     window.pressure_graph.setFixedWidth(window.graph_width)
     # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
     window.pressure_graph.setXRange(0, window.graph_width, padding=0)
     window.pressure_graph.setYRange(-45, 45, padding=0)
+
     window.pressure_graph_line = window.pressure_graph.plot(
         window.pressure_data, pen=window.new_graph_pen)
+    window.pressure_graph_cache_line = window.pressure_graph.plot(window.pressure_data_cache,
+                                                          pen=window.cache_graph_pen)
+    window.pressure_graph_cache_line.hide()
+
+
     window.pressure_graph.setBackground("w")
     window.pressure_graph.setMouseEnabled(False, False)
     window.pressure_graph_left_axis = window.pressure_graph.getAxis("left")
     window.pressure_graph_left_axis.setLabel("Pressure", **axisStyle)
     window.pressure_graph.getPlotItem().hideAxis('bottom')
 
-    window.volume_data = [0] * window.graph_width
+    window.volume_data = []
+    window.volume_data_cache = []
     window.volume_graph_ptr = 0
     window.volume_graph = pg.PlotWidget()
     window.volume_graph.setFixedWidth(window.graph_width)
@@ -179,6 +186,11 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph.setYRange(-200, 2200, padding=0)
     window.volume_graph_line = window.volume_graph.plot(window.volume_data,
                                                         pen=window.new_graph_pen)
+    window.volume_graph_cache_line = window.volume_graph.plot(window.volume_data_cache,
+                                                              pen=window.cache_graph_pen)
+    window.volume_graph_cache_line.hide()
+
+
     window.volume_graph.setBackground("w")
     window.volume_graph.setMouseEnabled(False, False)
     window.volume_graph_left_axis = window.volume_graph.getAxis("left")
