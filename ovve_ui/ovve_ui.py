@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import sys
+import time
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
 from random import randint
@@ -45,9 +46,10 @@ class MainWindow(QWidget):
         self.local_settings = Settings()  # local settings are changed with UI
         self.params = Params()
         self.ranges = Ranges()
-
         self.windowed = windowed
         self.dev_mode = dev_mode
+        self.last_main_update_time = 0
+        self.main_update_interval = 1.0
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -221,18 +223,21 @@ class MainWindow(QWidget):
                 self.showAlarm(i)
 
     def updateMainDisplays(self) -> None:
-        self.mode_button_main.updateValue(
-            self.get_mode_display(self.params.mode))
-        self.resp_rate_button_main.updateValue(self.params.resp_rate_set)
-        self.tv_button_main.updateValue(self.params.tv_set)
-        self.ie_button_main.updateValue(
-            self.get_ie_ratio_display(self.params.ie_ratio_set))
-        self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
-        self.peep_display_main.updateValue(self.params.peep)
-        self.tv_insp_display_main.updateValue(self.params.tv_insp)
-        self.tv_exp_display_main.updateValue(self.params.tv_exp)
-        self.ppeak_display_main.updateValue(self.params.ppeak)
-        self.pplat_display_main.updateValue(self.params.pplat)
+        t_now = time.time()
+        if (t_now - self.last_main_update_time) > self.main_update_interval:
+            self.last_main_update_time = t_now
+            self.mode_button_main.updateValue(
+                self.get_mode_display(self.params.mode))
+            self.resp_rate_button_main.updateValue(self.params.resp_rate_set)
+            self.tv_button_main.updateValue(self.params.tv_set)
+            self.ie_button_main.updateValue(
+                self.get_ie_ratio_display(self.params.ie_ratio_set))
+            self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
+            self.peep_display_main.updateValue(self.params.peep)
+            self.tv_insp_display_main.updateValue(self.params.tv_insp)
+            self.tv_exp_display_main.updateValue(self.params.tv_exp)
+            self.ppeak_display_main.updateValue(self.params.ppeak)
+            self.pplat_display_main.updateValue(self.params.pplat)
 
     def updatePageDisplays(self) -> None:
         self.mode_page_value_label.setText(
