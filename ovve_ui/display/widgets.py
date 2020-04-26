@@ -674,3 +674,48 @@ def initializeSettingsWidget(window: MainWindow) -> None:
     v_box_7.addLayout(h_box_7bottom)
 
     window.page["7"].setLayout(v_box_7)
+
+def initializeConfirmStopWidget(window: MainWindow) -> None:
+    v_box_8 = QVBoxLayout()
+    h_box_8top = QHBoxLayout()
+    h_box_8bottom = QHBoxLayout()
+
+    h_box_8top.setAlignment(Qt.AlignCenter)
+    h_box_8bottom.setAlignment(Qt.AlignCenter)
+
+    confirm_stop_value_label = QLabel("Caution: this will stop ventilation immediately. "
+                     "Proceed?")
+    confirm_stop_value_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    confirm_stop_value_label.setWordWrap(True)
+    confirm_stop_value_label.setAlignment(Qt.AlignCenter)
+    confirm_stop_value_label.setFixedHeight(150)
+    confirm_stop_value_label.setFixedWidth(400)
+
+
+    confirm_stop_cancel_button = window.makeSimpleDisplayButton("CANCEL", button_settings=SimpleButtonSettings(
+        valueSetting=window.ui_settings.page_settings.cancelSetting,
+        valueColor=window.ui_settings.page_settings.cancelColor,
+        fillColor="#FFFFFF",
+        borderColor=window.ui_settings.page_settings.cancelColor
+        ))
+    confirm_stop_cancel_button.clicked.connect(lambda: window.display(0))
+    confirm_stop_cancel_button.setFont(window.ui_settings.simple_button_settings.valueFont)
+
+    confirm_stop_confirm_button = window.makeSimpleDisplayButton("CONFIRM", button_settings=SimpleButtonSettings(
+        valueSetting=window.ui_settings.page_settings.commitSetting,
+        valueColor = window.ui_settings.page_settings.commitColor,
+        fillColor="#FFFFFF",
+        borderColor=window.ui_settings.page_settings.commitColor
+    ))
+    confirm_stop_confirm_button.clicked.connect(window.stopVentilation)
+    confirm_stop_confirm_button.setFont(window.ui_settings.simple_button_settings.valueFont)
+
+    h_box_8bottom.setSpacing(75)
+
+    h_box_8top.addWidget(confirm_stop_value_label)
+    h_box_8bottom.addWidget(confirm_stop_cancel_button)
+    h_box_8bottom.addWidget(confirm_stop_confirm_button)
+    v_box_8.addLayout(h_box_8top)
+    v_box_8.addLayout(h_box_8bottom)
+
+    window.page["8"].setLayout(v_box_8)

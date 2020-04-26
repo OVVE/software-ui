@@ -28,7 +28,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
-                             initializeGraphWidget, initializeSettingsWidget)
+                             initializeGraphWidget, initializeSettingsWidget,
+                             initializeConfirmStopWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -80,6 +81,7 @@ class MainWindow(QWidget):
             "5": QWidget(),
             "6": QWidget(),
             "7": QWidget(),
+            "8": QWidget()
         }
         self.alarms = Alarms()
         self.shownAlarmCode = None
@@ -203,6 +205,7 @@ class MainWindow(QWidget):
         initializeIERatioWidget(self)
         initializeAlarmWidget(self)
         initializeSettingsWidget(self)
+        initializeConfirmStopWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -370,7 +373,7 @@ class MainWindow(QWidget):
             self.passChanges()
 
         elif self.settings.run_state == 1:
-            self.showStartStopConfirm()
+            self.confirmStop()
 
     #TODO: doesn't support multiple alarms at once
     def showAlarm(self, code: int) -> None:
@@ -387,52 +390,15 @@ class MainWindow(QWidget):
         self.shownAlarmCode = None
         self.display(0)
 
-    def showStartStopConfirm(self):
-        d = QDialog()
-        d.setFixedWidth(600)
-        d.setFixedHeight(300)
+    def confirmStop(self):
+        self.display(7)
 
-        d_h_box_1 = QHBoxLayout()
-        d_h_box_2 = QHBoxLayout()
-        d_v_box = QVBoxLayout()
-        d_label = QLabel("Caution: this will stop ventilation immediately. "
-                         "Proceed?")
-        d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
-        d_label.setWordWrap(True)
-        d_label.setAlignment(Qt.AlignCenter)
-
-        d_cancel = QPushButton("Cancel")
-        d_cancel.clicked.connect(lambda: d.reject())
-        d_cancel.setFont(self.ui_settings.simple_button_settings.valueFont)
-        d_cancel.setStyleSheet("QPushButton {background-color: " +
-                               self.ui_settings.page_settings.cancelColor +
-                               ";}")
-
-        d_confirm = QPushButton("Confirm")
-        d_confirm.clicked.connect(lambda: self.stopVentilation(d))
-        d_confirm.setFont(self.ui_settings.simple_button_settings.valueFont)
-        d_confirm.setStyleSheet("QPushButton {background-color: " +
-                                self.ui_settings.page_settings.commitColor +
-                                ";}")
-
-        d_h_box_1.addWidget(d_label)
-        d_h_box_2.addWidget(d_cancel)
-        d_h_box_2.addWidget(d_confirm)
-        d_h_box_2.setSpacing(100)
-        d_v_box.addLayout(d_h_box_1)
-        d_v_box.addLayout(d_h_box_2)
-
-        d.setLayout(d_v_box)
-        d.setWindowTitle("Confirm Stop")
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
-
-    def stopVentilation(self, d: QDialog):
-        d.reject()
+    def stopVentilation(self):
         self.settings.run_state = 0
         self.start_stop_button_main.updateValue("START")
         self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
+        self.display(0)
 
     def commitMode(self):
         self.settings.mode = self.local_settings.mode
