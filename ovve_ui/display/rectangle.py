@@ -14,7 +14,7 @@ from display.ui_settings import DisplayRectSettings
 class DisplayRect(QWidget):
     def __init__(self,
                  label: str,
-                 value: Union[int, float],
+                 value: Union[int, float, str],
                  unit: str,
                  rect_settings: DisplayRectSettings,
                  parent: Optional[Any] = None,

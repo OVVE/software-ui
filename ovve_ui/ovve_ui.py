@@ -182,7 +182,7 @@ class MainWindow(QWidget):
     def makeDisplayRect(
             self,
             label: str,
-            value: Union[int, float],
+            value: Union[int, float, str],
             unit: str,
             size: Optional[Tuple[int, int]] = None,
             rect_settings: DisplayRectSettings = None) -> DisplayRect:
@@ -239,7 +239,7 @@ class MainWindow(QWidget):
             self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
             self.peep_display_main.updateValue(self.params.peep)
             self.tv_insp_display_main.updateValue(self.params.tv_insp)
-            self.tv_exp_display_main.updateValue(self.params.tv_exp)
+            # self.tv_exp_display_main.updateValue(self.params.tv_exp)
             self.ppeak_display_main.updateValue(self.params.ppeak)
             self.pplat_display_main.updateValue(self.params.pplat)
 

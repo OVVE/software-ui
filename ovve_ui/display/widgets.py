@@ -71,10 +71,20 @@ def initializeHomeScreenWidget(
         window.params.tv_insp,
         "mL",
     )
+    # window.tv_exp_display_main = window.makeDisplayRect(
+    #     "TV Exp",
+    #     window.params.tv_exp,
+    #     "mL",
+    # )
+
     window.tv_exp_display_main = window.makeDisplayRect(
         "TV Exp",
-        window.params.tv_exp,
+        "---",
         "mL",
+        rect_settings=DisplayRectSettings(fillColor="#C5C5C5",
+                                          labelColor = "#A9A9A9",
+                                          unitColor = "#A9A9A9"
+                                          ),
     )
 
     window.peep_display_main = window.makeDisplayRect(
