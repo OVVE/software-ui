@@ -211,8 +211,8 @@ class MainWindow(QWidget):
         self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
+        self.params = params
         if self.params.run_state > 0:
-            self.params = params
             self.logger.info(self.params.to_JSON())
             self.updateMainDisplays()
             self.updateGraphs()
