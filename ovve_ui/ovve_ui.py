@@ -211,20 +211,22 @@ class MainWindow(QWidget):
         self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
-        self.params = params
-        self.logger.info(self.params.to_JSON())
-        self.updateMainDisplays()
-        self.updateGraphs()
+        if self.params.run_state > 0:
+            self.params = params
+            self.logger.info(self.params.to_JSON())
+            self.updateMainDisplays()
+            self.updateGraphs()
 
     def update_ui_alarms(self, alarms_dict: dict) -> None:
-        self.alarms = Alarms()
-        self.alarms.from_dict(alarms_dict)
-        self.logger.info(self.alarms.to_JSON())
+        if self.params.run_state:
+            self.alarms = Alarms()
+            self.alarms.from_dict(alarms_dict)
+            self.logger.info(self.alarms.to_JSON())
 
-        for i in range(len(alarms_dict)):
-            if list(alarms_dict.items()
-                    )[i][1]:  #TODO: Revisit this for multi alarm handling
-                self.showAlarm(i)
+            for i in range(len(alarms_dict)):
+                if list(alarms_dict.items()
+                        )[i][1]:  #TODO: Revisit this for multi alarm handling
+                    self.showAlarm(i)
 
     def updateMainDisplays(self) -> None:
         t_now = time.time()
