@@ -218,7 +218,7 @@ class MainWindow(QWidget):
             self.updateGraphs()
 
     def update_ui_alarms(self, alarms_dict: dict) -> None:
-        if self.params.run_state:
+        if self.params.run_state > 0:
             self.alarms = Alarms()
             self.alarms.from_dict(alarms_dict)
             self.logger.info(self.alarms.to_JSON())
