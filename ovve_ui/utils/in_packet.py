@@ -24,16 +24,17 @@ class InPacket():
                     'battery_level': 0,             # byte 61
                     'reserved': 0,                  # bytes 62 - 63 - rpi unsigned int
                     'alarm_bits': 0,                # bytes 64 - 67
-                    'crc': 0,                       # bytes 68 - 69 
+                    'crc': 0,                       # bytes 68 - 69
                     'run_state': 0                  # Calculated from mode value
-                    }                     
+                    }
 
 
     # byteData must have already been checked for proper length and crc
     def from_bytes(self, byteData: bytes) -> None:
         self.data['sequence_count']=int.from_bytes(byteData[0:2], byteorder='little')
         self.data['packet_version']=byteData[2]
-        self.data['mode_value']=byteData[3]
+        self.data['run_state'] = byteData[3] & (1 << 7)
+        self.data['mode_value']= byteData[3] & 0x7F
         self.data['respiratory_rate_measured']=int.from_bytes(byteData[4:8], byteorder='little')
         self.data['respiratory_rate_set']=int.from_bytes(byteData[8:12], byteorder='little')
         self.data['tidal_volume_measured']=int.from_bytes(byteData[12:16], byteorder='little', signed=True)
@@ -53,7 +54,6 @@ class InPacket():
         self.data['reserved']=int.from_bytes(byteData[62:64], byteorder='little')
         self.data['alarm_bits']=int.from_bytes(byteData[64:68], byteorder='little')
         self.data['crc']=int.from_bytes(byteData[68:], byteorder='little')
-        self.data['run_state'] = self.calculate_runstate(self.data['mode_value'])
 
 
     def to_params(self) -> Params:
@@ -77,17 +77,5 @@ class InPacket():
         params.tv_exp = Units.ecu_to_ml(self.data['volume_out_measured'])
         params.tv_rate = Units.ecu_to_ml(self.data['volume_rate_measured'])
         params.battery_level = self.data['battery_level']
-
         return params
 
-
-    def calculate_runstate(self, mode_value):
-        # VC_CMV_NON_ASSISTED_OFF = 0
-        # VC_CMV_NON_ASSISTED_ON = 128
-        # VC_CMV_ASSISTED_OFF = 2
-        # VC_CMV_ASSISTED_OFF = 129
-        # SIMV_OFF = 3
-        # SIMV_ON = 130
-        # get MSB but 7
-
-        return mode_value & ( 1 << 7)
