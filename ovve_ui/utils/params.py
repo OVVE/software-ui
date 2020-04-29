@@ -31,8 +31,14 @@ class Params():
             "control_state": 0,
             "run_state": 0,
             "battery_level": 0,
+           'high_pressure_limit': 0,
+            'low_pressure_limit': 0,
+            'high_volume_limit': 0,
+            'low_volume_limit': 0,
+            'high_resp_rate_limit': 0,
+            'low_resp_rate_limit': 0,
         }
-        #TODO: handle alarms
+        #TODO: Do we need property and setter methods for alarm limits?
 
     @property
     def seq_num(self) -> int:
