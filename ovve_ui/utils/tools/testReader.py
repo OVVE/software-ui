@@ -15,6 +15,7 @@ SER_WRITE_TIMEOUT = 0.03
 #Global Variables
 ser = 0
 dicA = {'ver': '', 'seq': '' }
+IN_PKT_SZ = 70
 
 #Function to Initialize the Serial Port
 def init_serial():
@@ -107,6 +108,7 @@ def process_in_serial():
     global ser
     global in_pkt
     global cmd_pkt        
+    global IN_PKT_SZ
     #ser.reset_input_buffer()
     error_count = 0
     prevByte = 0
@@ -116,11 +118,11 @@ def process_in_serial():
     prevSeq = -1
     while True:
         print('begin:')
-        byteData = read_all(ser, 70)
-        if len(bytearray(byteData)) != 70:
+        byteData = read_all(ser, IN_PKT_SZ)
+        if len(bytearray(byteData)) != IN_PKT_SZ:
             #byteData = b''
             print('reread')
-            byteData = read_all(ser, 70)
+            byteData = read_all(ser, IN_PKT_SZ)
         # else:
         #     ValidPkt += ValidPkt
             
