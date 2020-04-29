@@ -28,8 +28,10 @@ def initializeHomeScreenWidget(
     v_box_11mid = QVBoxLayout()
     v_box_11right = QVBoxLayout()
 
-    window.mode_button_main = window.makeSimpleDisplayButton(
-        window.get_mode_display(window.settings.mode), )
+    window.mode_button_main = window.makeFancyDisplayButton(
+        "MODE",
+        window.get_mode_display(window.settings.mode),
+        "")
     window.mode_button_main.clicked.connect(lambda: window.display(1))
 
     window.resp_rate_button_main = window.makeFancyDisplayButton(
