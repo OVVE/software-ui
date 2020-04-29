@@ -127,8 +127,9 @@ class PicButton(QAbstractButton):
         self.pixmap = QPixmap(file)
         self.size = size
 
-    def paintEvent(self):
+    def paintEvent(self, event) -> None:
         painter = QPainter(self)
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)
         if self.size is not None:
             painter.drawPixmap(QRect(0,0,*self.size), self.pixmap)
         else:
@@ -136,7 +137,7 @@ class PicButton(QAbstractButton):
 
     def sizeHint(self):
         if self.size is not None:
-            return self.size
+            return QSize(*self.size)
         else:
             return self.pixmap.size()
 

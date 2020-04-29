@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
                              QWidget, QMessageBox, QDialog)
 
-from display.button import FancyDisplayButton, SimpleDisplayButton
+from display.button import FancyDisplayButton, SimpleDisplayButton, PicButton
 from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
                                  SimpleButtonSettings, TextSetting, UISettings)
@@ -180,6 +180,9 @@ class MainWindow(QWidget):
             size=size,
             button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
+
+    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None):
+        return PicButton(filename, size = size)
 
     def makeDisplayRect(
             self,

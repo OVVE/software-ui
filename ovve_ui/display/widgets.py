@@ -57,7 +57,7 @@ def initializeHomeScreenWidget(
     window.start_stop_button_main = window.makeSimpleDisplayButton("START")
     window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
-    window.settings_button_main = window.makeSimpleDisplayButton("SETTINGS")
+    window.settings_button_main = window.makePicButton("display/images/gear.png", size = (60,60))
     window.settings_button_main.clicked.connect(lambda: window.display(6))
 
     window.resp_rate_display_main = window.makeDisplayRect(
