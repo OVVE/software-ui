@@ -101,7 +101,7 @@ class MainWindow(QWidget):
             os.makedirs(self.logpath)
 
         self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(logging.ERROR)
 
         self.logfileroot = os.path.join(self.logpath, self.patient_id + ".log")
 
@@ -114,11 +114,11 @@ class MainWindow(QWidget):
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
-        fh.setLevel(25)
+        fh.setLevel(logging.ERROR)
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
+        ch.setLevel(logging.ERROR)
 
         # TODO: Create a custom handler for Ignition
 
