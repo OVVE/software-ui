@@ -451,11 +451,14 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitNewPatientID(self) -> None:
+        print(f"Old patient ID {self.patient_id}")
         self.patient_id = self.new_patient_id
+        print(f"New patient ID {self.patient_id}")
         self.new_patient_id = None
         self.patient_id_display = self.new_patient_id_display
         self.new_patient_id_display = None
         self.settings_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+
         self.generate_new_patient_id_page_button.show()
         self.display(6)
 
