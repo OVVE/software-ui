@@ -5,6 +5,7 @@ import logging
 import os
 import sys
 import time
+import uuid
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
 from random import randint
@@ -29,7 +30,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
                              initializeGraphWidget, initializeSettingsWidget,
-                             initializeConfirmStopWidget)
+                             initializeConfirmStopWidget, initializeChangePatientWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -58,16 +59,9 @@ class MainWindow(QWidget):
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
-
-        # Example 1 (changes color of Fancy numbers to red)
-        # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
-        # Example 2 (changes color of Simple numbers to red)
-        # self.ui_settings.set_simple_button_settings(SimpleButtonSettings(valueColor=Qt.red))
-
-        # Example 3 (sets display rect label font to Comic Sans MS)
-        # self.ui_settings.set_display_rect_settings(DisplayRectSettings(labelSetting = TextSetting("Comic Sans MS", 20, True)))
-
         self.ptr = 0
+
+        self.dateTime = QDateTime.currentDateTime()
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         (layout, stack) = initializeHomeScreenWidget(self)
@@ -81,10 +75,17 @@ class MainWindow(QWidget):
             "5": QWidget(),
             "6": QWidget(),
             "7": QWidget(),
-            "8": QWidget()
+            "8": QWidget(),
+            "9": QWidget(),
         }
         self.alarms = Alarms()
         self.shownAlarmCode = None
+
+
+        # TODO: Set patient_id from the UI
+        self.patient_id = uuid.uuid4()
+        self.patient_id_display = 1
+        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
 
         self.initalizeAndAddStackWidgets()
 
@@ -94,9 +95,6 @@ class MainWindow(QWidget):
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
 
-        # TODO: Set patient_id from the UI
-        self.patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
-        self.logpath = os.path.join("/tmp", "ovve_logs", self.patient_id)
 
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
@@ -105,7 +103,7 @@ class MainWindow(QWidget):
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
 
-        self.logfileroot = os.path.join(self.logpath, self.patient_id + ".log")
+        self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
 
         # The TimedRotatingFileHandler will write a new file each hour
         # After two weeks, the oldest logs will start being deleted
@@ -209,6 +207,7 @@ class MainWindow(QWidget):
         initializeAlarmWidget(self)
         initializeSettingsWidget(self)
         initializeConfirmStopWidget(self)
+        initializeChangePatientWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -378,6 +377,14 @@ class MainWindow(QWidget):
         elif self.settings.run_state == 1:
             self.confirmStop()
 
+    def generateNewPatientID(self) -> None:
+        self.new_patient_id = uuid.uuid4()
+        self.new_patient_id_display = self.patient_id_display+1
+        self.patient_page_label.setText( f"Current Patient: Patient {self.new_patient_id_display}")
+        self.patient_page_label.update()
+        self.generate_new_patient_id_page_button.hide()
+
+
     #TODO: doesn't support multiple alarms at once
     def showAlarm(self, code: int) -> None:
         self.shownAlarmCode = code
@@ -436,12 +443,28 @@ class MainWindow(QWidget):
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
 
-    def commitAlarm(self):
+    def commitAlarm(self) -> None:
         self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.display(0)
         self.passChanges()
         self.updatePageDisplays()
+
+    def commitNewPatientID(self) -> None:
+        self.patient_id = self.new_patient_id
+        self.new_patient_id = None
+        self.patient_id_display = self.new_patient_id_display
+        self.new_patient_id_display = None
+        self.settings_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+        self.generate_new_patient_id_page_button.show()
+        self.display(6)
+
+    def cancelNewPatientID(self):
+        self.new_patient_id = None
+        self.new_patient_id_display = None
+        self.patient_page_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+        self.generate_new_patient_id_page_button.show()
+        self.display(6)
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
