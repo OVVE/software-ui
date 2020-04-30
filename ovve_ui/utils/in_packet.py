@@ -2,32 +2,40 @@ from utils.params import Params
 from utils.units import Units
 
 class InPacket():
-    def __init__(self) -> None:
-        self.data={'sequence_count': 0,            # bytes  0- 1 - rpi unsigned short int
-                    'packet_version': 0,            # byte 2      - rpi unsigned char
-                    'mode_value': 0,                # byte 3      - rpi unsigned char
-                    'respiratory_rate_measured': 0, # bytes 4 - 7 - rpi unsigned int
-                    'respiratory_rate_set': 0,      # bytes 8 - 11
-                    'tidal_volume_measured': 0,     # bytes 12 - 15
-                    'tidal_volume_set': 0,          # bytes 16 - 19
-                    'ie_ratio_measured': 0,         # bytes 20 - 23
-                    'ie_ratio_set': 0,              # bytes 24 - 27
-                    'peep_value_measured': 0,       # bytes 28 - 31
-                    'peak_pressure_measured': 0,    # bytes 32 - 35
-                    'plateau_value_measured': 0,    # bytes 36 - 39
-                    'pressure_measured': 0,         # bytes 40 - 43
-                    'flow_measured': 0,             # bytes 44 - 47
-                    'volume_in_measured': 0,        # bytes 48 - 51
-                    'volume_out_measured': 0,       # bytes 52 - 55
-                    'volume_rate_measured': 0,      # bytes 56 - 59
-                    'control_state': 0,             # byte 60       - rpi unsigned char
-                    'battery_level': 0,             # byte 61
-                    'reserved': 0,                  # bytes 62 - 63 - rpi unsigned int
-                    'alarm_bits': 0,                # bytes 64 - 67
-                    'crc': 0,                       # bytes 68 - 69
-                    'run_state': 0                  # Calculated from mode value
-                    }
 
+    def __init__(self) -> None:
+        self.data={'sequence_count': 0,
+                   'packet_version': 0,
+                   'packet_type': 0,
+                   'mode_value': 0,
+                   'control_state': 0,
+                   'battery_status': 0,
+                   'reserved': 0,
+                   'respiratory_rate_set': 0,
+                   'respiratory_rate_measured': 0,
+                   'tidal_volume_set': 0,
+                   'tidal_volume_measured': 0,
+                   'ie_ratio_set': 0,
+                   'ie_ratio_measured': 0,
+                   'peep_value_measured': 0,
+                   'peak_pressure_measured': 0,
+                   'plateau_value_measurement': 0,
+                   'pressure_set': 0,
+                   'pressure_measured': 0,
+                   'flow_measured': 0,
+                   'volume_in_measured': 0,
+                   'volume_out_measured': 0,
+                   'volume_rate_measured': 0,
+                   'high_pressure_limit_set': 0,
+                   'low_pressure_limit_set': 0,
+                   'high_volume_limit_set': 0,
+                   'low_volume_limit_set': 0,
+                   'high_respiratory_rate_limit_set': 0,
+                   'low_respiratory_rate_limit_set': 0,
+                   'alarm_bits': 0,
+                   'crc': 0,
+                   'run_state': 0
+                   }
 
     # byteData must have already been checked for proper length and crc
     def from_bytes(self, byteData: bytes) -> None:
