@@ -44,6 +44,7 @@ class DisplayRect(QWidget):
         self.value_label.setMargin(-10)
         self.value_label.setStyleSheet("QLabel {color: " +
                                        self.rect_settings.valueColor + ";}")
+        self.value_label.setFixedWidth(self.size[0])
         self.layout.addWidget(self.value_label)
 
         self.unit_label.setFont(self.rect_settings.unitFont)

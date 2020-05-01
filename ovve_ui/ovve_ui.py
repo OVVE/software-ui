@@ -236,12 +236,12 @@ class MainWindow(QWidget):
             self.tv_button_main.updateValue(self.params.tv_set)
             self.ie_button_main.updateValue(
                 self.get_ie_ratio_display(self.params.ie_ratio_set))
-            self.resp_rate_display_main.updateValue(self.params.resp_rate_meas)
-            self.peep_display_main.updateValue(self.params.peep)
-            self.tv_insp_display_main.updateValue(self.params.tv_insp)
+            self.resp_rate_display_main.updateValue(round(self.params.resp_rate_meas, 2))
+            self.peep_display_main.updateValue(round(self.params.peep, 2))
+            self.tv_insp_display_main.updateValue(round(self.params.tv_insp, 2))
             # self.tv_exp_display_main.updateValue(self.params.tv_exp)
-            self.ppeak_display_main.updateValue(self.params.ppeak)
-            self.pplat_display_main.updateValue(self.params.pplat)
+            self.ppeak_display_main.updateValue(round(self.params.ppeak, 2))
+            self.pplat_display_main.updateValue(round(self.params.pplat, 2))
 
     def updatePageDisplays(self) -> None:
         self.mode_page_value_label.setText(

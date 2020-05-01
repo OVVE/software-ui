@@ -60,6 +60,7 @@ def initializeHomeScreenWidget(
     window.settings_button_main = window.makeSimpleDisplayButton("SETTINGS")
     window.settings_button_main.clicked.connect(lambda: window.display(6))
 
+
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
         window.params.resp_rate_meas,
