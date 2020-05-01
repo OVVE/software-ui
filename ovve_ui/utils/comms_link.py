@@ -48,9 +48,9 @@ class CommsLink(QThread):
         byteData = b''
         rereadCount = 0
         while len(bytearray(
-                byteData)) != 70 and rereadCount < self.SER_MAX_REREADS:
-            byteData = self.read_all(self.ser, 70)
-            if len(bytearray(byteData)) < 70:
+                byteData)) != 56 and rereadCount < self.SER_MAX_REREADS:
+            byteData = self.read_all(self.ser, 56)
+            if len(bytearray(byteData)) < 56:
                 self.logger.debug("reread " + str(rereadCount))
             rereadCount += 1
 
@@ -180,7 +180,7 @@ class CommsLink(QThread):
     def sendPkts(self, cmd_byteData: bytes) -> None:
         # Write to serial port
         # TO DO put in separate function
-        if (len(bytearray(cmd_byteData))) == 22:
+        if (len(bytearray(cmd_byteData))) == 34:
             #self.ser.write_timeout = (0.30)
             try:
                 i = 0
