@@ -50,6 +50,7 @@ class FancyDisplayButton(QAbstractButton):
                                        self.button_settings.valueColor + ";}")
         self.value_label.setMargin(-10)
         self.layout.addWidget(self.value_label)
+        self.value_label.setFixedWidth(self.size[0])
 
         self.unit_label.setFont(self.button_settings.unitFont)
         self.unit_label.setAlignment(Qt.AlignCenter)

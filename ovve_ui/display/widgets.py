@@ -64,6 +64,7 @@ def initializeHomeScreenWidget(
         "display/images/gear.png", size=(60, 60))
     window.settings_button_main.clicked.connect(lambda: window.display(6))
 
+
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
         window.params.resp_rate_meas,
