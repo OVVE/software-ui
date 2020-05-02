@@ -269,6 +269,8 @@ class MainWindow(QWidget):
         end = timer()
         print ("flow_data time " + str(end - start))
 
+        QtGui.QApplication.processEvents()
+
         start = timer()
         self.pressure_data.append(self.params.pressure)
         self.pressure_graph_line.setData(self.pressure_data)
@@ -277,6 +279,8 @@ class MainWindow(QWidget):
         self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
         end = timer()
         print("pressure_data time " + str(end - start))
+
+        QtGui.QApplication.processEvents()
 
         start = timer()
         self.volume_data.append(self.params.tv_meas)
@@ -287,6 +291,8 @@ class MainWindow(QWidget):
         end = timer()
         print("volume_data time " + str(end - start))
         
+        QtGui.QApplication.processEvents()
+
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
         if self.graph_ptr == 0:
@@ -300,19 +306,24 @@ class MainWindow(QWidget):
             self.flow_graph_cache_line.show()
             self.flow_graph_line.setData(self.flow_data[0:0])
 
+            QtGui.QApplication.processEvents()
+
             self.pressure_data_cache = self.pressure_data
             self.pressure_graph_cache_line.setData(self.pressure_data_cache)
             self.pressure_graph_cache_line.show()
             self.pressure_data = []
+
+            QtGui.QApplication.processEvents()
 
             self.volume_data_cache = self.volume_data
             self.volume_graph_cache_line.setData(self.volume_data_cache)
             self.volume_graph_cache_line.show()
             self.volume_data = []
 
+            QtGui.QApplication.processEvents()
+
         totalend = timer()
         print("Total time " + str(totalend - totalstart))
-        QtGui.QApplication.processEvents()
 
     def incrementMode(self) -> None:
         self.local_settings.mode += 1
