@@ -39,34 +39,6 @@ from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 
 
-class Worker(QRunnable):
-    '''
-    Worker thread
-
-    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
-
-    :param callback: The function callback to run on this worker thread. Supplied args and 
-                     kwargs will be passed through to the runner.
-    :type callback: function
-    :param args: Arguments to pass to the callback function
-    :param kwargs: Keywords to pass to the callback function
-
-    '''
-
-    def __init__(self, fn, *args, **kwargs):
-        super(Worker, self).__init__()
-        # Store constructor arguments (re-used for processing)
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-
-    @pyqtSlot()
-    def run(self):
-        '''
-        Initialise the runner function with passed args, kwargs.
-        '''
-        self.fn(*self.args, **self.kwargs)
-
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
 
@@ -162,9 +134,6 @@ class MainWindow(QWidget):
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
 
-        # Create a thread pool to handle updating graph data
-        self.threadpool = QThreadPool()
-
         if not is_sim:
             self.comms_handler = CommsLink(port)
         else:
@@ -248,10 +217,7 @@ class MainWindow(QWidget):
         if self.params.run_state > 0:
             self.logger.info(self.params.to_JSON())
             self.updateMainDisplays()
-            # Pass the function to execute
-            worker = Worker(self.updateGraphs)
-            self.threadpool.start(worker)
-            #self.updateGraphs()
+            self.updateGraphs()
 
     def update_ui_alarms(self, alarms_dict: dict) -> None:
         self.alarms = Alarms()
@@ -294,24 +260,39 @@ class MainWindow(QWidget):
         # self.flow_data_cache = self.flow_data_cache[1:]
         # self.flow_graph_cache_line.setData(self.flow_data_cache)
         # self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
-
+        totalstart = timer()
+        start = timer()
         self.flow_data[self.graph_ptr] = self.params.flow
         self.flow_graph_line.setData(self.flow_data[:self.graph_ptr+1])
         self.flow_graph_cache_line.setData(self.flow_data[self.graph_ptr+2:])
         self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
+        end = timer()
+        print ("flow_data time " + str(end - start))
 
+        QtGui.QApplication.processEvents()
+
+        start = timer()
         self.pressure_data.append(self.params.pressure)
         self.pressure_graph_line.setData(self.pressure_data)
         self.pressure_data_cache = self.pressure_data_cache[1:]
         self.pressure_graph_cache_line.setData(self.pressure_data_cache)
         self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
+        end = timer()
+        print("pressure_data time " + str(end - start))
 
+        QtGui.QApplication.processEvents()
+
+        start = timer()
         self.volume_data.append(self.params.tv_meas)
         self.volume_graph_line.setData(self.volume_data)
         self.volume_data_cache = self.volume_data_cache[1:]
         self.volume_graph_cache_line.setData(self.volume_data_cache)
         self.volume_graph_cache_line.setPos(self.graph_ptr, 0)
+        end = timer()
+        print("volume_data time " + str(end - start))
         
+        QtGui.QApplication.processEvents()
+
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
         if self.graph_ptr == 0:
@@ -325,15 +306,24 @@ class MainWindow(QWidget):
             self.flow_graph_cache_line.show()
             self.flow_graph_line.setData(self.flow_data[0:0])
 
+            QtGui.QApplication.processEvents()
+
             self.pressure_data_cache = self.pressure_data
             self.pressure_graph_cache_line.setData(self.pressure_data_cache)
             self.pressure_graph_cache_line.show()
             self.pressure_data = []
 
+            QtGui.QApplication.processEvents()
+
             self.volume_data_cache = self.volume_data
             self.volume_graph_cache_line.setData(self.volume_data_cache)
             self.volume_graph_cache_line.show()
             self.volume_data = []
+
+            QtGui.QApplication.processEvents()
+
+        totalend = timer()
+        print("Total time " + str(totalend - totalstart))
 
     def incrementMode(self) -> None:
         self.local_settings.mode += 1
