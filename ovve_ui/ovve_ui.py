@@ -253,10 +253,15 @@ class MainWindow(QWidget):
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
-        self.flow_data.append(self.params.flow)
-        self.flow_graph_line.setData(self.flow_data)
-        self.flow_data_cache = self.flow_data_cache[1:]
-        self.flow_graph_cache_line.setData(self.flow_data_cache)
+        # self.flow_data.append(self.params.flow)
+        # self.flow_graph_line.setData(self.flow_data)
+        # self.flow_data_cache = self.flow_data_cache[1:]
+        # self.flow_graph_cache_line.setData(self.flow_data_cache)
+        # self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
+
+        self.flow_data[self.graph_ptr] = self.params.flow
+        self.flow_graph_line.setData(self.flow_data[:self.graph_ptr+1])
+        self.flow_graph_cache_line.setData(self.flow_data[self.graph_ptr+2:])
         self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
 
         self.pressure_data.append(self.params.pressure)
@@ -274,10 +279,15 @@ class MainWindow(QWidget):
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
         if self.graph_ptr == 0:
-            self.flow_data_cache = self.flow_data
-            self.flow_graph_cache_line.setData(self.flow_data_cache)
+            # self.flow_data_cache = self.flow_data
+            # self.flow_graph_cache_line.setData(self.flow_data_cache)
+            # self.flow_graph_cache_line.show()
+            # self.flow_data = []
+
+            self.flow_graph_cache_line.setData(self.flow_data)
+            self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
             self.flow_graph_cache_line.show()
-            self.flow_data = []
+            self.flow_graph_line.setData(self.flow_data[0:0])
 
             self.pressure_data_cache = self.pressure_data
             self.pressure_graph_cache_line.setData(self.pressure_data_cache)

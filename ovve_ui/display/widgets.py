@@ -145,8 +145,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.graph_width = 400
     window.graph_ptr = 0
 
-    window.flow_data = []
-    window.flow_data_cache = []
+    window.flow_data = np.empty([window.graph_width,])
     window.flow_graph = pg.PlotWidget()
     window.flow_graph.setFixedWidth(window.graph_width)
 
@@ -157,7 +156,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
     window.flow_graph_cache_line = window.flow_graph.plot(
-        window.flow_data_cache, pen=window.cache_graph_pen)
+        window.flow_data, pen=window.cache_graph_pen)
     window.flow_graph_cache_line.hide()
 
     window.flow_graph.setBackground("w")
