@@ -5,6 +5,8 @@ import logging
 import os
 import sys
 import time
+from timeit import default_timer as timer
+
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
 from random import randint
@@ -114,11 +116,11 @@ class MainWindow(QWidget):
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
-        fh.setLevel(25)
+        fh.setLevel(logging.ERROR)
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
+        ch.setLevel(logging.ERROR)
 
         # TODO: Create a custom handler for Ignition
 
@@ -258,24 +260,33 @@ class MainWindow(QWidget):
         # self.flow_data_cache = self.flow_data_cache[1:]
         # self.flow_graph_cache_line.setData(self.flow_data_cache)
         # self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
-
+        totalstart = timer()
+        start = timer()
         self.flow_data[self.graph_ptr] = self.params.flow
         self.flow_graph_line.setData(self.flow_data[:self.graph_ptr+1])
         self.flow_graph_cache_line.setData(self.flow_data[self.graph_ptr+2:])
         self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
+        end = timer()
+        print ("flow_data time " + str(end - start))
 
+        start = timer()
         self.pressure_data.append(self.params.pressure)
         self.pressure_graph_line.setData(self.pressure_data)
         self.pressure_data_cache = self.pressure_data_cache[1:]
         self.pressure_graph_cache_line.setData(self.pressure_data_cache)
         self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
+        end = timer()
+        print("pressure_data time " + str(end - start))
 
+        start = timer()
         self.volume_data.append(self.params.tv_meas)
         self.volume_graph_line.setData(self.volume_data)
         self.volume_data_cache = self.volume_data_cache[1:]
         self.volume_graph_cache_line.setData(self.volume_data_cache)
         self.volume_graph_cache_line.setPos(self.graph_ptr, 0)
-
+        end = timer()
+        print("volume_data time " + str(end - start))
+        
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
         if self.graph_ptr == 0:
@@ -299,6 +310,8 @@ class MainWindow(QWidget):
             self.volume_graph_cache_line.show()
             self.volume_data = []
 
+        totalend = timer()
+        print("Total time " + str(end - start))
         QtGui.QApplication.processEvents()
 
     def incrementMode(self) -> None:
