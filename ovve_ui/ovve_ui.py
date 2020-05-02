@@ -311,7 +311,7 @@ class MainWindow(QWidget):
             self.volume_data = []
 
         totalend = timer()
-        print("Total time " + str(end - start))
+        print("Total time " + str(totalend - totalstart))
         QtGui.QApplication.processEvents()
 
     def incrementMode(self) -> None:
