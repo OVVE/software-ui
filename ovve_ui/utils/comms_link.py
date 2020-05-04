@@ -90,7 +90,7 @@ class CommsLink(QThread):
         # Get the fractional value from the enumeration and convert to fixed point.
         # If the lookup somehow fails, set I:E to a safe fallback value. 
         ie_fraction = self.settings.ie_ratio_switcher.get(self.settings.ie_ratio_enum, self.FALLBACK_IE)
-        ie_ratio_fixed = self.cmd_pkt.ie_fraction_to_fixed(self.settings.ie_fraction)
+        ie_ratio_fixed = self.cmd_pkt.ie_fraction_to_fixed(ie_fraction)
         self.cmd_pkt.data['ie_ratio_set'] = ie_ratio_fixed
         
         self.settings_lock.release()
