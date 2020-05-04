@@ -5,6 +5,8 @@ import logging
 import os
 import sys
 import time
+from timeit import default_timer as timer
+
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
 from random import randint
@@ -253,43 +255,50 @@ class MainWindow(QWidget):
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
-        self.flow_data.append(self.params.flow)
-        self.flow_graph_line.setData(self.flow_data)
-        self.flow_data_cache = self.flow_data_cache[1:]
-        self.flow_graph_cache_line.setData(self.flow_data_cache)
+        self.flow_data[self.graph_ptr] = self.params.flow
+        self.flow_graph_line.setData(self.flow_data[:self.graph_ptr+1])
+        self.flow_graph_cache_line.setData(self.flow_data[self.graph_ptr+2:])
         self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
 
-        self.pressure_data.append(self.params.pressure)
-        self.pressure_graph_line.setData(self.pressure_data)
-        self.pressure_data_cache = self.pressure_data_cache[1:]
-        self.pressure_graph_cache_line.setData(self.pressure_data_cache)
+        QtGui.QApplication.processEvents()
+
+        self.pressure_data[self.graph_ptr] = self.params.pressure
+        self.pressure_graph_line.setData(self.pressure_data[:self.graph_ptr + 1])
+        self.pressure_graph_cache_line.setData(self.pressure_data[self.graph_ptr + 2:])
         self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
 
-        self.volume_data.append(self.params.tv_meas)
-        self.volume_graph_line.setData(self.volume_data)
-        self.volume_data_cache = self.volume_data_cache[1:]
-        self.volume_graph_cache_line.setData(self.volume_data_cache)
+        QtGui.QApplication.processEvents()
+
+        self.volume_data[self.graph_ptr] = self.params.tv_meas
+        self.volume_graph_line.setData(self.volume_data[:self.graph_ptr + 1])
+        self.volume_graph_cache_line.setData(self.volume_data[self.graph_ptr + 2:])
         self.volume_graph_cache_line.setPos(self.graph_ptr, 0)
+        
+        QtGui.QApplication.processEvents()
 
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
         if self.graph_ptr == 0:
-            self.flow_data_cache = self.flow_data
-            self.flow_graph_cache_line.setData(self.flow_data_cache)
+            self.flow_graph_cache_line.setData(self.flow_data)
+            self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
             self.flow_graph_cache_line.show()
-            self.flow_data = []
+            self.flow_graph_line.setData(np.empty(0,))
 
-            self.pressure_data_cache = self.pressure_data
-            self.pressure_graph_cache_line.setData(self.pressure_data_cache)
+            QtGui.QApplication.processEvents()
+
+            self.pressure_graph_cache_line.setData(self.pressure_data)
+            self.pressure_graph_cache_line.setPos(self.graph_ptr, 0)
             self.pressure_graph_cache_line.show()
-            self.pressure_data = []
+            self.pressure_graph_line.setData(np.empty(0, ))
 
-            self.volume_data_cache = self.volume_data
-            self.volume_graph_cache_line.setData(self.volume_data_cache)
+            QtGui.QApplication.processEvents()
+
+            self.volume_graph_cache_line.setData(self.pressure_data)
+            self.volume_graph_cache_line.setPos(self.graph_ptr, 0)
             self.volume_graph_cache_line.show()
-            self.volume_data = []
+            self.volume_graph_line.setData(np.empty(0, ))
 
-        QtGui.QApplication.processEvents()
+            QtGui.QApplication.processEvents()
 
     def incrementMode(self) -> None:
         self.local_settings.mode += 1
