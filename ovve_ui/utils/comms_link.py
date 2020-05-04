@@ -36,6 +36,7 @@ class CommsLink(QThread):
         self.SER_INTER_TIMEOUT = 0.01
         self.SER_MAX_REREADS = 30
         self.ser = 0
+        self.FALLBACK_IE = float(1 / 1.5)
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
@@ -84,9 +85,16 @@ class CommsLink(QThread):
         self.cmd_pkt.data['respiratory_rate_set'] = self.settings.resp_rate
         self.cmd_pkt.data['tidal_volume_set'] = Units.ml_to_ecu(
             self.settings.tv)
-        self.cmd_pkt.data['ie_ratio_set'] = self.settings.ie_ratio
 
+        # The UI selects the I:E ratio from an enumeration.
+        # Get the fractional value from the enumeration and convert to fixed point.
+        # If the lookup somehow fails, set I:E to a safe fallback value. 
+        ie_fraction = self.settings.ie_ratio_switcher.get(self.settings.ie_ratio_enum, self.FALLBACK_IE)
+        ie_ratio_fixed = self.cmd_pkt.ie_fraction_to_fixed(self.settings.ie_fraction)
+        self.cmd_pkt.data['ie_ratio_set'] = ie_ratio_fixed
+        
         self.settings_lock.release()
+
 
     #This function processes the serial data from Arduino and sends ACK
     def process_SerialData(self) -> None:
