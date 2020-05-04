@@ -51,8 +51,11 @@ class CommsSimulator(QThread):
                 params.resp_rate_set = self.settings.resp_rate
                 params.tv_meas = random.randrange(0, 1000)
                 params.tv_set = self.settings.tv
-                params.ie_ratio_meas = self.settings.ie_ratio
-                params.ie_ratio_set = self.settings.ie_ratio
+                
+                ie_fractional = self.settings.ie_ratio_switcher.get(self.settings.ie_ratio_enum, -1)
+                params.ie_ratio_meas = ie_fractional
+                params.ie_ratio_set = ie_fractional
+
                 params.peep = random.randrange(3, 6)
                 params.ppeak = random.randrange(15, 20)
                 params.pplat = random.randrange(15, 20)

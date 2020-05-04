@@ -18,8 +18,8 @@ class Params():
             "resp_rate_set": 0,
             "tv_meas": 0,
             "tv_set": 0,
-            "ie_ratio_meas": 0,
-            "ie_ratio_set": 0,
+            "ie_ratio_meas": 0.0,
+            "ie_ratio_set": 0.0,
             "peep": 0,
             "ppeak": 0,
             "pplat": 0,
@@ -98,19 +98,19 @@ class Params():
         self._param["tv_set"] = value
 
     @property
-    def ie_ratio_meas(self) -> int:
+    def ie_ratio_meas(self) -> float:
         return self._param["ie_ratio_meas"]
 
     @ie_ratio_meas.setter
-    def ie_ratio_meas(self, value: int) -> None:
+    def ie_ratio_meas(self, value: float) -> None:
         self._param["ie_ratio_meas"] = value
 
     @property
-    def ie_ratio_set(self) -> int:
+    def ie_ratio_set(self) -> float:
         return self._param["ie_ratio_set"]
 
     @ie_ratio_set.setter
-    def ie_ratio_set(self, value: int) -> None:
+    def ie_ratio_set(self, value: float) -> None:
         self._param["ie_ratio_set"] = value
 
     @property

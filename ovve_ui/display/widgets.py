@@ -49,7 +49,7 @@ def initializeHomeScreenWidget(
 
     window.ie_button_main = window.makeFancyDisplayButton(
         "Set I/E Ratio",
-        window.get_ie_ratio_display(window.settings.ie_ratio),
+        window.get_ie_ratio_display(window.settings.ie_ratio_enum),
         "",
     )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
@@ -538,7 +538,7 @@ def initializeIERatioWidget(window: MainWindow) -> None:
     ie_ratio_title_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     window.ie_ratio_page_value_label = QLabel(
-        window.get_ie_ratio_display(window.local_settings.ie_ratio))
+        window.get_ie_ratio_display(window.local_settings.ie_ratio_enum))
     window.ie_ratio_page_value_label.setFont(page_settings.textValueFont)
     window.ie_ratio_page_value_label.setAlignment(Qt.AlignCenter)
     window.ie_ratio_page_value_label.setStyleSheet("QLabel {color: " +
