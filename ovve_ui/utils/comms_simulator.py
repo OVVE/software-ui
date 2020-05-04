@@ -49,7 +49,7 @@ class CommsSimulator(QThread):
                 params.mode = self.settings.mode
                 params.resp_rate_meas = self.settings.resp_rate
                 params.resp_rate_set = self.settings.resp_rate
-                params.tv_meas = random.randrange(0, 2000)
+                params.tv_meas = random.randrange(0, 1000)
                 params.tv_set = self.settings.tv
                 params.ie_ratio_meas = self.settings.ie_ratio
                 params.ie_ratio_set = self.settings.ie_ratio
@@ -57,7 +57,7 @@ class CommsSimulator(QThread):
                 params.ppeak = random.randrange(15, 20)
                 params.pplat = random.randrange(15, 20)
                 params.pressure = random.randrange(-40, 40)
-                params.flow = random.randrange(-200, 200)
+                params.flow = random.randrange(-20, 20)
                 params.tv_insp = random.randrange(475, 575)
                 params.tv_exp = random.randrange(475, 575)
                 params.tv_rate = random.randrange(475, 575)

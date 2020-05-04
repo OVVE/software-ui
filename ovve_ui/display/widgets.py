@@ -151,7 +151,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
 
     # TODO: Find good values for the ranges of flow, just use MIN and MAX from sensor for now
     window.flow_graph.setXRange(0, window.graph_width, padding=0)
-    window.flow_graph.setYRange(-220, 220, padding=0)
+    window.flow_graph.setYRange(-25, 25, padding=0) #Flow should be presented in L/min.
 
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
@@ -190,7 +190,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph.setFixedWidth(window.graph_width)
     # TODO: Find good values for ranges of volume, just picked a pretty big number for now
     window.volume_graph.setXRange(0, window.graph_width, padding=0)
-    window.volume_graph.setYRange(-200, 2200, padding=0)
+    window.volume_graph.setYRange(-200, 1200, padding=0)
     window.volume_graph_line = window.volume_graph.plot(
         window.volume_data, pen=window.new_graph_pen)
     window.volume_graph_cache_line = window.volume_graph.plot(
