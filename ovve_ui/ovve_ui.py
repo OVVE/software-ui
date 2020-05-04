@@ -116,11 +116,11 @@ class MainWindow(QWidget):
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
-        fh.setLevel(logging.ERROR)
+        fh.setLevel(25)
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
-        ch.setLevel(logging.ERROR)
+        ch.setLevel(logging.INFO)
 
         # TODO: Create a custom handler for Ignition
 
@@ -255,11 +255,6 @@ class MainWindow(QWidget):
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
-        # self.flow_data.append(self.params.flow)
-        # self.flow_graph_line.setData(self.flow_data)
-        # self.flow_data_cache = self.flow_data_cache[1:]
-        # self.flow_graph_cache_line.setData(self.flow_data_cache)
-        # self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
         self.flow_data[self.graph_ptr] = self.params.flow
         self.flow_graph_line.setData(self.flow_data[:self.graph_ptr+1])
         self.flow_graph_cache_line.setData(self.flow_data[self.graph_ptr+2:])
@@ -284,11 +279,6 @@ class MainWindow(QWidget):
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
 
         if self.graph_ptr == 0:
-            # self.flow_data_cache = self.flow_data
-            # self.flow_graph_cache_line.setData(self.flow_data_cache)
-            # self.flow_graph_cache_line.show()
-            # self.flow_data = []
-
             self.flow_graph_cache_line.setData(self.flow_data)
             self.flow_graph_cache_line.setPos(self.graph_ptr, 0)
             self.flow_graph_cache_line.show()
