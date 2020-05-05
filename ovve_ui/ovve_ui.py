@@ -147,9 +147,25 @@ class MainWindow(QWidget):
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
 
-    def get_ie_ratio_display(self, ie_ratio):
-        return self.settings.ie_ratio_switcher.get(ie_ratio, "invalid")
-
+    def ie_fractional_to_ratio_str(self, fractional_ie: float) -> str:
+        if fractional_ie <= 0:
+            return "invalid"
+        elif fractional_ie > 1.0:
+            return str(str(fractional_ie) + ":1")
+        else:
+            d = 1 / fractional_ie
+            r = round(d)
+            # If close to an integer, round to that integer
+            if (abs(d - r) < 0.1):
+                return str("1:" + str(r))
+            # Otherwise, round to one decimal place
+            return str("1:" + str(round(d, 1)))
+    
+            
+    def get_ie_ratio_display(self, ie_ratio_enum: int) -> str:
+        fractional_ie = self.settings.ie_ratio_switcher.get(ie_ratio_enum, -1)
+        return self.ie_fractional_to_ratio_str(fractional_ie)
+        
     def makeFancyDisplayButton(
             self,
             label: str,
@@ -237,7 +253,7 @@ class MainWindow(QWidget):
             self.resp_rate_button_main.updateValue(self.params.resp_rate_set)
             self.tv_button_main.updateValue(self.params.tv_set)
             self.ie_button_main.updateValue(
-                self.get_ie_ratio_display(self.params.ie_ratio_set))
+                self.ie_fractional_to_ratio_str(self.params.ie_ratio_set))
             self.resp_rate_display_main.updateValue(round(self.params.resp_rate_meas, 2))
             self.peep_display_main.updateValue(round(self.params.peep, 2))
             self.tv_insp_display_main.updateValue(round(self.params.tv_insp, 2))
@@ -251,7 +267,7 @@ class MainWindow(QWidget):
         self.resp_rate_page_value_label.setText(str(self.settings.resp_rate))
         self.tv_page_value_label.setText(str(self.settings.tv))
         self.ie_ratio_page_value_label.setText(
-            self.get_ie_ratio_display(self.settings.ie_ratio))
+            self.get_ie_ratio_display(self.settings.ie_ratio_enum))
 
     # TODO: Polish up and process data properly
     def updateGraphs(self) -> None:
@@ -351,21 +367,21 @@ class MainWindow(QWidget):
         self.tv_increment_button.show()
 
     def incrementIERatio(self) -> None:
-        self.local_settings.ie_ratio += 1
-        if self.local_settings.ie_ratio >= len(
+        self.local_settings.ie_ratio_enum += 1
+        if self.local_settings.ie_ratio_enum >= len(
                 self.settings.ie_ratio_switcher):
-            self.local_settings.ie_ratio -= len(
+            self.local_settings.ie_ratio_enum -= len(
                 self.settings.ie_ratio_switcher)
         self.ie_ratio_page_value_label.setText(
-            self.get_ie_ratio_display(self.local_settings.ie_ratio))
+            self.get_ie_ratio_display(self.local_settings.ie_ratio_enum))
 
     def decrementIERatio(self) -> None:
-        self.local_settings.ie_ratio -= 1
-        if self.local_settings.ie_ratio < 0:
-            self.local_settings.ie_ratio += len(
+        self.local_settings.ie_ratio_enum -= 1
+        if self.local_settings.ie_ratio_enum < 0:
+            self.local_settings.ie_ratio_enum += len(
                 self.settings.ie_ratio_switcher)
         self.ie_ratio_page_value_label.setText(
-            self.get_ie_ratio_display(self.local_settings.ie_ratio))
+            self.get_ie_ratio_display(self.local_settings.ie_ratio_enum))
 
     def changeAlarm(self, new_val) -> None:
         self.local_settings.alarm_mode = new_val
@@ -468,9 +484,9 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitIERatio(self) -> None:
-        self.settings.ie_ratio = self.local_settings.ie_ratio
+        self.settings.ie_ratio_enum = self.local_settings.ie_ratio_enum
         self.ie_button_main.updateValue(
-            self.get_ie_ratio_display(self.settings.ie_ratio))
+            self.get_ie_ratio_display(self.settings.ie_ratio_enum))
         self.display(0)
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
