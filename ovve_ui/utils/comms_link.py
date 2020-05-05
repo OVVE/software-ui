@@ -203,7 +203,7 @@ class CommsLink(QThread):
                 self.logger.debug(
                     int.from_bytes(cmd_byteData[0:2], byteorder='little'))
                 self.logger.debug(
-                    int.from_bytes(cmd_byteData[20:], byteorder='little'))
+                    int.from_bytes(cmd_byteData[32:], byteorder='little'))
                 self.ser.reset_output_buffer()
                 return True
 
