@@ -32,6 +32,7 @@ class OutPacket():
 
         cmd_byteData += bytes(self.data['sequence_count'].to_bytes(2, endian))
         cmd_byteData += bytes(self.data['packet_version'].to_bytes(1, endian))
+<<<<<<< HEAD
         cmd_byteData += bytes(self.data['packet_type'].to_bytes(1, endian))
         cmd_byteData += bytes(self.data['mode_value'].to_bytes(1, endian))        
         cmd_byteData += bytes(self.data['command'].to_bytes(1, endian))  
@@ -48,6 +49,13 @@ class OutPacket():
         cmd_byteData += bytes(self.data['high_respiratory_rate_limit_set'].to_bytes(2, endian))
         cmd_byteData += bytes(self.data['low_respiratory_rate_limit_set'].to_bytes(2, endian))        
 
+=======
+        cmd_byteData += bytes(self.data['mode_value'].to_bytes(1, endian))
+        cmd_byteData += bytes(self.data['respiratory_rate_set'].to_bytes(4, endian))
+        cmd_byteData += bytes(self.data['tidal_volume_set'].to_bytes(4, endian, signed=True))
+        cmd_byteData += bytes(self.data['ie_ratio_set'].to_bytes(4, endian))
+           
+>>>>>>> develop
         # TO DO set alarmbits correctly if sequence or CRC failed
         cmd_byteData += bytes(self.data['alarm_bits'].to_bytes(4, endian))
 
@@ -74,3 +82,7 @@ class OutPacket():
 
         return  (in_mode & 0x7f | (run_state << 7) & 0x80)
 
+
+    def ie_fraction_to_fixed(self, ie_fraction: float) -> int:
+        # I:E -> int(I / (I + E) * 256) = n
+        return int(1 / (1 + (1 / ie_fraction)) * 256)

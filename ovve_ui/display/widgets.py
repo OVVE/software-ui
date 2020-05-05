@@ -49,7 +49,7 @@ def initializeHomeScreenWidget(
 
     window.ie_button_main = window.makeFancyDisplayButton(
         "Set I/E Ratio",
-        window.get_ie_ratio_display(window.settings.ie_ratio),
+        window.get_ie_ratio_display(window.settings.ie_ratio_enum),
         "",
     )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
@@ -59,6 +59,7 @@ def initializeHomeScreenWidget(
 
     window.settings_button_main = window.makeSimpleDisplayButton("SETTINGS")
     window.settings_button_main.clicked.connect(lambda: window.display(6))
+
 
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
@@ -144,19 +145,18 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.graph_width = 400
     window.graph_ptr = 0
 
-    window.flow_data = []
-    window.flow_data_cache = []
+    window.flow_data = np.empty([window.graph_width,])
     window.flow_graph = pg.PlotWidget()
     window.flow_graph.setFixedWidth(window.graph_width)
 
     # TODO: Find good values for the ranges of flow, just use MIN and MAX from sensor for now
     window.flow_graph.setXRange(0, window.graph_width, padding=0)
-    window.flow_graph.setYRange(-220, 220, padding=0)
+    window.flow_graph.setYRange(-25, 25, padding=0) #Flow should be presented in L/min.
 
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
     window.flow_graph_cache_line = window.flow_graph.plot(
-        window.flow_data_cache, pen=window.cache_graph_pen)
+        window.flow_data, pen=window.cache_graph_pen)
     window.flow_graph_cache_line.hide()
 
     window.flow_graph.setBackground("w")
@@ -165,8 +165,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph_left_axis.setLabel("Flow", **axisStyle)
     window.flow_graph.getPlotItem().hideAxis('bottom')
 
-    window.pressure_data = []
-    window.pressure_data_cache = []
+    window.pressure_data = np.empty([window.graph_width,])
     window.pressure_graph = pg.PlotWidget()
     window.pressure_graph.setFixedWidth(window.graph_width)
     # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
@@ -176,7 +175,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph_line = window.pressure_graph.plot(
         window.pressure_data, pen=window.new_graph_pen)
     window.pressure_graph_cache_line = window.pressure_graph.plot(
-        window.pressure_data_cache, pen=window.cache_graph_pen)
+        window.pressure_data, pen=window.cache_graph_pen)
     window.pressure_graph_cache_line.hide()
 
     window.pressure_graph.setBackground("w")
@@ -185,18 +184,17 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph_left_axis.setLabel("Pressure", **axisStyle)
     window.pressure_graph.getPlotItem().hideAxis('bottom')
 
-    window.volume_data = []
-    window.volume_data_cache = []
+    window.volume_data = np.empty([window.graph_width,])
     window.volume_graph_ptr = 0
     window.volume_graph = pg.PlotWidget()
     window.volume_graph.setFixedWidth(window.graph_width)
     # TODO: Find good values for ranges of volume, just picked a pretty big number for now
     window.volume_graph.setXRange(0, window.graph_width, padding=0)
-    window.volume_graph.setYRange(-200, 2200, padding=0)
+    window.volume_graph.setYRange(-200, 1200, padding=0)
     window.volume_graph_line = window.volume_graph.plot(
         window.volume_data, pen=window.new_graph_pen)
     window.volume_graph_cache_line = window.volume_graph.plot(
-        window.volume_data_cache, pen=window.cache_graph_pen)
+        window.volume_data, pen=window.cache_graph_pen)
     window.volume_graph_cache_line.hide()
 
     window.volume_graph.setBackground("w")
@@ -540,7 +538,7 @@ def initializeIERatioWidget(window: MainWindow) -> None:
     ie_ratio_title_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     window.ie_ratio_page_value_label = QLabel(
-        window.get_ie_ratio_display(window.local_settings.ie_ratio))
+        window.get_ie_ratio_display(window.local_settings.ie_ratio_enum))
     window.ie_ratio_page_value_label.setFont(page_settings.textValueFont)
     window.ie_ratio_page_value_label.setAlignment(Qt.AlignCenter)
     window.ie_ratio_page_value_label.setStyleSheet("QLabel {color: " +
