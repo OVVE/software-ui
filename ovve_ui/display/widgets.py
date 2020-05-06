@@ -144,13 +144,14 @@ def initializeGraphWidget(window: MainWindow) -> None:
     # TODO: Adjust graph width for resp rate
     window.graph_width = 60
     window.graph_ptr = 0
+    label_style = {'color': 'k', 'font-size': '14pt'}
+
 
     window.flow_data = np.empty([window.graph_width,])
     window.flow_graph = pg.PlotWidget()
-    
     # TODO: Find good values for the ranges of flow, just use MIN and MAX from sensor for now
     window.flow_graph.setXRange(0, window.graph_width, padding=0)
-    window.flow_graph.setYRange(-25, 25, padding=0) #Flow should be presented in L/min.
+    window.flow_graph.setYRange(-30, 30, padding=0) #Flow should be presented in L/min.
 
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
@@ -161,7 +162,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph.setBackground("w")
     window.flow_graph.setMouseEnabled(False, False)
     window.flow_graph_left_axis = window.flow_graph.getAxis("left")
-    window.flow_graph_left_axis.setLabel("Flow", **axisStyle)
+    window.flow_graph_left_axis.setLabel("Flow (L/min.)", **label_style)
     window.flow_graph.getPlotItem().hideAxis('bottom')
 
     window.pressure_data = np.empty([window.graph_width,])
@@ -179,7 +180,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph.setBackground("w")
     window.pressure_graph.setMouseEnabled(False, False)
     window.pressure_graph_left_axis = window.pressure_graph.getAxis("left")
-    window.pressure_graph_left_axis.setLabel("Pressure", **axisStyle)
+    window.pressure_graph_left_axis.setLabel("Press. (cmH2O)", **label_style)
     window.pressure_graph.getPlotItem().hideAxis('bottom')
 
     window.volume_data = np.empty([window.graph_width,])
@@ -196,7 +197,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph.setBackground("w")
     window.volume_graph.setMouseEnabled(False, False)
     window.volume_graph_left_axis = window.volume_graph.getAxis("left")
-    window.volume_graph_left_axis.setLabel("Volume", **axisStyle)
+    window.volume_graph_left_axis.setLabel("Volume (mL)", **label_style)
     window.volume_graph.getPlotItem().hideAxis('bottom')
 
     v_box.addWidget(window.flow_graph)
