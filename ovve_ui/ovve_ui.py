@@ -309,7 +309,7 @@ class MainWindow(QWidget):
 
             QtGui.QApplication.processEvents()
 
-            self.volume_graph_cache_line.setData(self.pressure_data)
+            self.volume_graph_cache_line.setData(self.volume_data)
             self.volume_graph_cache_line.setPos(0, 0)
             self.volume_graph_cache_line.show()
             self.volume_graph_line.setData(np.empty(0, ))
