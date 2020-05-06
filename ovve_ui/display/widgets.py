@@ -142,13 +142,12 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.new_graph_pen = pg.mkPen(width=2, color="b")
     window.cache_graph_pen = pg.mkPen(width=2, color="k")
     # TODO: Adjust graph width for resp rate
-    window.graph_width = 400
+    window.graph_width = 60
     window.graph_ptr = 0
 
     window.flow_data = np.empty([window.graph_width,])
     window.flow_graph = pg.PlotWidget()
-    window.flow_graph.setFixedWidth(window.graph_width)
-
+    
     # TODO: Find good values for the ranges of flow, just use MIN and MAX from sensor for now
     window.flow_graph.setXRange(0, window.graph_width, padding=0)
     window.flow_graph.setYRange(-25, 25, padding=0) #Flow should be presented in L/min.
@@ -167,7 +166,6 @@ def initializeGraphWidget(window: MainWindow) -> None:
 
     window.pressure_data = np.empty([window.graph_width,])
     window.pressure_graph = pg.PlotWidget()
-    window.pressure_graph.setFixedWidth(window.graph_width)
     # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
     window.pressure_graph.setXRange(0, window.graph_width, padding=0)
     window.pressure_graph.setYRange(-45, 45, padding=0)
@@ -185,9 +183,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph.getPlotItem().hideAxis('bottom')
 
     window.volume_data = np.empty([window.graph_width,])
-    window.volume_graph_ptr = 0
     window.volume_graph = pg.PlotWidget()
-    window.volume_graph.setFixedWidth(window.graph_width)
     # TODO: Find good values for ranges of volume, just picked a pretty big number for now
     window.volume_graph.setXRange(0, window.graph_width, padding=0)
     window.volume_graph.setYRange(-200, 1200, padding=0)
