@@ -275,6 +275,7 @@ class MainWindow(QWidget):
         self.flow_graph_line.setData(self.flow_data[:self.graph_ptr+1])
         self.flow_graph_cache_line.setData(self.flow_data[self.graph_ptr+2:])
         self.flow_graph_cache_line.setPos(self.graph_ptr+2, 0)
+        self.flow_graph_line.show()
 
         QtGui.QApplication.processEvents()
 
@@ -282,6 +283,7 @@ class MainWindow(QWidget):
         self.pressure_graph_line.setData(self.pressure_data[:self.graph_ptr + 1])
         self.pressure_graph_cache_line.setData(self.pressure_data[self.graph_ptr + 2:])
         self.pressure_graph_cache_line.setPos(self.graph_ptr+2, 0)
+        self.pressure_graph_line.show()
 
         QtGui.QApplication.processEvents()
 
@@ -289,6 +291,7 @@ class MainWindow(QWidget):
         self.volume_graph_line.setData(self.volume_data[:self.graph_ptr + 1])
         self.volume_graph_cache_line.setData(self.volume_data[self.graph_ptr + 2:])
         self.volume_graph_cache_line.setPos(self.graph_ptr+2, 0)
+        self.volume_graph_line.show()
         
         QtGui.QApplication.processEvents()
 
