@@ -54,7 +54,7 @@ class FancyButtonSettings:
 class SimpleButtonSettings:
     def __init__(self,
                  valueSetting: TextSetting = TextSetting(
-                     "Arial Black", 18, False),
+                     "Arial Black", 16, False),
                  fillColor: str = '#f2fff0',
                  borderColor: str = '#C5C5C5',
                  valueColor: str = '#000000',
