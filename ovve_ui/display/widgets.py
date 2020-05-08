@@ -149,9 +149,8 @@ def initializeGraphWidget(window: MainWindow) -> None:
 
     window.flow_data = np.empty([window.graph_width,])
     window.flow_graph = pg.PlotWidget()
-    # TODO: Find good values for the ranges of flow, just use MIN and MAX from sensor for now
     window.flow_graph.setXRange(0, window.graph_width, padding=0)
-    window.flow_graph.setYRange(-30, 30, padding=0) #Flow should be presented in L/min.
+    window.flow_graph.setYRange(-15, 75, padding=0) #Flow should be presented in L/min.
 
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
