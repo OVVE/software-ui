@@ -120,7 +120,7 @@ class MainWindow(QWidget):
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
+        ch.setLevel(logging.WARNING)
 
         # TODO: Create a custom handler for Ignition
 
@@ -255,11 +255,11 @@ class MainWindow(QWidget):
             self.ie_button_main.updateValue(
                 self.ie_fractional_to_ratio_str(self.params.ie_ratio_set))
             self.resp_rate_display_main.updateValue(round(self.params.resp_rate_meas, 2))
-            self.peep_display_main.updateValue(round(self.params.peep, 2))
-            self.tv_insp_display_main.updateValue(round(self.params.tv_insp, 2))
+            self.peep_display_main.updateValue(round(self.params.peep, 1))
+            self.tv_insp_display_main.updateValue(round(self.params.tv_insp))
             # self.tv_exp_display_main.updateValue(self.params.tv_exp)
-            self.ppeak_display_main.updateValue(round(self.params.ppeak, 2))
-            self.pplat_display_main.updateValue(round(self.params.pplat, 2))
+            self.ppeak_display_main.updateValue(round(self.params.ppeak, 1))
+            self.pplat_display_main.updateValue(round(self.params.pplat, 1))
 
     def updatePageDisplays(self) -> None:
         self.mode_page_value_label.setText(
