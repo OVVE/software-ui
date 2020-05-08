@@ -94,5 +94,13 @@ class InPacket():
         params.tv_exp = Units.ecu_to_ml(self.data['volume_out_measured'])
         params.tv_rate = Units.ecu_to_ml(self.data['volume_rate_measured'])
         params.battery_level = self.data['battery_level']
+        params.battery_charge= self.data['battery_charge']
+        params.high_pressure_limit = self.data['high_pressure_limit_set']
+        params.low_pressure_limit = self.data['low_pressure_limit_set']
+        params.high_volume_limit = self.data['high_volume_limit_set']
+        params.low_volume_llimit = self.data['low_volume_limit_set']
+        params.high_resp_rate_limit_set = self.data['high_respiratory_rate_limit_set']
+        params.low_resp_rate_limit_set = self.data['low_respiratory_rate_limit_set']
+        params.alarm_bits = self.data['alarm_bits']
         return params
 

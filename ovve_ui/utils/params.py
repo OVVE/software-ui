@@ -31,12 +31,13 @@ class Params():
             "control_state": 0,
             "run_state": 0,
             "battery_level": 0,
-           'high_pressure_limit': 0,
+            'high_pressure_limit': 0,
             'low_pressure_limit': 0,
             'high_volume_limit': 0,
             'low_volume_limit': 0,
             'high_resp_rate_limit': 0,
             'low_resp_rate_limit': 0,
+            'alarm_bits': 0,
         }
         #TODO: Do we need property and setter methods for alarm limits?
 
@@ -200,6 +201,74 @@ class Params():
     @battery_level.setter
     def battery_level(self, value: int) -> None:
         self._param["battery_level"] = value
+
+    def to_JSON(self) -> str:
+        """ Convert OVVE UI Params to JSON file """
+        return json.dumps(self._param)
+
+    @property
+    def battery_charge(self) -> int:
+        return self._param["battery_charge"]
+
+    @battery_charge.setter
+    def battery_charge(self, value: int) -> None:
+        self._param["battery_charge"] = value
+
+    @property
+    def high_pressure_limit(self) -> int:
+        return self._param["high_pressure_limit"]
+
+    @high_pressure_limit.setter
+    def high_pressure_limit(self, value: int) -> None:
+        self._param["high_pressure_limit"] = value
+
+    @property
+    def low_pressure_limit(self) -> int:
+        return self._param["low_pressure_limit"]
+
+    @low_pressure_limit.setter
+    def low_pressure_limit(self, value: int) -> None:
+        self._param["low_pressure_limit"] = value
+
+    @property
+    def high_volume_limit(self) -> int:
+        return self._param["high_volume_limit"]
+
+    @high_volume_limit.setter
+    def high_volume_limit(self, value: int) -> None:
+        self._param["high_volume__limit"] = value
+
+    @property
+    def low_volume_limit(self) -> int:
+        return self._param["low_volume_limit"]
+
+    @low_volume_limit.setter
+    def low_volume_limit(self, value: int) -> None:
+        self._param["low_volume_limit"] = value
+
+    @property
+    def high_resp_rate_limit(self) -> int:
+        return self._param["high_resp_rate_limit"]
+
+    @high_resp_rate_limit.setter
+    def high_resp_rate_limit(self, value: int) -> None:
+        self._param["high_resp_rate_imit"] = value
+
+    @property
+    def low_resp_rate_limit(self) -> int:
+        return self._param["low_resp_rate_limit"]
+
+    @low_resp_rate_limit.setter
+    def low_resp_rate_limit(self, value: int) -> None:
+        self._param["low_resp_rate_limit"] = value
+
+    @property
+    def alarm_bits(self) -> int:
+        return self._param["alarm_bits"]
+
+    @alarm_bits.setter
+    def alarm_bits(self, value: int) -> None:
+        self._param["alarm_bits"] = value
 
     def to_JSON(self) -> str:
         """ Convert OVVE UI Params to JSON file """
