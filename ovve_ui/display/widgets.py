@@ -144,7 +144,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     # TODO: Adjust graph width for resp rate
     window.graph_width = 60
     window.graph_ptr = 0
-    label_style = {'color': 'k', 'font-size': '14pt'}
+    label_style = {'color': 'k', 'font-size': '10pt'}
 
 
     window.flow_data = np.empty([window.graph_width,])
@@ -157,6 +157,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph_cache_line = window.flow_graph.plot(
         window.flow_data, pen=window.cache_graph_pen)
     window.flow_graph_cache_line.hide()
+    window.flow_graph_line.hide()
 
     window.flow_graph.setBackground("w")
     window.flow_graph.setMouseEnabled(False, False)
@@ -175,6 +176,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph_cache_line = window.pressure_graph.plot(
         window.pressure_data, pen=window.cache_graph_pen)
     window.pressure_graph_cache_line.hide()
+    window.pressure_graph_line.hide()
 
     window.pressure_graph.setBackground("w")
     window.pressure_graph.setMouseEnabled(False, False)
@@ -192,6 +194,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph_cache_line = window.volume_graph.plot(
         window.volume_data, pen=window.cache_graph_pen)
     window.volume_graph_cache_line.hide()
+    window.volume_graph_line.hide()
 
     window.volume_graph.setBackground("w")
     window.volume_graph.setMouseEnabled(False, False)
