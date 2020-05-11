@@ -264,17 +264,17 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
     mode_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
     mode_decrement_button.clicked.connect(window.decrementMode)
     mode_increment_button.clicked.connect(window.incrementMode)
     mode_apply.clicked.connect(window.commitMode)
@@ -372,18 +372,18 @@ def initializeRespiratoryRateWidget(window) -> None:
     resp_rate_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
 
     resp_rate_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
 
     window.resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
     window.resp_rate_increment_button.clicked.connect(window.incrementRespRate)
@@ -480,17 +480,18 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
     tv_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
+
     tv_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
 
     window.tv_decrement_button.clicked.connect(window.decrementTidalVol)
     window.tv_increment_button.clicked.connect(window.incrementTidalVol)
@@ -571,17 +572,17 @@ def initializeIERatioWidget(window: MainWindow) -> None:
     ie_ratio_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
     ie_ratio_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
     ie_ratio_decrement_button.clicked.connect(window.decrementIERatio)
     ie_ratio_increment_button.clicked.connect(window.incrementIERatio)
     ie_ratio_apply.clicked.connect(window.commitIERatio)
