@@ -6,9 +6,12 @@ from threading import Thread, Lock
 import serial
 import sys
 from time import sleep
+from datetime import datetime
 import codecs
 import struct
 import crc16
+import os
+import glob
 
 from utils.params import Params
 from utils.settings import Settings
@@ -51,6 +54,14 @@ class CommsLink(QThread):
         self.statPacketTxCntOk=0
         self.statPacketTxFailCnt=0
         self.statPrintCnt=0
+        self.sequenceNoTx=0
+        self.dirName='/home/pi/logs'
+        if not os.path.exists(self.dirName):
+            os.makedirs(self.dirName)
+        dateStr=datetime.now().isoformat(timespec='minutes')
+        self.binaryLogFile=open(str(self.dirName)+"/["+dateStr+"] binary.log","wb+")
+        self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","w+")
+        
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
@@ -67,66 +78,66 @@ class CommsLink(QThread):
     #receive state machine per byte. Calls processPacket for each successful packet
     def handleRxByte(self, byte) -> None:
         if self.rxState == 0:
-            if byte== 0x26:
+            if byte== 0x26: #check for first sync byte
                 self.rxState=1
         elif self.rxState == 1:
-            if byte== 0x56:
+            if byte== 0x56: #check for 2nd sync byte
                 self.rxState=2
-            elif byte!= 0x26:
+            elif byte!= 0x26: #make sure to catch S1S1S2S3 sync byte combination
                 self.rxState=0
                 self.statPacketRxCntHeaderFail+=1
         elif self.rxState == 2:
-            if byte== 0x7E:
+            if byte== 0x7E: #check for 3rd sync byte
                 self.rxState=3
             else:
                 self.rxState=0
                 self.statPacketRxCntHeaderFail+=1
         elif self.rxState==3:
-            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), 0xffff)
-            self.seqNum=byte
+            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), 0xffff) #init CRC with 0xffff
+            self.seqNum=byte    #lower byte of seq no
             self.rxState=4
         elif self.rxState==4:
             self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
-            self.seqNum+=byte<<8
+            self.seqNum+=byte<<8 #high byte of seq no
             self.rxState=5
         elif self.rxState==5:
             self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
-            if byte!=4:
+            if byte!=4: #check protocol version
                 self.rxState=0
             else:
                 self.rxState=6
         elif self.rxState==6:
             self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
-            self.msgType=byte
+            self.msgType=byte #store packetType
             self.rxState=7
             self.rxCnt=0
             self.rxData=bytearray()
         elif self.rxState==7:
             self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
-            self.packetLen=byte
-            if (self.packetLen<128):
+            self.packetLen=byte #store length
+            if (self.packetLen<128): #128 is max
                 self.rxState=8
             else:
                 self.statPacketRxCntLenFail+=1
                 self.rxState=0
         elif self.rxState==8:
             self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
-            self.rxData.append(byte)
+            self.rxData.append(byte) #save data
             self.rxCnt+=1
             if self.rxCnt==self.packetLen:
                 self.rxState=9
         elif self.rxState==9:
-            self.recCrc=byte
+            self.recCrc=byte #low byte crc
             self.rxState=10
         elif self.rxState==10:
-            self.recCrc|=byte<<8
-            if self.recCrc==self.crcCalc:
+            self.recCrc|=byte<<8 #high byte crc
+            if self.recCrc==self.crcCalc: #check crc
                 self.statPacketRxCntOk+=1
                 self.processPacket(self.rxData,self.msgType,self.seqNum)
             else:
                 self.logger.debug("Got packet with wrong CRC! Rec: "+str(self.recCrc)+" Calc: "+str(self.crcCalc))
                 self.statPacketRxCntCrcFail+=1
-            self.rxState=0
+            self.rxState=0 #restart state machine
         
     def get_bytes_from_serial(self) -> str:
         byteData = b''
@@ -162,6 +173,11 @@ class CommsLink(QThread):
 
     def processPacket(self, byteData, packetType, sequenceNo):
         #handle public data packet
+        if ((self.lastSeq+1!=sequenceNo) and (self.lastSeq!=-1)):
+                self.logger.debug('Error in sequence -> likely packet drop')
+                self.statSeqError+=1
+                self.lastSeq=sequenceNo
+
         if packetType==0x01:
             inpkt = {}
             inpkt['type'] = "inpkt"
@@ -184,9 +200,13 @@ class CommsLink(QThread):
             outpkt['type'] = "outpkt"
             outpkt['bytes'] = str(cmd_byteData)
             self.logger.log(25, json.dumps(outpkt))
-            self.sendPkts(cmd_byteData,sequenceNo)
+            self.sendPkts(cmd_byteData)
 
-            self.lastSeq=sequenceNo
+            
+        elif packetType==0x80:
+            byteData+=b'\n'
+            self.textLogFile.write(str(byteData.decode('utf-8')))
+            self.textLogFile.flush()
 
 
     #This function processes the serial data from Arduino and sends ACK
@@ -203,6 +223,16 @@ class CommsLink(QThread):
 
         while True:
             byteData = self.get_bytes_from_serial()
+            self.binaryLogFile.write(byteData)
+            self.binaryLogFile.flush()
+            fileSize=self.binaryLogFile.tell()
+            #max 8Mbyte per file so it fit's in one e-mail. Assumes that binaryFile larger than textLogFile
+            if (fileSize>(8*1024*1024)): 
+                self.binaryLogFile.close()
+                self.textLogFile.close()
+                dateStr=datetime.now().isoformat(timespec='minutes')
+                self.binaryLogFile=open(str(self.dirName)+"/["+dateStr+"] binary.log","wb+")
+                self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","w+")
 
             for byte in byteData:
                 self.handleRxByte(byte)
@@ -250,15 +280,15 @@ class CommsLink(QThread):
         return read_buffer
 
     #send a packet
-    def sendPkts(self, cmd_byteData: bytes,sequenceNo) -> None:
+    def sendPkts(self, cmd_byteData: bytes) -> None:
         # Write to serial port
         # TO DO put in separate function
 
         try:
             
             self.ser.write(bytes([ 0x26,0x56,0x7e ]))
-            self.ser.write(sequenceNo.to_bytes(2,'little'))
-            txCrc=crc16.crc16xmodem(sequenceNo.to_bytes(2,'little'), 0xFFFF)
+            self.ser.write(self.sequenceNoTx.to_bytes(2,'little'))
+            txCrc=crc16.crc16xmodem(self.sequenceNoTx.to_bytes(2,'little'), 0xFFFF)
             self.ser.write(bytes([ 4 ]))
             txCrc=crc16.crc16xmodem(bytes([ 4 ]), txCrc)
             self.ser.write(bytes([ 0x02 ]))
@@ -273,9 +303,10 @@ class CommsLink(QThread):
 
             self.logger.debug("Packet Written:")
             self.logger.debug("Sent back SEQ and CRC: ")
-            self.logger.debug(sequenceNo)
+            self.logger.debug(self.sequenceNoTx)
             self.logger.debug(txCrc)
             self.statPacketTxCntOk+=1
+            self.sequenceNoTx+=1
             return True
 
         except serial.SerialException:
