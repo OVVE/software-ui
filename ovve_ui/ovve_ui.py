@@ -41,6 +41,7 @@ from utils.ranges import Ranges
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
+    dataUpdateDone_signal = pyqtSignal()
 
     def __init__(self,
                  port: str,
@@ -116,7 +117,7 @@ class MainWindow(QWidget):
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
-        fh.setLevel(25)
+        fh.setLevel(logging.INFO)
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
@@ -142,6 +143,7 @@ class MainWindow(QWidget):
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
+        self.dataUpdateDone_signal.connect(self.comms_handler.update_done)
         self.comms_handler.start()
 
     def get_mode_display(self, mode):
@@ -229,11 +231,12 @@ class MainWindow(QWidget):
         self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
-        self.params = params
+        self.params = deepcopy(params)
         if self.params.run_state > 0:
             self.logger.info(self.params.to_JSON())
             self.updateMainDisplays()
             self.updateGraphs()
+        self.dataUpdateDone_signal.emit()
 
     def update_ui_alarms(self, alarms_dict: dict) -> None:
         self.alarms = Alarms()

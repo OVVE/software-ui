@@ -32,6 +32,7 @@ class CommsLink(QThread):
         self.logger = logging.getLogger()
         self.settings = Settings()
         self.settings_lock = Lock()
+        self.update_lock = Lock()
         self.packet_version = 1
         self.BAUD = 125000
         self.PORT = port
@@ -53,6 +54,7 @@ class CommsLink(QThread):
         self.statPacketTxFailCnt=0
         self.statPrintCnt=0
         self.sequenceNoTx=0
+        self.uiUpdateDone=0
         self.dirName='/home/pi/logs'
         if not os.path.exists(self.dirName):
             os.makedirs(self.dirName)
@@ -67,6 +69,11 @@ class CommsLink(QThread):
         self.settings_lock.release()
         self.logger.debug("Got updated settings from UI")
         self.logger.debug(self.settings.to_JSON())
+
+    def update_done(self) -> None:
+        self.update_lock.acquire()
+        self.uiUpdateDone=1
+        self.update_lock.release()
 
     #receive state machine per byte. Calls processPacket for each successful packet
     def handleRxByte(self, byte) -> None:
@@ -166,11 +173,19 @@ class CommsLink(QThread):
             inpkt = {}
             inpkt['type'] = "inpkt"
             inpkt['bytes'] = str(byteData)
-            self.logger.log(25, json.dumps(inpkt))
             self.in_pkt.from_bytes(byteData)
 
-            self.new_params.emit(self.in_pkt.to_params(sequenceNo))
 
+            self.update_lock.acquire()
+            if self.uiUpdateDone==1:
+                self.update_lock.release()
+                self.new_params.emit(self.in_pkt.to_params(sequenceNo))
+                self.update_lock.acquire()
+                self.uiUpdateDone=0
+            self.update_lock.release()
+
+            self.logger.log(25, json.dumps(inpkt))
+            
             self.create_cmd_pkt()
             cmd_byteData = self.cmd_pkt.to_bytes()
             outpkt = {}
