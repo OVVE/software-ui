@@ -146,6 +146,25 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.graph_ptr = 0
     label_style = {'color': 'k', 'font-size': '10pt'}
 
+    window.pressure_data = np.empty([window.graph_width, ])
+    window.pressure_graph = pg.PlotWidget()
+    # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
+    window.pressure_graph.setXRange(0, window.graph_width, padding=0)
+    window.pressure_graph.setYRange(-45, 45, padding=0)
+
+    window.pressure_graph_line = window.pressure_graph.plot(
+        window.pressure_data, pen=window.new_graph_pen)
+    window.pressure_graph_cache_line = window.pressure_graph.plot(
+        window.pressure_data, pen=window.cache_graph_pen)
+    window.pressure_graph_cache_line.hide()
+    window.pressure_graph_line.hide()
+
+    window.pressure_graph.setBackground("w")
+    window.pressure_graph.setMouseEnabled(False, False)
+    window.pressure_graph_left_axis = window.pressure_graph.getAxis("left")
+    window.pressure_graph_left_axis.setLabel("Press. (cmH2O)", **label_style)
+    window.pressure_graph.getPlotItem().hideAxis('bottom')
+
 
     window.flow_data = np.empty([window.graph_width,])
     window.flow_graph = pg.PlotWidget()
@@ -165,25 +184,6 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph_left_axis.setLabel("Flow (L/min.)", **label_style)
     window.flow_graph.getPlotItem().hideAxis('bottom')
 
-    window.pressure_data = np.empty([window.graph_width,])
-    window.pressure_graph = pg.PlotWidget()
-    # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
-    window.pressure_graph.setXRange(0, window.graph_width, padding=0)
-    window.pressure_graph.setYRange(-45, 45, padding=0)
-
-    window.pressure_graph_line = window.pressure_graph.plot(
-        window.pressure_data, pen=window.new_graph_pen)
-    window.pressure_graph_cache_line = window.pressure_graph.plot(
-        window.pressure_data, pen=window.cache_graph_pen)
-    window.pressure_graph_cache_line.hide()
-    window.pressure_graph_line.hide()
-
-    window.pressure_graph.setBackground("w")
-    window.pressure_graph.setMouseEnabled(False, False)
-    window.pressure_graph_left_axis = window.pressure_graph.getAxis("left")
-    window.pressure_graph_left_axis.setLabel("Press. (cmH2O)", **label_style)
-    window.pressure_graph.getPlotItem().hideAxis('bottom')
-
     window.volume_data = np.empty([window.graph_width,])
     window.volume_graph = pg.PlotWidget()
     # TODO: Find good values for ranges of volume, just picked a pretty big number for now
@@ -202,8 +202,8 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph_left_axis.setLabel("Volume (mL)", **label_style)
     window.volume_graph.getPlotItem().hideAxis('bottom')
 
-    v_box.addWidget(window.flow_graph)
     v_box.addWidget(window.pressure_graph)
+    v_box.addWidget(window.flow_graph)
     v_box.addWidget(window.volume_graph)
 
     window.page["1"].setLayout(v_box)
@@ -264,17 +264,17 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
     mode_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
     mode_decrement_button.clicked.connect(window.decrementMode)
     mode_increment_button.clicked.connect(window.incrementMode)
     mode_apply.clicked.connect(window.commitMode)
@@ -372,18 +372,18 @@ def initializeRespiratoryRateWidget(window) -> None:
     resp_rate_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
 
     resp_rate_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
 
     window.resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
     window.resp_rate_increment_button.clicked.connect(window.incrementRespRate)
@@ -480,17 +480,18 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
     tv_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
+
     tv_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
 
     window.tv_decrement_button.clicked.connect(window.decrementTidalVol)
     window.tv_increment_button.clicked.connect(window.incrementTidalVol)
@@ -571,17 +572,17 @@ def initializeIERatioWidget(window: MainWindow) -> None:
     ie_ratio_apply = window.makeSimpleDisplayButton(
         "APPLY",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.commitColor,
             borderColor=page_settings.commitColor,
             valueSetting=page_settings.commitSetting,
-            valueColor=page_settings.commitColor))
+            valueColor="#FFFFFF"))
     ie_ratio_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
-            valueColor=page_settings.cancelColor))
+            valueColor="#FFFFFF"))
     ie_ratio_decrement_button.clicked.connect(window.decrementIERatio)
     ie_ratio_increment_button.clicked.connect(window.incrementIERatio)
     ie_ratio_apply.clicked.connect(window.commitIERatio)
