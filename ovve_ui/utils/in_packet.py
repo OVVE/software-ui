@@ -39,8 +39,15 @@ class InPacket():
         self.data['respiratory_rate_set']=int.from_bytes(byteData[8:12], byteorder='little')
         self.data['tidal_volume_measured']=int.from_bytes(byteData[12:16], byteorder='little', signed=True)
         self.data['tidal_volume_set']=int.from_bytes(byteData[16:20], byteorder='little', signed=True)
-        self.data['ie_ratio_measured']=int.from_bytes(byteData[20:24], byteorder='little')
-        self.data['ie_ratio_set']=int.from_bytes(byteData[24:28], byteorder='little')
+        
+        ie_measured_fixed = int.from_bytes(byteData[20:24], byteorder='little')
+        ie_measured_fraction = self.ie_fixed_to_fraction(ie_measured_fixed)
+        self.data['ie_ratio_measured'] = ie_measured_fraction
+
+        ie_set_fixed = int.from_bytes(byteData[24:28], byteorder='little')
+        ie_set_fraction = self.ie_fixed_to_fraction(ie_set_fixed)
+        self.data['ie_ratio_set'] = ie_set_fraction
+
         self.data['peep_value_measured']=int.from_bytes(byteData[28:32], byteorder='little', signed=True)
         self.data['peak_pressure_measured']=int.from_bytes(byteData[32:36], byteorder='little', signed=True)
         self.data['plateau_value_measured']=int.from_bytes(byteData[36:40], byteorder='little', signed=True)
@@ -79,3 +86,21 @@ class InPacket():
         params.battery_level = self.data['battery_level']
         return params
 
+
+    def ie_fixed_to_fraction(self, n: int) -> float:
+        if n == 0:
+            return 0
+
+        if (n <= 128):
+            i = 1.0
+            e = (256 / float(n)) - 1
+        else:
+            i = (float(n) / 256) / (1 - float(n) / 256)
+            e = 1.0
+        
+        if e == 0:
+            return 0
+        else:
+            return i / e
+       
+    
