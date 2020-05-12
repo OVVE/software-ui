@@ -128,10 +128,10 @@ class PageSettings:
         changeButtonBorderColor: str = '#C5C5C5',
         valueLabelWidth: int = 210,
         changeButtonSpacing: int = 50,
-        cancelSetting: TextSetting = TextSetting("Arial", 14, True),
+        cancelSetting: TextSetting = TextSetting("Arial", 16, True),
         cancelColor: str = "#ff0000",
-        commitSetting: TextSetting = TextSetting("Arial", 14, True),
-        commitColor: str = "#00FF00",
+        commitSetting: TextSetting = TextSetting("Arial", 16, True),
+        commitColor: str = "#3cb371",
         commitCancelButtonSpacing: int = 100,
         alarmSilenceButtonColor: str = '#C5C5C5',
     ):
