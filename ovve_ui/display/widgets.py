@@ -728,6 +728,7 @@ def initializeConfirmStopWidget(window: MainWindow) -> None:
     confirm_stop_value_label.setAlignment(Qt.AlignCenter)
     confirm_stop_value_label.setFixedHeight(150)
     confirm_stop_value_label.setFixedWidth(400)
+    confirm_stop_value_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     confirm_stop_cancel_button = window.makeSimpleDisplayButton(
         "CANCEL",
