@@ -130,6 +130,7 @@ class PicButton(QAbstractButton):
 
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
+        painter.setPen(QPen(QColor("#000000")))
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
         if self.size is not None:
             painter.drawPixmap(QRect(0,0,*self.size), self.pixmap)
