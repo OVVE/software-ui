@@ -264,32 +264,38 @@ def initializeModeWidget(window: MainWindow) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    mode_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+
     mode_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
+
+    mode_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+
     mode_decrement_button.clicked.connect(window.decrementMode)
     mode_increment_button.clicked.connect(window.incrementMode)
-    mode_apply.clicked.connect(window.commitMode)
     mode_cancel.clicked.connect(window.cancelChange)
+    mode_apply.clicked.connect(window.commitMode)
+
 
     h_box_1.addWidget(mode_title_label)
     h_box_2.addWidget(mode_decrement_button)
     h_box_2.addWidget(window.mode_page_value_label)
     h_box_2.addWidget(mode_increment_button)
     h_box_3.addWidget(mode_unit_label)
-    h_box_4.addWidget(mode_apply)
     h_box_4.addWidget(mode_cancel)
+    h_box_4.addWidget(mode_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -372,27 +378,29 @@ def initializeRespiratoryRateWidget(window) -> None:
             > window.ranges._ranges["max_resp_rate"]:
         window.resp_rate_increment_button.hide()
 
-    resp_rate_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
-
     resp_rate_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
 
+    resp_rate_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+
     window.resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
     window.resp_rate_increment_button.clicked.connect(window.incrementRespRate)
 
-    resp_rate_apply.clicked.connect(window.commitRespRate)
     resp_rate_cancel.clicked.connect(window.cancelChange)
+    resp_rate_apply.clicked.connect(window.commitRespRate)
 
     h_box_1.addWidget(resp_rate_title_label)
     h_box_2.addWidget(window.resp_rate_decrement_button)
@@ -401,8 +409,8 @@ def initializeRespiratoryRateWidget(window) -> None:
         page_settings.valueLabelWidth)
     h_box_2.addWidget(window.resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
-    h_box_4.addWidget(resp_rate_apply)
     h_box_4.addWidget(resp_rate_cancel)
+    h_box_4.addWidget(resp_rate_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -480,21 +488,26 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
             > window.ranges._ranges["max_tv"]:
         window.tv_increment_button.hide()
 
-    tv_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
 
     tv_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
+
+
+    tv_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size = (150,90),
+        button_settings=SimpleButtonSettings(
+            fillColor= page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF",
+            ))
 
     window.tv_decrement_button.clicked.connect(window.decrementTidalVol)
     window.tv_increment_button.clicked.connect(window.incrementTidalVol)
@@ -507,8 +520,8 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
     h_box_2.addWidget(window.tv_increment_button)
 
     h_box_3.addWidget(tv_unit_label)
-    h_box_4.addWidget(tv_apply)
     h_box_4.addWidget(tv_cancel)
+    h_box_4.addWidget(tv_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -572,32 +585,37 @@ def initializeIERatioWidget(window: MainWindow) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    ie_ratio_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+
     ie_ratio_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
+
+    ie_ratio_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+
     ie_ratio_decrement_button.clicked.connect(window.decrementIERatio)
     ie_ratio_increment_button.clicked.connect(window.incrementIERatio)
-    ie_ratio_apply.clicked.connect(window.commitIERatio)
     ie_ratio_cancel.clicked.connect(window.cancelChange)
+    ie_ratio_apply.clicked.connect(window.commitIERatio)
 
     h_box_1.addWidget(ie_ratio_title_label)
     h_box_2.addWidget(ie_ratio_decrement_button)
     h_box_2.addWidget(window.ie_ratio_page_value_label)
     h_box_2.addWidget(ie_ratio_increment_button)
     h_box_3.addWidget(ie_unit_label)
-    h_box_4.addWidget(ie_ratio_apply)
     h_box_4.addWidget(ie_ratio_cancel)
+    h_box_4.addWidget(ie_ratio_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -723,10 +741,11 @@ def initializeConfirmStopWidget(window: MainWindow) -> None:
 
     confirm_stop_cancel_button = window.makeSimpleDisplayButton(
         "CANCEL",
+        size = (150,90),
         button_settings=SimpleButtonSettings(
             valueSetting=window.ui_settings.page_settings.cancelSetting,
-            valueColor=window.ui_settings.page_settings.cancelColor,
-            fillColor="#FFFFFF",
+            valueColor="#FFFFFF",
+            fillColor=window.ui_settings.page_settings.cancelColor,
             borderColor=window.ui_settings.page_settings.cancelColor))
     confirm_stop_cancel_button.clicked.connect(lambda: window.display(0))
     confirm_stop_cancel_button.setFont(
@@ -734,10 +753,11 @@ def initializeConfirmStopWidget(window: MainWindow) -> None:
 
     confirm_stop_confirm_button = window.makeSimpleDisplayButton(
         "CONFIRM",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             valueSetting=window.ui_settings.page_settings.commitSetting,
-            valueColor=window.ui_settings.page_settings.commitColor,
-            fillColor="#FFFFFF",
+            valueColor="#FFFFFF",
+            fillColor=window.ui_settings.page_settings.commitColor,
             borderColor=window.ui_settings.page_settings.commitColor))
     confirm_stop_confirm_button.clicked.connect(window.stopVentilation)
     confirm_stop_confirm_button.setFont(
