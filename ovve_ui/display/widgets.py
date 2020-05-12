@@ -3,14 +3,17 @@ Widgets used to initialize the the OVVE UI
 """
 from random import randint
 from typing import TypeVar
-
+from os import path
 import numpy as np
 import pyqtgraph as pg
 
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QStackedWidget, QLabel
+from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout, QStackedWidget,
+                             QLabel)
 from PyQt5.QtCore import Qt
 
-from display.ui_settings import SimpleButtonSettings, FancyButtonSettings, DisplayRectSettings, PageSettings
+from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
+                                 DisplayRectSettings, PageSettings,
+                                 TextSetting)
 
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')
@@ -57,7 +60,9 @@ def initializeHomeScreenWidget(
     window.start_stop_button_main = window.makeSimpleDisplayButton("START")
     window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
-    window.settings_button_main = window.makeSimpleDisplayButton("SETTINGS")
+    settings_icon_path = path.abspath(path.join(path.dirname(__file__), "images/gear.png"))
+    window.settings_button_main = window.makePicButton(
+        settings_icon_path, size=(60, 60))
     window.settings_button_main.clicked.connect(lambda: window.display(6))
 
 
@@ -83,9 +88,8 @@ def initializeHomeScreenWidget(
         "---",
         "mL",
         rect_settings=DisplayRectSettings(fillColor="#C5C5C5",
-                                          labelColor = "#A9A9A9",
-                                          unitColor = "#A9A9A9"
-                                          ),
+                                          labelColor="#A9A9A9",
+                                          unitColor="#A9A9A9"),
     )
 
     window.peep_display_main = window.makeDisplayRect(
@@ -141,15 +145,15 @@ def initializeGraphWidget(window: MainWindow) -> None:
     axisStyle = {'color': 'black', 'font-size': '20pt'}
     window.new_graph_pen = pg.mkPen(width=2, color="b")
     window.cache_graph_pen = pg.mkPen(width=2, color="k")
+
     # TODO: Adjust graph width for resp rate
     window.graph_width = 60
     window.graph_ptr = 0
-    label_style = {'color': 'k', 'font-size': '10pt'}
+    label_style = {'color': 'k', 'font-size': '16pt'}
 
     window.pressure_data = np.empty([window.graph_width, ])
     window.pressure_graph = pg.PlotWidget()
     # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
-    window.pressure_graph.setXRange(0, window.graph_width, padding=0)
     window.pressure_graph.setYRange(-45, 45, padding=0)
 
     window.pressure_graph_line = window.pressure_graph.plot(
@@ -159,18 +163,12 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph_cache_line.hide()
     window.pressure_graph_line.hide()
 
-    window.pressure_graph.setBackground("w")
-    window.pressure_graph.setMouseEnabled(False, False)
     window.pressure_graph_left_axis = window.pressure_graph.getAxis("left")
     window.pressure_graph_left_axis.setLabel("Press. (cmH2O)", **label_style)
-    window.pressure_graph.getPlotItem().hideAxis('bottom')
-
 
     window.flow_data = np.empty([window.graph_width,])
     window.flow_graph = pg.PlotWidget()
-    window.flow_graph.setXRange(0, window.graph_width, padding=0)
     window.flow_graph.setYRange(-15, 75, padding=0) #Flow should be presented in L/min.
-
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
     window.flow_graph_cache_line = window.flow_graph.plot(
@@ -178,16 +176,12 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph_cache_line.hide()
     window.flow_graph_line.hide()
 
-    window.flow_graph.setBackground("w")
-    window.flow_graph.setMouseEnabled(False, False)
     window.flow_graph_left_axis = window.flow_graph.getAxis("left")
     window.flow_graph_left_axis.setLabel("Flow (L/min.)", **label_style)
-    window.flow_graph.getPlotItem().hideAxis('bottom')
 
     window.volume_data = np.empty([window.graph_width,])
     window.volume_graph = pg.PlotWidget()
     # TODO: Find good values for ranges of volume, just picked a pretty big number for now
-    window.volume_graph.setXRange(0, window.graph_width, padding=0)
     window.volume_graph.setYRange(-200, 1200, padding=0)
     window.volume_graph_line = window.volume_graph.plot(
         window.volume_data, pen=window.new_graph_pen)
@@ -196,15 +190,15 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph_cache_line.hide()
     window.volume_graph_line.hide()
 
-    window.volume_graph.setBackground("w")
-    window.volume_graph.setMouseEnabled(False, False)
     window.volume_graph_left_axis = window.volume_graph.getAxis("left")
     window.volume_graph_left_axis.setLabel("Volume (mL)", **label_style)
-    window.volume_graph.getPlotItem().hideAxis('bottom')
 
-    v_box.addWidget(window.pressure_graph)
-    v_box.addWidget(window.flow_graph)
-    v_box.addWidget(window.volume_graph)
+    for graph in [window.pressure_graph, window.flow_graph, window.volume_graph]:
+        graph.setXRange(0, window.graph_width, padding=0)
+        graph.setBackground("w")
+        graph.setMouseEnabled(False, False)
+        graph.getPlotItem().hideAxis('bottom')
+        v_box.addWidget(graph)
 
     window.page["1"].setLayout(v_box)
 
@@ -261,32 +255,38 @@ def initializeModeWidget(window: MainWindow) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    mode_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+
     mode_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
+
+    mode_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+
     mode_decrement_button.clicked.connect(window.decrementMode)
     mode_increment_button.clicked.connect(window.incrementMode)
-    mode_apply.clicked.connect(window.commitMode)
     mode_cancel.clicked.connect(window.cancelChange)
+    mode_apply.clicked.connect(window.commitMode)
+
 
     h_box_1.addWidget(mode_title_label)
     h_box_2.addWidget(mode_decrement_button)
     h_box_2.addWidget(window.mode_page_value_label)
     h_box_2.addWidget(mode_increment_button)
     h_box_3.addWidget(mode_unit_label)
-    h_box_4.addWidget(mode_apply)
     h_box_4.addWidget(mode_cancel)
+    h_box_4.addWidget(mode_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -369,27 +369,29 @@ def initializeRespiratoryRateWidget(window) -> None:
             > window.ranges._ranges["max_resp_rate"]:
         window.resp_rate_increment_button.hide()
 
-    resp_rate_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
-
     resp_rate_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
 
+    resp_rate_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+
     window.resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
     window.resp_rate_increment_button.clicked.connect(window.incrementRespRate)
 
-    resp_rate_apply.clicked.connect(window.commitRespRate)
     resp_rate_cancel.clicked.connect(window.cancelChange)
+    resp_rate_apply.clicked.connect(window.commitRespRate)
 
     h_box_1.addWidget(resp_rate_title_label)
     h_box_2.addWidget(window.resp_rate_decrement_button)
@@ -398,8 +400,8 @@ def initializeRespiratoryRateWidget(window) -> None:
         page_settings.valueLabelWidth)
     h_box_2.addWidget(window.resp_rate_increment_button)
     h_box_3.addWidget(resp_rate_unit_label)
-    h_box_4.addWidget(resp_rate_apply)
     h_box_4.addWidget(resp_rate_cancel)
+    h_box_4.addWidget(resp_rate_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -477,21 +479,26 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
             > window.ranges._ranges["max_tv"]:
         window.tv_increment_button.hide()
 
-    tv_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
 
     tv_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
+
+
+    tv_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size = (150,90),
+        button_settings=SimpleButtonSettings(
+            fillColor= page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF",
+            ))
 
     window.tv_decrement_button.clicked.connect(window.decrementTidalVol)
     window.tv_increment_button.clicked.connect(window.incrementTidalVol)
@@ -504,8 +511,8 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
     h_box_2.addWidget(window.tv_increment_button)
 
     h_box_3.addWidget(tv_unit_label)
-    h_box_4.addWidget(tv_apply)
     h_box_4.addWidget(tv_cancel)
+    h_box_4.addWidget(tv_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -569,32 +576,37 @@ def initializeIERatioWidget(window: MainWindow) -> None:
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
 
-    ie_ratio_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+
     ie_ratio_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
             fillColor= page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
+
+    ie_ratio_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+
     ie_ratio_decrement_button.clicked.connect(window.decrementIERatio)
     ie_ratio_increment_button.clicked.connect(window.incrementIERatio)
-    ie_ratio_apply.clicked.connect(window.commitIERatio)
     ie_ratio_cancel.clicked.connect(window.cancelChange)
+    ie_ratio_apply.clicked.connect(window.commitIERatio)
 
     h_box_1.addWidget(ie_ratio_title_label)
     h_box_2.addWidget(ie_ratio_decrement_button)
     h_box_2.addWidget(window.ie_ratio_page_value_label)
     h_box_2.addWidget(ie_ratio_increment_button)
     h_box_3.addWidget(ie_unit_label)
-    h_box_4.addWidget(ie_ratio_apply)
     h_box_4.addWidget(ie_ratio_cancel)
+    h_box_4.addWidget(ie_ratio_apply)
 
     v_box.addLayout(h_box_1)
     v_box.addLayout(h_box_2)
@@ -649,18 +661,39 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
 def initializeSettingsWidget(window: MainWindow) -> None:
     v_box_7 = QVBoxLayout()
     h_box_7top = QHBoxLayout()
+    h_box_7mid1 = QHBoxLayout()
+    h_box_7mid1_v1 = QVBoxLayout()
+    h_box_7mid1_v2 = QVBoxLayout()
     h_box_7bottom = QHBoxLayout()
 
     h_box_7top.setAlignment(Qt.AlignCenter)
+    h_box_7mid1.setAlignment(Qt.AlignCenter)
     h_box_7bottom.setAlignment(Qt.AlignCenter)
 
     settings_page_label = QLabel("Settings")
     settings_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    settings_page_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
+    window.settings_patient_label = QLabel(
+        f"Current Patient: Patient {window.patient_id_display}")
+    window.settings_patient_label.setAlignment(Qt.AlignCenter)
+    window.settings_patient_label.setFont(TextSetting("Arial", 20, True).font)
+    window.settings_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+
+    settings_change_patient_button = window.makeSimpleDisplayButton(
+        "Change Patient",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(150, 65))
+    settings_change_patient_button.clicked.connect(lambda: window.display(8))
+
     settings_back_button = window.makeSimpleDisplayButton(
-        "Back",
+        "Back to Main",
         button_settings=SimpleButtonSettings(
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
@@ -669,8 +702,159 @@ def initializeSettingsWidget(window: MainWindow) -> None:
     settings_back_button.clicked.connect(lambda: window.display(0))
 
     h_box_7top.addWidget(settings_page_label)
+    h_box_7mid1_v1.addWidget(window.settings_patient_label)
+    h_box_7mid1_v2.addWidget(settings_change_patient_button)
     h_box_7bottom.addWidget(settings_back_button)
+    h_box_7mid1.addLayout(h_box_7mid1_v1)
+    h_box_7mid1.addLayout(h_box_7mid1_v2)
+
     v_box_7.addLayout(h_box_7top)
+    v_box_7.addLayout(h_box_7mid1)
     v_box_7.addLayout(h_box_7bottom)
 
     window.page["7"].setLayout(v_box_7)
+
+
+def initializeConfirmStopWidget(window: MainWindow) -> None:
+    v_box_8 = QVBoxLayout()
+    h_box_8top = QHBoxLayout()
+    h_box_8bottom = QHBoxLayout()
+
+    h_box_8top.setAlignment(Qt.AlignCenter)
+    h_box_8bottom.setAlignment(Qt.AlignCenter)
+
+    confirm_stop_value_label = QLabel(
+        "Caution: this will stop ventilation immediately. "
+        "Proceed?")
+    confirm_stop_value_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+    confirm_stop_value_label.setWordWrap(True)
+    confirm_stop_value_label.setAlignment(Qt.AlignCenter)
+    confirm_stop_value_label.setFixedHeight(150)
+    confirm_stop_value_label.setFixedWidth(400)
+    confirm_stop_value_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+    confirm_stop_cancel_button = window.makeSimpleDisplayButton(
+        "CANCEL",
+        size = (150,90),
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            valueColor="#FFFFFF",
+            fillColor=window.ui_settings.page_settings.cancelColor,
+            borderColor=window.ui_settings.page_settings.cancelColor))
+    confirm_stop_cancel_button.clicked.connect(lambda: window.display(0))
+    confirm_stop_cancel_button.setFont(
+        window.ui_settings.simple_button_settings.valueFont)
+
+    confirm_stop_confirm_button = window.makeSimpleDisplayButton(
+        "CONFIRM",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.commitSetting,
+            valueColor="#FFFFFF",
+            fillColor=window.ui_settings.page_settings.commitColor,
+            borderColor=window.ui_settings.page_settings.commitColor))
+    confirm_stop_confirm_button.clicked.connect(window.stopVentilation)
+    confirm_stop_confirm_button.setFont(
+        window.ui_settings.simple_button_settings.valueFont)
+
+    h_box_8bottom.setSpacing(75)
+
+    h_box_8top.addWidget(confirm_stop_value_label)
+    h_box_8bottom.addWidget(confirm_stop_cancel_button)
+    h_box_8bottom.addWidget(confirm_stop_confirm_button)
+    v_box_8.addLayout(h_box_8top)
+    v_box_8.addLayout(h_box_8bottom)
+
+    window.page["8"].setLayout(v_box_8)
+
+
+def initializeChangePatientWidget(window: MainWindow) -> None:
+    v_box_9 = QVBoxLayout()
+    h_box_9top = QHBoxLayout()
+    h_box_9mid1 = QHBoxLayout()
+    h_box_9mid2 = QHBoxLayout()
+    h_box_9mid3 = QHBoxLayout()
+    h_box_9bottom = QHBoxLayout()
+
+    h_box_9top.setAlignment(Qt.AlignCenter)
+    h_box_9mid1.setAlignment(Qt.AlignCenter)
+    h_box_9mid2.setAlignment(Qt.AlignCenter)
+    h_box_9mid3.setAlignment(Qt.AlignCenter)
+    h_box_9bottom.setAlignment(Qt.AlignCenter)
+
+    change_patient_main_label = QLabel("Change Patient")
+    change_patient_main_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+    change_patient_main_label.setWordWrap(True)
+    change_patient_main_label.setAlignment(Qt.AlignCenter)
+    change_patient_main_label.setFixedWidth(400)
+    change_patient_main_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+
+    window.patient_page_label = QLabel(
+        f"Current Patient: Patient {window.patient_id_display}")
+    window.patient_page_label.setAlignment(Qt.AlignCenter)
+    window.patient_page_label.setFont(TextSetting("Arial", 20, True).font)
+    window.patient_page_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+    window.generate_new_patient_id_page_button = window.makeSimpleDisplayButton(
+        "Generate New Patient ID",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
+    window.generate_new_patient_id_page_button.clicked.connect(
+        window.generateNewPatientID)
+    generate_new_patient_id_size_policy = window.generate_new_patient_id_page_button.sizePolicy(
+    )
+    generate_new_patient_id_size_policy.setRetainSizeWhenHidden(True)
+    window.generate_new_patient_id_page_button.setSizePolicy(
+        generate_new_patient_id_size_policy)
+
+    change_patient_cancel = window.makeSimpleDisplayButton(
+        "CANCEL",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor= window.ui_settings.page_settings.cancelColor,
+            borderColor=window.ui_settings.page_settings.cancelColor,
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            valueColor="#FFFFFF"))
+
+    change_patient_cancel.clicked.connect(window.cancelNewPatientID)
+
+    change_patient_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor= window.ui_settings.page_settings.commitColor,
+            borderColor=window.ui_settings.page_settings.commitColor,
+            valueSetting=window.ui_settings.page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+    change_patient_apply.clicked.connect(window.commitNewPatientID)
+
+    change_patient_back = window.makeSimpleDisplayButton(
+        "Back to Settings",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
+    change_patient_back.clicked.connect(lambda: window.display(6))
+
+    h_box_9mid3.setSpacing(75)
+
+    h_box_9top.addWidget(change_patient_main_label)
+    h_box_9mid1.addWidget(window.patient_page_label)
+    h_box_9mid2.addWidget(window.generate_new_patient_id_page_button)
+    h_box_9mid3.addWidget(change_patient_cancel)
+    h_box_9mid3.addWidget(change_patient_apply)
+    h_box_9bottom.addWidget(change_patient_back)
+    v_box_9.addLayout(h_box_9top)
+    v_box_9.addLayout(h_box_9mid1)
+    v_box_9.addLayout(h_box_9mid2)
+    v_box_9.addLayout(h_box_9mid3)
+    v_box_9.addLayout(h_box_9bottom)
+
+    window.page["9"].setLayout(v_box_9)

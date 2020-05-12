@@ -7,6 +7,7 @@ import sys
 import time
 from timeit import default_timer as timer
 
+import uuid
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
 from random import randint
@@ -21,7 +22,7 @@ from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
                              QWidget, QMessageBox, QDialog)
 
-from display.button import FancyDisplayButton, SimpleDisplayButton
+from display.button import FancyDisplayButton, SimpleDisplayButton, PicButton
 from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
                                  SimpleButtonSettings, TextSetting, UISettings)
@@ -30,7 +31,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeRespiratoryRateWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
-                             initializeGraphWidget, initializeSettingsWidget)
+                             initializeGraphWidget, initializeSettingsWidget,
+                             initializeConfirmStopWidget, initializeChangePatientWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -59,16 +61,9 @@ class MainWindow(QWidget):
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
-
-        # Example 1 (changes color of Fancy numbers to red)
-        # self.ui_settings.set_fancy_button_settings(FancyButtonSettings(valueColor=Qt.red))
-        # Example 2 (changes color of Simple numbers to red)
-        # self.ui_settings.set_simple_button_settings(SimpleButtonSettings(valueColor=Qt.red))
-
-        # Example 3 (sets display rect label font to Comic Sans MS)
-        # self.ui_settings.set_display_rect_settings(DisplayRectSettings(labelSetting = TextSetting("Comic Sans MS", 20, True)))
-
         self.ptr = 0
+
+        self.dateTime = QDateTime.currentDateTime()
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         (layout, stack) = initializeHomeScreenWidget(self)
@@ -82,9 +77,17 @@ class MainWindow(QWidget):
             "5": QWidget(),
             "6": QWidget(),
             "7": QWidget(),
+            "8": QWidget(),
+            "9": QWidget(),
         }
         self.alarms = Alarms()
         self.shownAlarmCode = None
+
+
+        # TODO: Set patient_id from the UI
+        self.patient_id = uuid.uuid4()
+        self.patient_id_display = 1
+        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
 
         self.initalizeAndAddStackWidgets()
 
@@ -94,9 +97,6 @@ class MainWindow(QWidget):
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
 
-        # TODO: Set patient_id from the UI
-        self.patient_id = "13c50304-5a34-4a39-8665-bde212f2f206"
-        self.logpath = os.path.join("/tmp", "ovve_logs", self.patient_id)
 
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
@@ -105,7 +105,7 @@ class MainWindow(QWidget):
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
 
-        self.logfileroot = os.path.join(self.logpath, self.patient_id + ".log")
+        self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
 
         # The TimedRotatingFileHandler will write a new file each hour
         # After two weeks, the oldest logs will start being deleted
@@ -160,12 +160,12 @@ class MainWindow(QWidget):
                 return str("1:" + str(r))
             # Otherwise, round to one decimal place
             return str("1:" + str(round(d, 1)))
-    
-            
+
+
     def get_ie_ratio_display(self, ie_ratio_enum: int) -> str:
         fractional_ie = self.settings.ie_ratio_switcher.get(ie_ratio_enum, -1)
         return self.ie_fractional_to_ratio_str(fractional_ie)
-        
+
     def makeFancyDisplayButton(
             self,
             label: str,
@@ -197,6 +197,9 @@ class MainWindow(QWidget):
             button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
 
+    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None):
+        return PicButton(filename, size = size)
+
     def makeDisplayRect(
             self,
             label: str,
@@ -221,6 +224,8 @@ class MainWindow(QWidget):
         initializeIERatioWidget(self)
         initializeAlarmWidget(self)
         initializeSettingsWidget(self)
+        initializeConfirmStopWidget(self)
+        initializeChangePatientWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -293,7 +298,7 @@ class MainWindow(QWidget):
         self.volume_graph_cache_line.setData(self.volume_data[self.graph_ptr + 2:])
         self.volume_graph_cache_line.setPos(self.graph_ptr+2, 0)
         self.volume_graph_line.show()
-        
+
         QtGui.QApplication.processEvents()
 
         self.graph_ptr = (self.graph_ptr + 1) % self.graph_width
@@ -399,7 +404,15 @@ class MainWindow(QWidget):
             self.passChanges()
 
         elif self.settings.run_state == 1:
-            self.showStartStopConfirm()
+            self.confirmStop()
+
+    def generateNewPatientID(self) -> None:
+        self.new_patient_id = uuid.uuid4()
+        self.new_patient_id_display = self.patient_id_display+1
+        self.patient_page_label.setText( f"Current Patient: Patient {self.new_patient_id_display}")
+        self.patient_page_label.update()
+        self.generate_new_patient_id_page_button.hide()
+
 
     #TODO: doesn't support multiple alarms at once
     def showAlarm(self, code: int) -> None:
@@ -416,52 +429,15 @@ class MainWindow(QWidget):
         self.shownAlarmCode = None
         self.display(0)
 
-    def showStartStopConfirm(self):
-        d = QDialog()
-        d.setFixedWidth(600)
-        d.setFixedHeight(300)
+    def confirmStop(self):
+        self.display(7)
 
-        d_h_box_1 = QHBoxLayout()
-        d_h_box_2 = QHBoxLayout()
-        d_v_box = QVBoxLayout()
-        d_label = QLabel("Caution: this will stop ventilation immediately. "
-                         "Proceed?")
-        d_label.setFont(self.ui_settings.page_settings.mainLabelFont)
-        d_label.setWordWrap(True)
-        d_label.setAlignment(Qt.AlignCenter)
-
-        d_cancel = QPushButton("Cancel")
-        d_cancel.clicked.connect(lambda: d.reject())
-        d_cancel.setFont(self.ui_settings.simple_button_settings.valueFont)
-        d_cancel.setStyleSheet("QPushButton {background-color: " +
-                               self.ui_settings.page_settings.cancelColor +
-                               ";}")
-
-        d_confirm = QPushButton("Confirm")
-        d_confirm.clicked.connect(lambda: self.stopVentilation(d))
-        d_confirm.setFont(self.ui_settings.simple_button_settings.valueFont)
-        d_confirm.setStyleSheet("QPushButton {background-color: " +
-                                self.ui_settings.page_settings.commitColor +
-                                ";}")
-
-        d_h_box_1.addWidget(d_label)
-        d_h_box_2.addWidget(d_cancel)
-        d_h_box_2.addWidget(d_confirm)
-        d_h_box_2.setSpacing(100)
-        d_v_box.addLayout(d_h_box_1)
-        d_v_box.addLayout(d_h_box_2)
-
-        d.setLayout(d_v_box)
-        d.setWindowTitle("Confirm Stop")
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
-
-    def stopVentilation(self, d: QDialog):
-        d.reject()
+    def stopVentilation(self):
         self.settings.run_state = 0
         self.start_stop_button_main.updateValue("START")
         self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
+        self.display(0)
 
     def commitMode(self):
         self.settings.mode = self.local_settings.mode
@@ -496,12 +472,31 @@ class MainWindow(QWidget):
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
 
-    def commitAlarm(self):
+    def commitAlarm(self) -> None:
         self.settings.alarm_mode = self.local_settings.alarm_mode
         self.alarm_button_main.updateValue(self.settings.get_alarm_display())
         self.display(0)
         self.passChanges()
         self.updatePageDisplays()
+
+    def commitNewPatientID(self) -> None:
+        print(f"Old patient ID {self.patient_id}")
+        self.patient_id = self.new_patient_id
+        print(f"New patient ID {self.patient_id}")
+        self.new_patient_id = None
+        self.patient_id_display = self.new_patient_id_display
+        self.new_patient_id_display = None
+        self.settings_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+
+        self.generate_new_patient_id_page_button.show()
+        self.display(6)
+
+    def cancelNewPatientID(self):
+        self.new_patient_id = None
+        self.new_patient_id_display = None
+        self.patient_page_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+        self.generate_new_patient_id_page_button.show()
+        self.display(6)
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
