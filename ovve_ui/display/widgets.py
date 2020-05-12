@@ -787,8 +787,9 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
         window.ui_settings.page_settings.mainLabelFont)
     change_patient_main_label.setWordWrap(True)
     change_patient_main_label.setAlignment(Qt.AlignCenter)
-    change_patient_main_label.setFixedHeight(150)
     change_patient_main_label.setFixedWidth(400)
+    change_patient_main_label.setStyleSheet("QLabel {color: #000000 ;}")
+
 
     window.patient_page_label = QLabel(
         f"Current Patient: Patient {window.patient_id_display}")
@@ -813,31 +814,33 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
 
     change_patient_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= window.ui_settings.page_settings.cancelColor,
             borderColor=window.ui_settings.page_settings.cancelColor,
             valueSetting=window.ui_settings.page_settings.cancelSetting,
-            valueColor=window.ui_settings.page_settings.cancelColor))
+            valueColor="#FFFFFF"))
 
     change_patient_cancel.clicked.connect(window.cancelNewPatientID)
 
     change_patient_apply = window.makeSimpleDisplayButton(
         "APPLY",
+        size=(150, 90),
         button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
+            fillColor= window.ui_settings.page_settings.commitColor,
             borderColor=window.ui_settings.page_settings.commitColor,
             valueSetting=window.ui_settings.page_settings.commitSetting,
-            valueColor=window.ui_settings.page_settings.commitColor))
+            valueColor="#FFFFFF"))
     change_patient_apply.clicked.connect(window.commitNewPatientID)
 
-    change_patient_back_button = window.makeSimpleDisplayButton(
+    change_patient_back = window.makeSimpleDisplayButton(
         "Back to Settings",
         button_settings=SimpleButtonSettings(
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
         ),
         size=(200, 65))
-    change_patient_back_button.clicked.connect(lambda: window.display(6))
+    change_patient_back.clicked.connect(lambda: window.display(6))
 
     h_box_9mid3.setSpacing(75)
 
@@ -846,7 +849,7 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
     h_box_9mid2.addWidget(window.generate_new_patient_id_page_button)
     h_box_9mid3.addWidget(change_patient_cancel)
     h_box_9mid3.addWidget(change_patient_apply)
-    h_box_9bottom.addWidget(change_patient_back_button)
+    h_box_9bottom.addWidget(change_patient_back)
     v_box_9.addLayout(h_box_9top)
     v_box_9.addLayout(h_box_9mid1)
     v_box_9.addLayout(h_box_9mid2)
