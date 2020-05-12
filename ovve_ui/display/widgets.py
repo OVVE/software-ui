@@ -3,7 +3,7 @@ Widgets used to initialize the the OVVE UI
 """
 from random import randint
 from typing import TypeVar
-
+from os import path
 import numpy as np
 import pyqtgraph as pg
 
@@ -60,8 +60,9 @@ def initializeHomeScreenWidget(
     window.start_stop_button_main = window.makeSimpleDisplayButton("START")
     window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
+    settings_icon_path = path.abspath(path.join(path.dirname(__file__), "images/gear.png"))
     window.settings_button_main = window.makePicButton(
-        "display/images/gear.png", size=(60, 60))
+        settings_icon_path, size=(60, 60))
     window.settings_button_main.clicked.connect(lambda: window.display(6))
 
 
