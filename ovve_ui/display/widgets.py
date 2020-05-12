@@ -671,6 +671,7 @@ def initializeSettingsWidget(window: MainWindow) -> None:
 
     settings_page_label = QLabel("Settings")
     settings_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
+    settings_page_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
@@ -678,6 +679,8 @@ def initializeSettingsWidget(window: MainWindow) -> None:
         f"Current Patient: Patient {window.patient_id_display}")
     window.settings_patient_label.setAlignment(Qt.AlignCenter)
     window.settings_patient_label.setFont(TextSetting("Arial", 20, True).font)
+    window.settings_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
+
 
     settings_change_patient_button = window.makeSimpleDisplayButton(
         "Change Patient",
@@ -791,6 +794,7 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
         f"Current Patient: Patient {window.patient_id_display}")
     window.patient_page_label.setAlignment(Qt.AlignCenter)
     window.patient_page_label.setFont(TextSetting("Arial", 20, True).font)
+    window.patient_page_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     window.generate_new_patient_id_page_button = window.makeSimpleDisplayButton(
         "Generate New Patient ID",
