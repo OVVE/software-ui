@@ -510,7 +510,7 @@ class MainWindow(QWidget):
         print(f"New patient ID {self.patient_id}")
         self.new_patient_id = None
         self.patient_id_display = self.new_patient_id_display
-        self.new_patient_id_display = None
+        self.new_patient_id_display = self.patient_id_display
         self.settings_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
         self.main_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
 
