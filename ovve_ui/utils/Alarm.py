@@ -1,5 +1,5 @@
 class Alarm():
-    def __init__(self, time, bit_number: int, priority: int):
+    def __init__(self, time, alarm_type, priority: int):
         self.time = time
-        self.bit_number = bit_number
+        self.alarm_type = alarm_type
         self.priority = priority
