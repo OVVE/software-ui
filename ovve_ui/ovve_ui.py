@@ -61,6 +61,7 @@ class MainWindow(QWidget):
 
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
+        self.new_patient_id_display =1
         self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
 
         self.battery_img = "battery_grey_full"
@@ -433,11 +434,10 @@ class MainWindow(QWidget):
 
     def generateNewPatientID(self) -> None:
         self.new_patient_id = uuid.uuid4()
-        self.new_patient_id_display = self.patient_id_display+1
+        self.new_patient_id_display += 1
         self.patient_page_label.setText( f"Current Patient: Patient {self.new_patient_id_display}")
         self.patient_page_label.update()
-        self.generate_new_patient_id_page_button.hide()
-
+        # self.generate_new_patient_id_page_button.hide()
 
     #TODO: doesn't support multiple alarms at once
     def showAlarm(self, code: int) -> None:
