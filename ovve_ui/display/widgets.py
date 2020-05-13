@@ -23,13 +23,13 @@ def initializeHomeScreenWidget(
         window: MainWindow) -> (QVBoxLayout, QStackedWidget):
     """ Creates Home Screen for Widgets """
     layout = QVBoxLayout()
-    h_box_11 = QHBoxLayout()
     h_box_12 = QHBoxLayout()
-    h_box_11.setAlignment(Qt.AlignCenter)
+    h_box_13 = QHBoxLayout()
+    h_box_12.setAlignment(Qt.AlignCenter)
 
-    v_box_11left = QVBoxLayout()
-    v_box_11mid = QVBoxLayout()
-    v_box_11right = QVBoxLayout()
+    v_box_13left = QVBoxLayout()
+    v_box_13mid = QVBoxLayout()
+    v_box_13right = QVBoxLayout()
 
     window.mode_button_main = window.makeSimpleDisplayButton(
         window.get_mode_display(window.settings.mode), )
@@ -109,34 +109,42 @@ def initializeHomeScreenWidget(
         "cmH2O",
     )
 
-    h_box_11.addWidget(window.mode_button_main)
-    h_box_11.addWidget(window.resp_rate_button_main)
-    h_box_11.addWidget(window.tv_button_main)
-    h_box_11.addWidget(window.ie_button_main)
-    h_box_11.addWidget(window.start_stop_button_main)
-    h_box_11.addWidget(window.settings_button_main)
+    for button in [window.mode_button_main,
+                   window.resp_rate_button_main,
+                   window.tv_button_main,
+                   window.ie_button_main,
+                   window.start_stop_button_main,
+                   window.settings_button_main,
+                   ]:
+        h_box_12.addWidget(button)
 
-    v_box_11left.addWidget(window.resp_rate_display_main)
-    v_box_11left.addWidget(window.tv_insp_display_main)
-    v_box_11left.addWidget(window.tv_exp_display_main)
+    for left_display in [window.resp_rate_display_main,
+                    window.tv_insp_display_main,
+                    window.tv_exp_display_main,
+                    ]:
+        v_box_13left.addWidget(left_display)
 
     stack = QStackedWidget()
+    v_box_13mid.addWidget(stack)
 
-    v_box_11mid.addWidget(stack)
+    for right_display in [window.peep_display_main,
+                    window.ppeak_display_main,
+                    window.pplat_display_main,
+                    ]:
+        v_box_13right.addWidget(right_display)
 
-    v_box_11right.addWidget(window.peep_display_main)
-    v_box_11right.addWidget(window.ppeak_display_main)
-    v_box_11right.addWidget(window.pplat_display_main)
+    for v_layout in [v_box_13left,
+                     v_box_13mid,
+                     v_box_13right,
+                     ]:
+        h_box_13.addLayout(v_layout)
 
-    h_box_12.addLayout(v_box_11left)
-    h_box_12.addLayout(v_box_11mid)
-    h_box_12.addLayout(v_box_11right)
+    h_box_13.setSpacing(18)
 
-    h_box_11.setSpacing(18)
-
-    layout.addLayout(h_box_11)
     layout.addLayout(h_box_12)
-    return (layout, stack)
+    layout.addLayout(h_box_13)
+
+    return layout, stack
 
 
 #TODO: Add Units
