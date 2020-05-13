@@ -868,7 +868,7 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
         ),
-        size=(200, 65))
+        size=(250, 65))
     window.generate_new_patient_id_page_button.clicked.connect(
         window.generateNewPatientID)
     generate_new_patient_id_size_policy = window.generate_new_patient_id_page_button.sizePolicy(
