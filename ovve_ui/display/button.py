@@ -118,3 +118,32 @@ class SimpleDisplayButton(QAbstractButton):
         self.value = value
         self.value_label.setText(str(value))
         self.update()
+
+class PicButton(QAbstractButton):
+    def __init__(self,
+                 file: str,
+                 size: Optional[Tuple[int, int]]  = None,
+                parent: Optional[Any] = None):
+        super().__init__(parent)
+        self.pixmap = QPixmap(file)
+        self.size = size
+
+    def paintEvent(self, event) -> None:
+        painter = QPainter(self)
+        painter.setPen(QPen(QColor("#000000")))
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)
+        if self.size is not None:
+            painter.drawPixmap(QRect(0,0,*self.size), self.pixmap)
+        else:
+            painter.drawPixmap(self.pixmap)
+
+    def sizeHint(self):
+        if self.size is not None:
+            return QSize(*self.size)
+        else:
+            return self.pixmap.size()
+
+    def updateValue(self, file: str):
+        self.pixmap = QPixmap(file)
+        self.update()
+

@@ -23,7 +23,7 @@ class FancyButtonSettings:
                  labelColor: str = '#A7A9AA',
                  valueColor: str = '#000000',
                  unitColor: str = '#808080',
-                 default_size: Tuple[int, int] = (115, 65)):
+                 default_size: Tuple[int, int] = (126, 64)):
 
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
@@ -54,11 +54,11 @@ class FancyButtonSettings:
 class SimpleButtonSettings:
     def __init__(self,
                  valueSetting: TextSetting = TextSetting(
-                     "Arial Black", 18, False),
+                     "Arial Black", 16, False),
                  fillColor: str = '#f2fff0',
                  borderColor: str = '#C5C5C5',
                  valueColor: str = '#000000',
-                 default_size: Tuple[int, int] = (115, 65)):
+                 default_size: Tuple[int, int] = (150, 98)):
 
         self.valueFont = valueSetting.font
         self.borderColor = borderColor
@@ -87,7 +87,7 @@ class DisplayRectSettings:
                  labelColor: str = '#29ABE2',
                  valueColor: str = '#000000',
                  unitColor: str = '#7394A0',
-                 default_size: Tuple[int, int] = (160, 115)):
+                 default_size: Tuple[int, int] = (140, 95)):
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
         self.unitFont = unitSetting.font
@@ -128,12 +128,13 @@ class PageSettings:
         changeButtonBorderColor: str = '#C5C5C5',
         valueLabelWidth: int = 210,
         changeButtonSpacing: int = 50,
-        cancelSetting: TextSetting = TextSetting("Arial", 14, True),
+        cancelSetting: TextSetting = TextSetting("Arial", 20, True),
         cancelColor: str = "#ff0000",
-        commitSetting: TextSetting = TextSetting("Arial", 14, True),
-        commitColor: str = "#00FF00",
+        commitSetting: TextSetting = TextSetting("Arial", 20, True),
+        commitColor: str = "#3cb371",
         commitCancelButtonSpacing: int = 100,
         alarmSilenceButtonColor: str = '#C5C5C5',
+        topBarTextSetting: TextSetting = TextSetting("Arial", 16, True),
     ):
 
         self.mainLabelFont = mainLabelSetting.font
@@ -153,6 +154,7 @@ class PageSettings:
         self.commitColor = commitColor
         self.commitCancelButtonSpacing = commitCancelButtonSpacing
         self.alarmSilenceButtonColor = alarmSilenceButtonColor
+        self.topBarFont = topBarTextSetting.font
 
         def getCancelBorderPen(self) -> QPen:
             return QPen(QColor(self.cancelColor))

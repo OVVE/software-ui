@@ -62,16 +62,16 @@ class CommsSimulator(QThread):
                 params.ie_ratio_meas = ie_fraction2
                 params.ie_ratio_set = ie_fraction
 
-                params.peep = random.randrange(3, 6)
-                params.ppeak = random.randrange(15, 20)
-                params.pplat = random.randrange(15, 20)
-                params.pressure = random.randrange(-40, 40)
-                params.flow = random.randrange(-20, 20)
-                params.tv_insp = random.randrange(475, 575)
-                params.tv_exp = random.randrange(475, 575)
-                params.tv_rate = random.randrange(475, 575)
+                params.peep = random.uniform(3, 6)
+                params.ppeak = random.uniform(15, 20)
+                params.pplat = random.uniform(15, 20)
+                params.pressure = random.uniform(-40, 40)
+                params.flow = random.uniform(0, 55)
+                params.tv_insp = random.uniform(475, 575)
+                params.tv_exp = random.uniform(475, 575)
+                params.tv_rate = random.uniform(475, 575)
                 params.control_state = 0
-                params.battery_level = 255
+                params.battery_level = random.randint(0, 100)
                 self.new_params.emit(params)
 
                 # Every N loops fire an alarm
