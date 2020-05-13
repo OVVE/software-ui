@@ -143,3 +143,7 @@ class PicButton(QAbstractButton):
         else:
             return self.pixmap.size()
 
+    def updateValue(self, file: str):
+        self.pixmap = QPixmap(file)
+        self.update()
+
