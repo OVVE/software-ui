@@ -265,7 +265,7 @@ def sendPkts(seq_cnt, crc):
     #print(bytearray(cmd_byteData))
     
     print("Sent back SEQ and CRC: ")
-    # print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
+    print(''.join(r'\x'+hex(letter)[2:] for letter in cmd_byteData))
     print (int.from_bytes(cmd_byteData[0:2], byteorder='little'))
     print (int.from_bytes(cmd_byteData[32:], byteorder='little'))
     byteData = b'\x00'
