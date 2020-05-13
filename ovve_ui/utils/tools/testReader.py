@@ -18,6 +18,8 @@ dicA = {'ver': '', 'seq': '' }
 IN_PKT_SZ = 56
 OUT_PKT_SZ = 34
 
+send_count = 0
+
 #Function to Initialize the Serial Port
 def init_serial():
     
@@ -194,6 +196,7 @@ def process_in_serial():
         
 
 def sendPkts(seq_cnt, crc):
+    global send_count
     global ser
     global in_pkt
     global cmd_pkt
@@ -221,6 +224,13 @@ def sendPkts(seq_cnt, crc):
     cmd_byteData += bytes(cmd_pkt['low_volume_limit_set'].to_bytes(2, endian))
     cmd_byteData += bytes(cmd_pkt['high_respiratory_rate_limit_set'].to_bytes(2, endian))
     cmd_byteData += bytes(cmd_pkt['low_respiratory_rate_limit_set'].to_bytes(2, endian))        
+    
+    if send_count % 200 == 0:
+      cmd_pkt['alarm_bits'] = 0xffff
+    else:
+      cmd_pkt['alarm_bits'] = 0x0
+    send_count += 1
+    
     # TO DO set alarmbits correctly if sequence or CRC failed
     cmd_byteData += bytes(cmd_pkt['alarm_bits'].to_bytes(4, endian))
     #Get CRC
@@ -262,6 +272,3 @@ def sendPkts(seq_cnt, crc):
     
 if __name__ == '__main__':
     process_in_serial()
-
-
-
