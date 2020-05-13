@@ -59,6 +59,13 @@ class MainWindow(QWidget):
         self.last_main_update_time = 0
         self.main_update_interval = 1.0
 
+        self.patient_id = uuid.uuid4()
+        self.patient_id_display = 1
+        self.new_patient_id_display =1
+        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
+
+        self.battery_img = "battery_grey_full"
+
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
         self.ptr = 0
@@ -84,10 +91,6 @@ class MainWindow(QWidget):
         self.shownAlarmCode = None
 
 
-        # TODO: Set patient_id from the UI
-        self.patient_id = uuid.uuid4()
-        self.patient_id_display = 1
-        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
 
         self.initalizeAndAddStackWidgets()
 
@@ -265,6 +268,29 @@ class MainWindow(QWidget):
             # self.tv_exp_display_main.updateValue(self.params.tv_exp)
             self.ppeak_display_main.updateValue(round(self.params.ppeak, 1))
             self.pplat_display_main.updateValue(round(self.params.pplat, 1))
+            self.main_battery_level_label.setText(f"{self.params.battery_level}%")
+
+            if self.params.battery_level == 0:
+                self.battery_img = "battery_grey_0"
+            elif self.params.battery_level<=25:
+                self.battery_img = "battery_grey_25"
+            elif self.params.battery_level<=50:
+                self.battery_img = "battery_grey_50"
+
+            elif self.params.battery_level<=75:
+                self.battery_img = "battery_grey_75"
+
+            elif self.params.battery_level<=75:
+                self.battery_img = "battery_grey_75"
+
+            else:
+                self.battery_img = "battery_grey_full"
+
+            self.main_battery_icon.updateValue(os.path.abspath(os.path.join(
+                os.path.dirname(__file__),
+                f"display/images/batteries/light_theme/{self.battery_img}")))
+
+            #TODO: Get battery level converted to percentage
 
     def updatePageDisplays(self) -> None:
         self.mode_page_value_label.setText(
@@ -408,11 +434,10 @@ class MainWindow(QWidget):
 
     def generateNewPatientID(self) -> None:
         self.new_patient_id = uuid.uuid4()
-        self.new_patient_id_display = self.patient_id_display+1
+        self.new_patient_id_display += 1
         self.patient_page_label.setText( f"Current Patient: Patient {self.new_patient_id_display}")
         self.patient_page_label.update()
-        self.generate_new_patient_id_page_button.hide()
-
+        # self.generate_new_patient_id_page_button.hide()
 
     #TODO: doesn't support multiple alarms at once
     def showAlarm(self, code: int) -> None:
@@ -485,8 +510,10 @@ class MainWindow(QWidget):
         print(f"New patient ID {self.patient_id}")
         self.new_patient_id = None
         self.patient_id_display = self.new_patient_id_display
-        self.new_patient_id_display = None
+        self.new_patient_id_display = self.patient_id_display
         self.settings_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+        self.main_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+
 
         self.generate_new_patient_id_page_button.show()
         self.display(6)

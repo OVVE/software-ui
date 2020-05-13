@@ -23,16 +23,52 @@ def initializeHomeScreenWidget(
         window: MainWindow) -> (QVBoxLayout, QStackedWidget):
     """ Creates Home Screen for Widgets """
     layout = QVBoxLayout()
-    h_box_11 = QHBoxLayout()
-    h_box_12 = QHBoxLayout()
-    h_box_11.setAlignment(Qt.AlignCenter)
+    h_box_1 = QHBoxLayout()
+    h_box_2 = QHBoxLayout()
+    h_box_3 = QHBoxLayout()
 
-    v_box_11left = QVBoxLayout()
-    v_box_11mid = QVBoxLayout()
-    v_box_11right = QVBoxLayout()
+    h_box_1left = QHBoxLayout()
+    h_box_1mid= QHBoxLayout()
+    h_box_1right = QHBoxLayout()
+
+    h_box_1right.setAlignment(Qt.AlignRight)
+
+    h_box_2.setAlignment(Qt.AlignCenter)
+
+    v_box_3left = QVBoxLayout()
+    v_box_3mid = QVBoxLayout()
+    v_box_3right = QVBoxLayout()
+
+    main_logo_path = path.abspath(path.join(path.dirname(__file__), "images/lm_logo_light.png"))
+    main_logo = window.makePicButton(
+        main_logo_path,
+        size = (215, 50),
+    )
+
+    window.main_patient_label = QLabel(f"Current Patient: Patient {window.patient_id_display}")
+    window.main_patient_label.setFont(window.ui_settings.page_settings.topBarFont)
+    window.main_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+
+    window.main_datetime_label = QLabel(window.dateTime.toString()[:-8])
+    window.main_datetime_label.setFont(window.ui_settings.page_settings.topBarFont)
+    window.main_datetime_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+
+    window.main_battery_level_label = QLabel(f"{window.params.battery_level}%")
+    window.main_battery_level_label.setFont(window.ui_settings.page_settings.topBarFont)
+    window.main_battery_level_label.setFixedWidth(50)
+    window.main_battery_level_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+    main_battery_icon_path = path.abspath(path.join(path.dirname(__file__),
+                                            f"images/batteries/light_theme/{window.battery_img}"))
+    window.main_battery_icon = window.makePicButton(
+        main_battery_icon_path,
+        size = (30, 15),
+    )
 
     window.mode_button_main = window.makeSimpleDisplayButton(
-        window.get_mode_display(window.settings.mode), )
+        window.get_mode_display(window.settings.mode), size = (126,64))
     window.mode_button_main.clicked.connect(lambda: window.display(1))
 
     window.resp_rate_button_main = window.makeFancyDisplayButton(
@@ -57,7 +93,7 @@ def initializeHomeScreenWidget(
     )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
 
-    window.start_stop_button_main = window.makeSimpleDisplayButton("START")
+    window.start_stop_button_main = window.makeSimpleDisplayButton("START", size = (126,64))
     window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
     settings_icon_path = path.abspath(path.join(path.dirname(__file__), "images/gear.png"))
@@ -109,34 +145,62 @@ def initializeHomeScreenWidget(
         "cmH2O",
     )
 
-    h_box_11.addWidget(window.mode_button_main)
-    h_box_11.addWidget(window.resp_rate_button_main)
-    h_box_11.addWidget(window.tv_button_main)
-    h_box_11.addWidget(window.ie_button_main)
-    h_box_11.addWidget(window.start_stop_button_main)
-    h_box_11.addWidget(window.settings_button_main)
+    h_box_1left.addWidget(main_logo)
+    h_box_1mid.addWidget(window.main_patient_label)
+    h_box_1mid.addWidget(window.main_datetime_label)
 
-    v_box_11left.addWidget(window.resp_rate_display_main)
-    v_box_11left.addWidget(window.tv_insp_display_main)
-    v_box_11left.addWidget(window.tv_exp_display_main)
+    h_box_1mid.setSpacing(18)
+
+    h_box_1right.addWidget(window.main_battery_level_label)
+    h_box_1right.addWidget(window.main_battery_icon)
+
+    h_box_1right.setSpacing(0)
+
+
+    for button in [window.mode_button_main,
+                   window.resp_rate_button_main,
+                   window.tv_button_main,
+                   window.ie_button_main,
+                   window.start_stop_button_main,
+                   window.settings_button_main,
+                   ]:
+        h_box_2.addWidget(button)
+
+    for left_display in [window.resp_rate_display_main,
+                    window.tv_insp_display_main,
+                    window.tv_exp_display_main,
+                    ]:
+        v_box_3left.addWidget(left_display)
 
     stack = QStackedWidget()
+    v_box_3mid.addWidget(stack)
 
-    v_box_11mid.addWidget(stack)
+    for right_display in [window.peep_display_main,
+                    window.ppeak_display_main,
+                    window.pplat_display_main,
+                    ]:
+        v_box_3right.addWidget(right_display)
 
-    v_box_11right.addWidget(window.peep_display_main)
-    v_box_11right.addWidget(window.ppeak_display_main)
-    v_box_11right.addWidget(window.pplat_display_main)
+    for h_layout1 in [h_box_1left,
+                      h_box_1mid,
+                     h_box_1right,
+                     ]:
+        h_box_1.addLayout(h_layout1)
 
-    h_box_12.addLayout(v_box_11left)
-    h_box_12.addLayout(v_box_11mid)
-    h_box_12.addLayout(v_box_11right)
+    for v_layout3 in [v_box_3left,
+                     v_box_3mid,
+                     v_box_3right,
+                     ]:
+        h_box_3.addLayout(v_layout3)
 
-    h_box_11.setSpacing(18)
+    h_box_3.setSpacing(18)
 
-    layout.addLayout(h_box_11)
-    layout.addLayout(h_box_12)
-    return (layout, stack)
+    for h_layout in [h_box_1,
+                     h_box_2,
+                     h_box_3]:
+        layout.addLayout(h_layout)
+
+    return layout, stack
 
 
 #TODO: Add Units
@@ -804,7 +868,7 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
         ),
-        size=(200, 65))
+        size=(250, 65))
     window.generate_new_patient_id_page_button.clicked.connect(
         window.generateNewPatientID)
     generate_new_patient_id_size_policy = window.generate_new_patient_id_page_button.sizePolicy(

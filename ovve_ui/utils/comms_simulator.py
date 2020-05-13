@@ -71,7 +71,7 @@ class CommsSimulator(QThread):
                 params.tv_exp = random.uniform(475, 575)
                 params.tv_rate = random.uniform(475, 575)
                 params.control_state = 0
-                params.battery_level = 255
+                params.battery_level = random.randint(0, 100)
                 self.new_params.emit(params)
 
                 # Every N loops fire an alarm
