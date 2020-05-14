@@ -7,12 +7,12 @@ from utils.Alarm import *
   Simulates what should happen in comms handler
 '''
 class AlarmEmitter(QtCore.QThread):
-    new_alarm_signal = pyqtSignal(bytearray)
+    new_alarm_signal = pyqtSignal(int)
 
     def __init__(self, handler: AlarmHandler):
         super().__init__()
         self.handler = handler
-        self.new_alarm_signal.connect(self.handler.set_alarms)
+        self.new_alarm_signal.connect(self.handler.set_active_alarms)
         self.handler.acknowledge_alarm_signal.connect(self.handle_ack)
         self.start()
 
@@ -20,14 +20,13 @@ class AlarmEmitter(QtCore.QThread):
         print("Ack received from alarm handler")
 
     def run(self):
-        count = 0
         while True:  
-            print("Emitting an alarm")
-            alarm_bytes = bytearray(5)
-            alarm_bytes[4] = count
-            self.new_alarm_signal.emit(alarm_bytes)
-            count += 1
-            time.sleep(1)
+            for alarmtype in list(AlarmType):
+                alarmbits = 0
+                alarmbits |= 1 << alarmtype.value      
+                print("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(alarmbits)))
+                self.new_alarm_signal.emit(alarmbits)
+                time.sleep(1)
             
 '''
   Simulates what should happen in UI
@@ -40,12 +39,12 @@ class AlarmConsumer(QtCore.QThread):
 
     def run(self):
         while True:  
-            if self.handler.is_alarm_pending():
+            if self.handler.alarm_is_pending():
                 highest_alarm = self.handler.get_highest_priority_alarm()
                 message = highest_alarm.get_message()
-                print("Got an alarm from the queue " + str(highest_alarm) + " message: " + message)
+                print("Current highest alarm is " + str(highest_alarm) + " message: " + message)
                 print("Consumer acknowledging the alarm")
-                self.handler.acknowledge_alarm(highest_alarm)
+                self.handler.acknowledge_current_alarm()
 
 
 if __name__ == '__main__':
