@@ -12,7 +12,7 @@ class AlarmEmitter(QtCore.QThread):
     def __init__(self, handler: AlarmHandler):
         super().__init__()
         self.handler = handler
-        self.new_alarm_signal.connect(self.handler.handle_alarms)
+        self.new_alarm_signal.connect(self.handler.set_alarms)
         self.handler.acknowledge_alarm_signal.connect(self.handle_ack)
         self.start()
 

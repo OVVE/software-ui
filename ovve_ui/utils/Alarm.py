@@ -24,8 +24,7 @@ class Alarm():
         return self.messages.get(self.alarm_type, "")
 
 
-class AlarmQueue(PriorityQueue):
-       
+class AlarmQueue(PriorityQueue): 
     priorities : dict = {
         AlarmType.LOW_PRESSURE: 100,
         AlarmType.HIGH_PRESSURE: 200
@@ -55,13 +54,13 @@ class AlarmHandler(QtCore.QObject):
      This function should be connected to a signal emitted
      by the comms handler when alarm bits are received
     '''
-    def handle_alarms(self, alarm_bytes: bytearray) -> None:
+    def set_alarms(self, alarm_bytes: bytearray) -> None:
         print("Alarm handler got alarm bytes " + str(alarm_bytes))
         
         # TODO: Parse bytes and enqueue alarms
         # parse alarm bits and add alarms to the priority queue
         # Ex.  e got a low pressure alarm
-        self.enqueue_alarm(AlarmType.LOW_PRESSURE)
+        self.__enqueue_alarm(AlarmType.LOW_PRESSURE)
 
     '''
      This function should be called by the UI when it
@@ -84,12 +83,13 @@ class AlarmHandler(QtCore.QObject):
     def get_highest_priority_alarm(self) -> Alarm:
         return self.alarm_queue.get()
         
-    def enqueue_alarm(self, alarm_type: AlarmType) -> None:
-        alarm = Alarm(alarm_type)
-        self.alarm_queue.put(alarm)
-
     def is_alarm_pending(self) -> bool:
         return self.alarm_queue.empty()
 
+    def __enqueue_alarm(self, alarm_type: AlarmType) -> None:
+        alarm = Alarm(alarm_type)
+        self.alarm_queue.put(alarm)
+
+ 
 
     
