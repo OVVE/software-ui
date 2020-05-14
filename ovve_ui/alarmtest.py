@@ -40,24 +40,12 @@ class AlarmConsumer(QtCore.QThread):
 
     def run(self):
         while True:  
-            
-            try:
-                print("Get an alarm from the queue")
+            if self.handler.is_alarm_pending():
                 highest_alarm = self.handler.get_highest_priority_alarm()
+                message = highest_alarm.get_message()
+                print("Got an alarm from the queue " + str(highest_alarm) + " message: " + message)
                 print("Consumer acknowledging the alarm")
                 self.handler.acknowledge_alarm(highest_alarm)
-            except queue.Empty:
-                pass
-
-            # OR, you can test for empty first
-            
-            # if self.handler.is_alarm_pending():
-            #     print("Get an alarm from the queue")
-            #     highest_alarm = self.handler.get_highest_priority_alarm()
-            #     print("Acknowledge the alarm")
-            #     self.handler.acknowledge_alarm(highest_alarm)
-        
-            time.sleep(1)
 
 
 if __name__ == '__main__':

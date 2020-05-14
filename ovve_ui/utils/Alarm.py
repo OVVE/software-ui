@@ -4,24 +4,28 @@ from queue import PriorityQueue
 from typing import List
 from PyQt5.QtCore import pyqtSignal
 from PyQt5 import QtCore
+from threading import Lock
 
 class AlarmType(Enum):
     LOW_PRESSURE = 1
     HIGH_PRESSURE = 2
 
-class AlarmMessages():
-    def __init__(self) -> None:
-        self.messages : dict = {
-            AlarmType.LOW_PRESSURE: "Low pressure warning!",
-            AlarmTyp.HIGH_PRESSURE: "High pressure warning!"
-        }
-
 class Alarm():
+    messages : dict = {
+        AlarmType.LOW_PRESSURE: "Low pressure warning!",
+        AlarmType.HIGH_PRESSURE: "High pressure warning!"
+    }
+
     def __init__(self, alarm_type: AlarmType):
         self.timefired = time.time()
         self.alarm_type = alarm_type
 
+    def get_message(self) -> str:
+        return self.messages.get(self.alarm_type, "")
+
+
 class AlarmQueue(PriorityQueue):
+       
     priorities : dict = {
         AlarmType.LOW_PRESSURE: 100,
         AlarmType.HIGH_PRESSURE: 200
@@ -29,12 +33,16 @@ class AlarmQueue(PriorityQueue):
 
     def __init__(self) -> None:
         super().__init__()
+ 
     
     def put(self, alarm: Alarm):
         # TODO: Check and see if alarm is already in the queue 
         # before adding a new entry
-        super().put(self.priorities.get(alarm.alarm_type), alarm)
+        super().put((self.priorities.get(alarm.alarm_type), alarm))
 
+    def get(self) -> Alarm:
+        tup = super().get()
+        return tup[1]
 
 class AlarmHandler(QtCore.QObject):
     acknowledge_alarm_signal = pyqtSignal(bytearray)
@@ -74,8 +82,8 @@ class AlarmHandler(QtCore.QObject):
       highest priority alarm in the queue
     '''
     def get_highest_priority_alarm(self) -> Alarm:
-        return self.alarm_queue.get()  
-
+        return self.alarm_queue.get()
+        
     def enqueue_alarm(self, alarm_type: AlarmType) -> None:
         alarm = Alarm(alarm_type)
         self.alarm_queue.put(alarm)
