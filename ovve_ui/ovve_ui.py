@@ -32,7 +32,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
                              initializeGraphWidget, initializeSettingsWidget,
-                             initializeConfirmStopWidget, initializeChangePatientWidget)
+                             initializeConfirmStopWidget, initializeChangePatientWidget,
+                             initializeChangeDatetimeWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
@@ -70,27 +71,15 @@ class MainWindow(QWidget):
         self.ui_settings = UISettings()
         self.ptr = 0
 
-        self.dateTime = QDateTime.currentDateTime()
+        self.datetime = QDateTime.currentDateTime()
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {
-            "1": QWidget(),
-            "2": QWidget(),
-            "3": QWidget(),
-            "4": QWidget(),
-            "5": QWidget(),
-            "6": QWidget(),
-            "7": QWidget(),
-            "8": QWidget(),
-            "9": QWidget(),
-        }
+        self.page = {str(i): QWidget() for i in range(1,11)}
         self.alarms = Alarms()
         self.shownAlarmCode = None
-
-
 
         self.initalizeAndAddStackWidgets()
 
@@ -229,6 +218,7 @@ class MainWindow(QWidget):
         initializeSettingsWidget(self)
         initializeConfirmStopWidget(self)
         initializeChangePatientWidget(self)
+        initializeChangeDatetimeWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -505,9 +495,7 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitNewPatientID(self) -> None:
-        print(f"Old patient ID {self.patient_id}")
         self.patient_id = self.new_patient_id
-        print(f"New patient ID {self.patient_id}")
         self.new_patient_id = None
         self.patient_id_display = self.new_patient_id_display
         self.new_patient_id_display = self.patient_id_display
@@ -518,12 +506,58 @@ class MainWindow(QWidget):
         self.generate_new_patient_id_page_button.show()
         self.display(6)
 
+
     def cancelNewPatientID(self):
         self.new_patient_id = None
         self.new_patient_id_display = None
         self.patient_page_label.setText( f"Current Patient: Patient {self.patient_id_display}")
         self.generate_new_patient_id_page_button.show()
         self.display(6)
+
+    def incrementMonth(self) -> None:
+        self.new_date = self.new_date.addMonths(1)
+        self.date_tab_month_label.setText(str(self.new_date.month()))
+        if self.new_date.month == 1:
+            self.new_date = self.new_date.addYears(-1)
+
+    def decrementMonth(self) -> None:
+        self.new_date = self.new_date.addMonths(-1)
+        self.date_tab_month_label.setText(str(self.new_date.month()))
+        if self.new_date.month == 12:
+            self.new_date = self.new_date.addYears(1)
+
+    def incrementDay(self) -> None:
+        self.new_date = self.new_date.addDays(1)
+        self.date_tab_day_label.setText(str(self.new_date.day()))
+        if self.new_date.day == 1:
+            self.new_date = self.new_date.addMonths(-1)
+
+    def decrementDay(self) -> None:
+        self.new_date = self.new_date.addDays(-1)
+        self.date_tab_day_label.setText(str(self.new_date.day()))
+        if self.new_date.day() == self.new_date.daysInMonth():
+            self.new_date = self.new_date.addMonths(1)
+            self.new_date = self.new_date.setDate(self.new_date.year(),
+                                                 self.new_date.month(),
+                                                 self.new_date.daysInMonth())
+
+    def incrementYear(self) -> None:
+        self.new_date = self.new_date.addYears(1)
+        self.date_tab_year_label.setText(str(self.new_date.year()))
+
+    def decrementYear(self) -> None:
+        self.new_date = self.new_date.addYears(-1)
+        self.date_tab_year_label.setText(str(self.new_date.year()))
+
+    def cancelDate(self) -> None:
+        self.new_date = self.datetime.date()
+        self.date_tab_month_label.setText(str(self.new_date.month()))
+        self.date_tab_day_label.setText(str(self.new_date.day()))
+        self.date_tab_year_label.setText(str(self.new_date.year()))
+
+    def commitDate(self) -> None:
+        self.datetime.setDate(self.new_date)
+        self.main_datetime_label.setText(self.datetime.toString()[:-8])
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
