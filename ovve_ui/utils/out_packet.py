@@ -6,7 +6,7 @@ class OutPacket():
     def __init__(self) -> None:
         self.crc = CRC()
         self.data = {'sequence_count': 0,               # bytes 0 - 1 - rpi unsigned short int
-            'packet_version': 1,                         # byte 2      - rpi unsigned char
+            'packet_version': 3,                         # byte 2      - rpi unsigned char
             'packet_type': 2, 
             'mode_value': 0,                             # byte 3      - rpi unsigned char
             'command': 0,
