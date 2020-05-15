@@ -37,6 +37,8 @@ class CommsLink(QThread):
         self.SER_MAX_REREADS = 30
         self.ser = 0
         self.FALLBACK_IE = float(1 / 1.5)
+        self.alarmbits = 0
+        self.ackbits = 0
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
@@ -44,6 +46,11 @@ class CommsLink(QThread):
         self.settings_lock.release()
         self.logger.debug("Got updated settings from UI")
         self.logger.debug(self.settings.to_JSON())
+
+    def update_alarm_ackbits(self, ackbits: int) -> None:
+        print("Commslink got ackbits :" + str(ackbits))
+        # If an alarm is not active, do not ack it
+        self.ackbits = ackbits & self.alarmbits
 
     def get_bytes_from_serial(self) -> str:
         byteData = b''
@@ -93,6 +100,8 @@ class CommsLink(QThread):
         ie_ratio_fixed = self.cmd_pkt.ie_fraction_to_fixed(ie_fraction)
         self.cmd_pkt.data['ie_ratio_set'] = ie_ratio_fixed
         
+        self.cmd_pkt.data['alarm_bits'] = self.ackbits
+
         self.settings_lock.release()
 
 
@@ -113,11 +122,6 @@ class CommsLink(QThread):
         validData = False
         valid_pkt_count = 0
 
-        # TEMP
-        shouldAck = False
-        ackDelayStart = 0
-        ackDelay = 5  # 5 seconds between alarm and auto-ack
-
         while True:
             byteData = self.get_bytes_from_serial()
             seqOK = self.check_sequence(byteData)
@@ -127,21 +131,15 @@ class CommsLink(QThread):
             inpkt['type'] = "inpkt"
             inpkt['bytes'] = str(byteData)
             
-
-
             if crcOK and seqOK:
                 # Log raw packet data at a level betwen INFO and WARNING so that
                 # we can log only raw packets in production
                 self.logger.log(25, json.dumps(inpkt))
                 self.in_pkt.from_bytes(byteData)
-
-                # TEMP:  Check for alarms and set a timer to auto-ack
-               
-                if self.in_pkt.data["alarm_bits"] != 0 and not shouldAck:
-                    ackDelayStart = time.time()
-                    shouldAck = True
+                self.alarmbits = self.in_pkt.from_bytes(byteData)
 
                 self.new_params.emit(self.in_pkt.to_params())
+                self.new_alarms.emit(self.alarmbits)
 
                 self.create_cmd_pkt()
 
@@ -157,8 +155,7 @@ class CommsLink(QThread):
                         self.cmd_pkt.data["alarm_bits"] = 0
                         shouldAck = False
                 
-                #self.cmd_pkt.data["alarm_bits"] = 0xFFFFFFFF
-                #self.create_cmd_pkt()
+                
                 cmd_byteData = self.cmd_pkt.to_bytes()
 
                 outpkt = {}

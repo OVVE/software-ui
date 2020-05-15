@@ -34,7 +34,7 @@ class CommsSimulator(QThread):
         self.settings_lock.release()
 
 
-    def set_acknowledged_alarms(self, ackbits: int) -> None:
+    def set_alarm_ackbits(self, ackbits: int) -> None:
         print("CommsSimulator got ackbits " + str(int))
 
 

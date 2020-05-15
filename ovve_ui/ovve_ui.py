@@ -35,7 +35,6 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeConfirmStopWidget, initializeChangePatientWidget)
 from utils.params import Params
 from utils.settings import Settings
-from utils.alarms import Alarms
 from utils.Alarm import Alarm, AlarmHandler
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
@@ -88,10 +87,7 @@ class MainWindow(QWidget):
             "8": QWidget(),
             "9": QWidget(),
         }
-        self.alarms = Alarms()
         self.shownAlarmCode = None
-
-
 
         self.initalizeAndAddStackWidgets()
 
@@ -145,7 +141,7 @@ class MainWindow(QWidget):
 
         self.alarm_handler = AlarmHandler()
         self.comms_handler.new_alarms.connect(self.alarm_handler.set_active_alarms)
-        self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.set_acknowledged_alarms)
+        self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.set_alarm_ackbits)
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
