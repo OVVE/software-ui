@@ -108,7 +108,7 @@ global cmd_pkt
 
 cmd_pkt = {'sequence_count': 0,               # bytes 0 - 1 - rpi unsigned short int
             'packet_version': 1,                         # byte 2      - rpi unsigned char
-            'packet_type': 3, 
+            'packet_type': 2, 
             'mode_value': 0,                             # byte 3      - rpi unsigned char
             'command': 0,
             'reserved': 0,
