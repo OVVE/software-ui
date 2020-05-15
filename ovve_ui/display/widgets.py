@@ -955,8 +955,6 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     change_datetime_main_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     change_datetime_tab_widget = QTabWidget()
-    change_datetime_tab_widget.setFixedHeight(300)
-    change_datetime_tab_widget.setContentsMargins(0,0,0,0)
 
 
     date_tab_widget = QWidget()
@@ -1038,8 +1036,10 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     window.date_tab_month_label = QLabel(str(window.datetime.date().month()))
     window.date_tab_day_label = QLabel(str(window.datetime.date().day()))
     window.date_tab_year_label = QLabel(str(window.datetime.date().year()))
-    window.date_tab_year_label.setAlignment(Qt.AlignCenter)
+
+
     window.date_tab_year_label.setFixedWidth(200)
+
 
     date_tab_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
@@ -1064,33 +1064,53 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     for date_tab_label in [window.date_tab_month_label,
                            window.date_tab_day_label,
                            window.date_tab_year_label]:
-        date_tab_label.setFont(page_settings.valueFont)
+        date_tab_label.setFont(page_settings.setDatetimeFont)
+        date_tab_label.setAlignment(Qt.AlignCenter)
 
+    date_tab_month_increment_wrapper = QHBoxLayout()
+    date_tab_month_increment_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_month_increment_wrapper.addWidget(date_tab_month_increment)
 
-    date_tab_v_box_11.addWidget(date_tab_month_increment)
+    date_tab_month_decrement_wrapper = QHBoxLayout()
+    date_tab_month_decrement_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_month_decrement_wrapper.addWidget(date_tab_month_decrement)
+
+    date_tab_v_box_11.addLayout(date_tab_month_increment_wrapper)
     date_tab_v_box_11.addWidget(window.date_tab_month_label)
-    date_tab_v_box_11.addWidget(date_tab_month_decrement)
-    date_tab_v_box_11.setAlignment(Qt.AlignCenter)
+    date_tab_v_box_11.addLayout(date_tab_month_decrement_wrapper)
+    date_tab_v_box_11.setAlignment(Qt.AlignHCenter)
 
 
-    date_tab_v_box_12.addWidget(date_tab_day_increment)
+    date_tab_day_increment_wrapper = QHBoxLayout()
+    date_tab_day_increment_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_day_increment_wrapper.addWidget(date_tab_day_increment)
+
+    date_tab_day_decrement_wrapper = QHBoxLayout()
+    date_tab_day_decrement_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_day_decrement_wrapper.addWidget(date_tab_day_decrement)
+
+    date_tab_v_box_12.addLayout(date_tab_day_increment_wrapper)
     date_tab_v_box_12.addWidget(window.date_tab_day_label)
-    date_tab_v_box_12.addWidget(date_tab_day_decrement)
+    date_tab_v_box_12.addLayout(date_tab_day_decrement_wrapper)
+    date_tab_v_box_12.setAlignment(Qt.AlignHCenter)
 
 
-
-    date_tab_v_box_13.addWidget(date_tab_year_increment)
-    date_tab_v_box_13.addWidget(window.date_tab_year_label)
+    date_tab_year_increment_wrapper = QHBoxLayout()
+    date_tab_year_increment_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_year_increment_wrapper.addWidget(date_tab_year_increment)
 
     date_tab_year_decrement_wrapper = QHBoxLayout()
     date_tab_year_decrement_wrapper.setAlignment(Qt.AlignCenter)
     date_tab_year_decrement_wrapper.addWidget(date_tab_year_decrement)
 
+    date_tab_v_box_13.addLayout(date_tab_year_increment_wrapper)
+    date_tab_v_box_13.addWidget(window.date_tab_year_label)
     date_tab_v_box_13.addLayout(date_tab_year_decrement_wrapper)
     date_tab_v_box_13.setAlignment(Qt.AlignHCenter)
 
 
     for v_layout in [date_tab_v_box_11, date_tab_v_box_12, date_tab_v_box_13]:
+        v_layout.setAlignment(Qt.AlignCenter)
         date_tab_h_box_1.addLayout(v_layout)
 
     date_tab_h_box_2.addWidget(date_tab_cancel)
