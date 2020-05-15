@@ -699,6 +699,7 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
         window.ui_settings.page_settings.mainLabelFont)
     window.alarm_display_label.setAlignment(Qt.AlignCenter)
     window.alarm_display_label.setWordWrap(True)
+    window.alarm_display_label.setStyleSheet("QLabel {color: #000000 ;}")
 
     alarm_silence_button = window.makeSimpleDisplayButton(
         f"Silence for {window.settings.silence_time} min.",
