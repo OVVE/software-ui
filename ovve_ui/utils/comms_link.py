@@ -113,6 +113,11 @@ class CommsLink(QThread):
         validData = False
         valid_pkt_count = 0
 
+        # TEMP
+        shouldAck = False
+        ackDelayStart = 0
+        ackDelay = 5  # 5 seconds between alarm and auto-ack
+
         while True:
             byteData = self.get_bytes_from_serial()
             seqOK = self.check_sequence(byteData)
@@ -121,16 +126,41 @@ class CommsLink(QThread):
             inpkt = {}
             inpkt['type'] = "inpkt"
             inpkt['bytes'] = str(byteData)
+            
+
+
             if crcOK and seqOK:
                 # Log raw packet data at a level betwen INFO and WARNING so that
                 # we can log only raw packets in production
                 self.logger.log(25, json.dumps(inpkt))
                 self.in_pkt.from_bytes(byteData)
 
+                # TEMP:  Check for alarms and set a timer to auto-ack
+               
+                if self.in_pkt.data["alarm_bits"] != 0 and not shouldAck:
+                    ackDelayStart = time.time()
+                    shouldAck = True
+
                 self.new_params.emit(self.in_pkt.to_params())
 
                 self.create_cmd_pkt()
+
+                # TEMP:  If we got an alarm, wait ackDelay before
+                # acknowledging the alarms and 2 * ackDelay before
+                # resetting the ack. Then wait for a new alarm
+                
+                if shouldAck:
+                    td = time.time() - ackDelayStart
+                    if (td > ackDelay):
+                        self.cmd_pkt.data["alarm_bits"] = 0xFFFFFFFF
+                    if (td > ackDelay * 2):
+                        self.cmd_pkt.data["alarm_bits"] = 0
+                        shouldAck = False
+                
+                #self.cmd_pkt.data["alarm_bits"] = 0xFFFFFFFF
+                #self.create_cmd_pkt()
                 cmd_byteData = self.cmd_pkt.to_bytes()
+
                 outpkt = {}
                 outpkt['type'] = "outpkt"
                 outpkt['bytes'] = str(cmd_byteData)
