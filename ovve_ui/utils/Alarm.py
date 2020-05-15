@@ -108,6 +108,7 @@ class AlarmQueue(List):
     def get(self, alarm) -> Alarm:
         priority = self.priorities.get(alarm.alarm_type)
         tup = super().remove((priority, alarm))
+        return tup[1]
 
     def num_pending(self) -> int:
         return len(self)
