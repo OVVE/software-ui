@@ -1032,10 +1032,8 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
             borderColor=page_settings.changeButtonBorderColor,
             valueSetting=page_settings.changeButtonTextSetting,
             valueColor=page_settings.changeButtonValueColor))
-    date_tab_year_decrement.setFixedWidth(200)
+    date_tab_year_decrement.setFixedWidth(50)
     date_tab_year_decrement.clicked.connect(window.decrementYear)
-
-
 
     window.date_tab_month_label = QLabel(str(window.datetime.date().month()))
     window.date_tab_day_label = QLabel(str(window.datetime.date().day()))
@@ -1079,10 +1077,17 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     date_tab_v_box_12.addWidget(window.date_tab_day_label)
     date_tab_v_box_12.addWidget(date_tab_day_decrement)
 
+
+
     date_tab_v_box_13.addWidget(date_tab_year_increment)
     date_tab_v_box_13.addWidget(window.date_tab_year_label)
-    date_tab_v_box_13.addWidget(date_tab_year_decrement)
-    date_tab_v_box_13.setAlignment(Qt.AlignCenter)
+
+    date_tab_year_decrement_wrapper = QHBoxLayout()
+    date_tab_year_decrement_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_year_decrement_wrapper.addWidget(date_tab_year_decrement)
+
+    date_tab_v_box_13.addLayout(date_tab_year_decrement_wrapper)
+    date_tab_v_box_13.setAlignment(Qt.AlignHCenter)
 
 
     for v_layout in [date_tab_v_box_11, date_tab_v_box_12, date_tab_v_box_13]:
