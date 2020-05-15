@@ -87,12 +87,13 @@ class AlarmQueue(List):
  
     
     def put(self, alarm: Alarm):
-        # TODO: Check and see if alarm is already in the queue 
-        # before adding a new entry
-        priority = self.priorities.get(alarm.alarm_type)
-        #super().put((priority, alarm))
-        super().append((priority, alarm))
-        super().sort()
+        # If the alarm is already in the queue, do nothing
+        try:
+            index(alarm)
+        except:
+            priority = self.priorities.get(alarm.alarm_type)
+            super().append((priority, alarm))
+            super().sort()
 
     def peek(self) -> Alarm:
         if len(self) > 0:
@@ -173,6 +174,7 @@ class AlarmHandler(QtCore.QObject):
         try:
             # Make sure the alarm is in the queue
             self._alarm_queue.index(alarm)
+            self._alarm_queue.remove(alarm)
             alarmbit = alarm.alarm_type.value
             self._ack_alarmbits |= 1 << alarmbit
             self.acknowledge_alarm_signal.emit(self._ack_alarmbits)
