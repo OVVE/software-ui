@@ -24,7 +24,7 @@ class Settings():
         self.high_resp_rate_limit: int = 20
         self.low_resp_rate_limit: int = 0
 
-        self.silence_time: int = 1  #Number of minutes for which alarm is silenced
+        self.silence_time: int = 2  #Number of minutes for which alarm is silenced
 
         self.ie_ratio_switcher: dict = {
             0: 1.0,
