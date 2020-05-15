@@ -143,14 +143,15 @@ class MainWindow(QWidget):
         else:
             self.comms_handler = CommsSimulator()
 
+        self.alarm_handler = AlarmHandler()
+        self.comms_handler.new_alarms.connect(self.alarm_handler.set_active_alarms)
+        self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.set_acknowledged_alarms)
+
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
 
-        self.alarm_handler = AlarmHandler()
-        self.comms_handler.new_alarms.connect(self.alarm_handler.setActiveBits)
-        self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.)
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -244,8 +245,6 @@ class MainWindow(QWidget):
     def update_ui_params(self, params: Params) -> None:
         self.params = params
         if self.params.run_state > 0:
-
-
             self.logger.info(self.params.to_JSON())
             self.update_ui_alarms()
             self.updateMainDisplays()
@@ -253,11 +252,12 @@ class MainWindow(QWidget):
 
     def update_ui_alarms(self) -> None:
         while self.alarm_handler.alarms_pending() > 0:
-            self.shown_alarm = self.handler.get_highest_priority_alarm()
+            print("Alarms are pending")
+            self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
             self.showAlarm()
 
     def showAlarm(self) -> None:
-        self.alarm_display_label.setText(self.highest_alarm.get_message())
+        self.alarm_display_label.setText(self.shown_alarm.get_message())
         self.display(5)
 
     def silenceAlarm(self) -> None:

@@ -104,3 +104,18 @@ class InPacket():
         params.alarm_bits = self.data['alarm_bits']
         return params
 
+    def ie_fixed_to_fraction(self, n: int) -> float:
+        if n == 0:
+            return 0
+
+        if (n <= 128):
+            i = 1.0
+            e = (256 / float(n)) - 1
+        else:
+            i = (float(n) / 256) / (1 - float(n) / 256)
+            e = 1.0
+        
+        if e == 0:
+            return 0
+        else:
+            return i / e
