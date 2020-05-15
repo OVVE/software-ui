@@ -138,7 +138,7 @@ class AlarmHandler(QtCore.QObject):
      by the comms handler when alarm bits are received
     '''
     def set_active_alarms(self, alarmbits: int) -> None:
-        print("Got alarm signal " + str(alarmbits))
+        print("Got alarm signal " + str(bin(alarmbits)))
         self._lock.acquire()
     
         self._active_alarmbits = alarmbits

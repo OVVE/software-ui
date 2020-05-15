@@ -27,6 +27,8 @@ class CommsSimulator(QThread):
         self.firedAlarms = []
         self.in_pkt = InPacket()
         self.out_pkt = OutPacket()
+        self.alarmbits = 0
+        self.ackbits = 0
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
@@ -35,8 +37,9 @@ class CommsSimulator(QThread):
 
 
     def set_alarm_ackbits(self, ackbits: int) -> None:
-        print("CommsSimulator got ackbits " + str(ackbits))
-
+        print("CommsSimulator got ackbits " + str(bin(ackbits)))
+        self.ackbits = ackbits & self.alarmbits
+        self.alarmbits = self.alarmbits &  ~self.ackbits
 
     def fireAlarm(self, key: int):
         self.firedAlarms.append(key)
@@ -78,16 +81,16 @@ class CommsSimulator(QThread):
                 if (self.seqnum % 50 == 0):
                     alarmindex = random.randrange(len(list(AlarmType)))
                     alarmtype = list(AlarmType)[alarmindex]
-                    alarmbits = 1 << alarmtype.value
+                    self.alarmbits |= 1 << alarmtype.value
                     if random.randint(0,3) == 0:
                         alarmindex2 = random.randrange(len(list(AlarmType)))
                         alarmtype2 = list(AlarmType)[alarmindex2]
-                        alarmbits |= 1 << alarmtype2.value
-                        print("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(alarmbits)))
+                        self.alarmbits |= 1 << alarmtype2.value
+                        print("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(self.alarmbits)))
                     else:
-                        print("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(alarmbits)))
+                        print("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(self.alarmbits)))
 
-                    self.new_alarms.emit(alarmbits)
+                    self.new_alarms.emit(self.alarmbits)
 
                 self.seqnum += 1
 
