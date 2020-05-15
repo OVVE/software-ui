@@ -142,6 +142,7 @@ class MainWindow(QWidget):
         self.alarm_handler = AlarmHandler()
         self.comms_handler.new_alarms.connect(self.alarm_handler.set_active_alarms)
         self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.set_alarm_ackbits)
+        self.dismissedAlarms = []
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
@@ -266,8 +267,10 @@ class MainWindow(QWidget):
 
     def silenceAlarm(self) -> None:
         self.alarm_handler.acknowledge_alarm(self.shown_alarm)
-        self.shown_alarm = None
         self.display(0)
+        self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
+        self.shown_alarm = None
+        print(self.dismissedAlarms)
         self.update_ui_alarms()
 
     def updateMainDisplays(self) -> None:
