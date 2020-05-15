@@ -98,11 +98,9 @@ class AlarmQueue(List):
         return False
 
     def put(self, alarm: Alarm):
-        # If the alarm is already in the queue, do nothing
-        if not self.alarm_type_in_queue(alarm.alarm_type):
-            priority = self.priorities.get(alarm.alarm_type)
-            super().append((priority, alarm))
-            super().sort()
+        priority = self.priorities.get(alarm.alarm_type)
+        super().append((priority, alarm))
+        super().sort()
 
     def peek(self) -> Alarm:
         if len(self) > 0:
@@ -204,6 +202,8 @@ class AlarmHandler(QtCore.QObject):
     def _set_alarm(self, alarm_type: AlarmType) -> None:
         self._lock.acquire()
         alarm = Alarm(alarm_type)
-        self._alarm_queue.put(alarm)
+        #  If the alarm is already in the queue, do nothing
+        if not self._alarm_queue.alarm_type_in_queue(alarm.alarm_type):
+            self._alarm_queue.put(alarm)
         self._lock.release()
 
