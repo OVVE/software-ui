@@ -105,9 +105,13 @@ class AlarmQueue(List):
         tup = super().get()
         return tup[1]
 
-    def get(self, alarm) -> Alarm:
+    def index(self, alarm) -> int:
         priority = self.priorities.get(alarm.alarm_type)
-        tup = super().remove((priority, alarm))
+        return super().index((priority, alarm))
+
+    def remove(self, alarm):
+        priority = self.priorities.get(alarm.alarm_type)
+        super().remove((priority, alarm))
 
     def num_pending(self) -> int:
         return len(self)
@@ -164,19 +168,19 @@ class AlarmHandler(QtCore.QObject):
      This function should be called by the UI when it
      acknowledges the current alarm.  
     '''
-    def acknowledge_alarm(self, alarm) -> bool:
-        alarm_acknowledged = False
-
+    def acknowledge_alarm(self, alarm) -> None:
         self._lock.acquire()
-        alarm_from_queue = self._alarm_queue.get(alarm)
-        if alarm_from_queue != None:
-            alarmbit = current_alarm.alarm_type.value
+        try:
+            # Make sure the alarm is in the queue
+            self._alarm_queue.index(alarm)
+            alarmbit = alarm.alarm_type.value
             self._ack_alarmbits |= 1 << alarmbit
             self.acknowledge_alarm_signal.emit(self._ack_alarmbits)
-            alarm_acknowledged = True
+        except:
+            print("Error acknowledging alarm: " + str(alarm))
+       
         self._lock.release()
-        return alarm_acknowledged
-
+        
 
     def alarms_pending(self) -> int:
         self._lock.acquire()
