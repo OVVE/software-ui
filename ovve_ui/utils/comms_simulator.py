@@ -35,7 +35,7 @@ class CommsSimulator(QThread):
 
 
     def set_alarm_ackbits(self, ackbits: int) -> None:
-        print("CommsSimulator got ackbits " + str(int))
+        print("CommsSimulator got ackbits " + str(ackbits))
 
 
     def fireAlarm(self, key: int):
@@ -76,10 +76,17 @@ class CommsSimulator(QThread):
                 self.new_params.emit(params)
 
                 if (self.seqnum % 100 == 0):
-                    alarmindex = random.randint(0, len(list(AlarmType)))
+                    alarmindex = random.randrange(len(list(AlarmType)))
                     alarmtype = list(AlarmType)[alarmindex]
                     alarmbits = 1 << alarmtype.value
-                    print("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(alarmbits)))
+                    if random.randint(0,3) == 2:
+                        alarmindex2 = random.randrange(len(list(AlarmType)))
+                        alarmtype2 = list(AlarmType)[alarmindex2]
+                        alarmbits |= 1 << alarmtype2.value
+                        print("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(alarmbits)))
+                    else:
+                        print("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(alarmbits)))
+
                     self.new_alarms.emit(alarmbits)
 
                 self.seqnum += 1

@@ -87,7 +87,7 @@ class MainWindow(QWidget):
             "8": QWidget(),
             "9": QWidget(),
         }
-        self.shownAlarmCode = None
+        self.shown_alarm = None
 
         self.initalizeAndAddStackWidgets()
 
@@ -247,17 +247,21 @@ class MainWindow(QWidget):
             self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
-        while self.alarm_handler.alarms_pending() > 0:
-            print("Alarms are pending")
-            self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
-            self.showAlarm()
+        if self.alarm_handler.alarms_pending() > 0:
+            if self.shown_alarm is None:
+                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
+                self.showAlarm()
+
+            elif not self.shown_alarm.isSamePrior(self.alarm_handler.get_highest_priority_alarm()):
+                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
+                self.showAlarm()
 
     def showAlarm(self) -> None:
         self.alarm_display_label.setText(self.shown_alarm.get_message())
         self.display(5)
 
     def silenceAlarm(self) -> None:
-        self.alarm_handler.acknowledge_alarm(self.highest_alarm)
+        self.alarm_handler.acknowledge_alarm(self.shown_alarm)
         self.shown_alarm = None
         self.update_ui_alarms()
         self.display(0)

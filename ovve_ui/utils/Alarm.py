@@ -62,6 +62,11 @@ class Alarm():
             return True
         return False
 
+    def isSamePrior(self, other):
+        if self.alarm_type == other.alarm_type:
+            return True
+        return False
+
 class AlarmQueue(List): 
     priorities : dict = {
         AlarmType.AC_POWER_LOSS: 0,
