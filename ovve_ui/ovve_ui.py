@@ -249,11 +249,12 @@ class MainWindow(QWidget):
     def update_ui_alarms(self) -> None:
         if self.alarm_handler.alarms_pending() > 0:
             if self.shown_alarm is None: #There is no alarm currently shown, so show something if it comes
-                print("Pending : " + str(self.alarm_handler.alarms_pending()))
+                self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
 
             elif not self.shown_alarm.isSamePrior(self.alarm_handler.get_highest_priority_alarm()):
+                self.logger.debug("Pending2 : " + str(self.alarm_handler.alarms_pending()))
                 #the alarm that we're showing isn't the highest priority one
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
@@ -497,9 +498,9 @@ class MainWindow(QWidget):
         self.updatePageDisplays()
 
     def commitNewPatientID(self) -> None:
-        print(f"Old patient ID {self.patient_id}")
+        self.logger.debug(f"Old patient ID {self.patient_id}")
         self.patient_id = self.new_patient_id
-        print(f"New patient ID {self.patient_id}")
+        self.logger.debug(f"New patient ID {self.patient_id}")
         self.new_patient_id = None
         self.patient_id_display = self.new_patient_id_display
         self.new_patient_id_display = self.patient_id_display

@@ -1,3 +1,4 @@
+import logging
 import time
 from enum import Enum
 from queue import PriorityQueue
@@ -129,6 +130,7 @@ class AlarmHandler(QtCore.QObject):
 
     def __init__(self) -> None:
         super().__init__()
+        self.logger = logging.getLogger()
         self._active_alarmbits = 0
         self._ack_alarmbits = 0
         self._alarm_queue = AlarmQueue()
@@ -140,7 +142,7 @@ class AlarmHandler(QtCore.QObject):
      by the comms handler when alarm bits are received
     '''
     def set_active_alarms(self, alarmbits: int) -> None:
-        print("Got alarm signal " + str(bin(alarmbits)))
+        self.logger.debug("Got alarm signal " + str(bin(alarmbits)))
         self._lock.acquire()
     
         self._active_alarmbits = alarmbits
@@ -154,7 +156,7 @@ class AlarmHandler(QtCore.QObject):
                     alarmtype = AlarmType(pos)
                     self._set_alarm(alarmtype)
                 except ValueError:
-                    print("Got invalid alarm bit at pos " + str(pos))
+                    self.logger.debug("Got invalid alarm bit at pos " + str(pos))
             alarmbits = alarmbits >> 1
             pos += 1
 
@@ -187,7 +189,7 @@ class AlarmHandler(QtCore.QObject):
             self._ack_alarmbits |= 1 << alarmbit
             self.acknowledge_alarm_signal.emit(self._ack_alarmbits)
         except:
-            print("Error acknowledging alarm: " + str(alarm))
+            self.logger.debug("Error acknowledging alarm: " + str(alarm))
        
         self._lock.release()
         

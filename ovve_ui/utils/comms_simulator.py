@@ -1,4 +1,5 @@
 import json
+import logging
 import random
 import time
 from threading import Thread, Lock
@@ -19,6 +20,7 @@ class CommsSimulator(QThread):
 
     def __init__(self) -> None:
         QThread.__init__(self)
+        self.logger = logging.getLogger()
         self.done = False
         self.settings = Settings()
         self.seqnum = 0
@@ -37,7 +39,7 @@ class CommsSimulator(QThread):
 
 
     def set_alarm_ackbits(self, ackbits: int) -> None:
-        print("CommsSimulator got ackbits " + str(bin(ackbits)))
+        self.logger.debug("CommsSimulator got ackbits " + str(bin(ackbits)))
         self.ackbits = ackbits & self.alarmbits
         self.alarmbits = self.alarmbits &  ~self.ackbits
 
@@ -86,9 +88,9 @@ class CommsSimulator(QThread):
                         alarmindex2 = random.randrange(len(list(AlarmType)))
                         alarmtype2 = list(AlarmType)[alarmindex2]
                         self.alarmbits |= 1 << alarmtype2.value
-                        print("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(self.alarmbits)))
+                        self.logger.debug("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(self.alarmbits)))
                     else:
-                        print("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(self.alarmbits)))
+                        self.logger.debug("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(self.alarmbits)))
 
                     self.new_alarms.emit(self.alarmbits)
 
