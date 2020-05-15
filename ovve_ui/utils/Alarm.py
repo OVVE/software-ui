@@ -58,9 +58,11 @@ class Alarm():
         return self.time < other.time
     
     def __eq__(self, other):
-        return self.time == other.time
+        if self.time == other.time and self.alarm_type == other.alarm_type:
+            return True
+        return False
 
-class AlarmQueue(PriorityQueue): 
+class AlarmQueue(List): 
     priorities : dict = {
         AlarmType.AC_POWER_LOSS: 0,
         AlarmType.LOW_BATTERY : 1,
@@ -88,16 +90,28 @@ class AlarmQueue(PriorityQueue):
         # TODO: Check and see if alarm is already in the queue 
         # before adding a new entry
         priority = self.priorities.get(alarm.alarm_type)
-        super().put((priority, alarm))
+        #super().put((priority, alarm))
+        super().append((priority, alarm))
+        super().sort()
 
     def peek(self) -> Alarm:
-        tup = self.queue[0]
-        return tup[1]
+        if len(self) > 0:
+            tup = self[0]
+            return tup[1]
+        else:
+            return None
 
     def get(self) -> Alarm:
         tup = super().get()
         return tup[1]
 
+    def get(self, alarm) -> Alarm:
+        priority = self.priorities.get(alarm.alarm_type)
+        tup = super().remove((priority, alarm))
+
+    def num_pending(self) -> int:
+        return len(self)
+        
 class AlarmHandler(QtCore.QObject):
     acknowledge_alarm_signal = pyqtSignal(int)
 
@@ -106,7 +120,6 @@ class AlarmHandler(QtCore.QObject):
         self._active_alarmbits = 0
         self._ack_alarmbits = 0
         self._alarm_queue = AlarmQueue()
-        self._current_alarm = None
         self._lock = RLock()
         
 
@@ -125,7 +138,6 @@ class AlarmHandler(QtCore.QObject):
             bit = alarmbits & 1
             if bit == 1:
                 try:
-                    print("Bit " + str(pos) + " is high")
                     alarmtype = AlarmType(pos)
                     self._set_alarm(alarmtype)
                 except ValueError:
@@ -152,28 +164,29 @@ class AlarmHandler(QtCore.QObject):
      This function should be called by the UI when it
      acknowledges the current alarm.  
     '''
-    def acknowledge_current_alarm(self):
+    def acknowledge_alarm(self, alarm) -> bool:
+        alarm_acknowledged = False
+
         self._lock.acquire()
-        if self.alarm_is_pending():
-            current_alarm = self._alarm_queue.get()
+        alarm_from_queue = self._alarm_queue.get(alarm)
+        if alarm_from_queue != None:
             alarmbit = current_alarm.alarm_type.value
             self._ack_alarmbits |= 1 << alarmbit
             self.acknowledge_alarm_signal.emit(self._ack_alarmbits)
-            self._current_alarm = None
+            alarm_acknowledged = True
         self._lock.release()
+        return alarm_acknowledged
 
 
-    def alarm_is_pending(self) -> bool:
+    def alarms_pending(self) -> int:
         self._lock.acquire()
-        alarm_pending = not self._alarm_queue.empty()
+        num_pending = self._alarm_queue.num_pending()
         self._lock.release()
-        return alarm_pending
-           
- 
+        return num_pending
+
 
     def _set_alarm(self, alarm_type: AlarmType) -> None:
         self._lock.acquire()
-        print("Setting alarm " + alarm_type.name)
         alarm = Alarm(alarm_type)
         self._alarm_queue.put(alarm)
         self._lock.release()
