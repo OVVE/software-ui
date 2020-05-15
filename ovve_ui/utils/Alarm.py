@@ -91,11 +91,15 @@ class AlarmQueue(List):
         super().__init__()
  
     
+    def alarm_type_in_queue(self, alarm_type: AlarmType) -> bool:
+        for item in self:
+            if item[1].alarm_type == alarm_type:
+                return True
+        return False
+
     def put(self, alarm: Alarm):
         # If the alarm is already in the queue, do nothing
-        try:
-            index(alarm)
-        except:
+        if not self.alarm_type_in_queue(alarm.alarm_type):
             priority = self.priorities.get(alarm.alarm_type)
             super().append((priority, alarm))
             super().sort()
