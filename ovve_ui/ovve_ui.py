@@ -205,7 +205,7 @@ class MainWindow(QWidget):
             button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
 
-    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None):
+    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None) -> PicButton:
         return PicButton(filename, size = size)
 
     def makeDisplayRect(
@@ -260,7 +260,7 @@ class MainWindow(QWidget):
         self.alarm_display_label.setText(self.highest_alarm.get_message())
         self.display(5)
 
-    def silenceAlarm(self):
+    def silenceAlarm(self) -> None:
         self.alarm_handler.acknowledge_alarm(self.highest_alarm)
         self.shown_alarm = None
         self.update_ui_alarms()
@@ -453,17 +453,17 @@ class MainWindow(QWidget):
         self.patient_page_label.update()
         # self.generate_new_patient_id_page_button.hide()
 
-    def confirmStop(self):
+    def confirmStop(self) -> None:
         self.display(7)
 
-    def stopVentilation(self):
+    def stopVentilation(self) -> None:
         self.settings.run_state = 0
         self.start_stop_button_main.updateValue("START")
         self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
         self.display(0)
 
-    def commitMode(self):
+    def commitMode(self) -> None:
         self.settings.mode = self.local_settings.mode
         self.mode_button_main.updateValue(
             self.get_mode_display(self.settings.mode))
@@ -517,7 +517,7 @@ class MainWindow(QWidget):
         self.generate_new_patient_id_page_button.show()
         self.display(6)
 
-    def cancelNewPatientID(self):
+    def cancelNewPatientID(self) -> None:
         self.new_patient_id = None
         self.new_patient_id_display = None
         self.patient_page_label.setText( f"Current Patient: Patient {self.patient_id_display}")
@@ -541,7 +541,7 @@ class MainWindow(QWidget):
             self, settings_callback: Callable[[Settings], None]) -> None:
         self.settings_callback = settings_callback
 
-    def closeEvent(self, *args, **kwargs):
+    def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
     def keyPressEvent(self, event):
