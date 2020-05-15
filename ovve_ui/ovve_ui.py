@@ -36,6 +36,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
 from utils.params import Params
 from utils.settings import Settings
 from utils.alarms import Alarms
+from utils.Alarm import Alarm, AlarmHandler
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
@@ -147,6 +148,10 @@ class MainWindow(QWidget):
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
 
+        self.alarm_handler = AlarmHandler()
+        self.comms_handler.new_alarms.connect(self.alarm_handler.setActiveBits)
+        self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.)
+
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
 
@@ -239,18 +244,27 @@ class MainWindow(QWidget):
     def update_ui_params(self, params: Params) -> None:
         self.params = params
         if self.params.run_state > 0:
+
+
             self.logger.info(self.params.to_JSON())
+            self.update_ui_alarms()
             self.updateMainDisplays()
             self.updateGraphs()
 
-    def update_ui_alarms(self, alarms_dict: dict) -> None:
-        self.alarms = Alarms()
-        self.alarms.from_dict(alarms_dict)
-        self.logger.info(self.alarms.to_JSON())
-        for i in range(len(alarms_dict)):
-            if list(alarms_dict.items()
-                    )[i][1]:  #TODO: Revisit this for multi alarm handling
-                self.showAlarm(i)
+    def update_ui_alarms(self) -> None:
+        while self.alarm_handler.alarms_pending() > 0:
+            self.shown_alarm = self.handler.get_highest_priority_alarm()
+            self.showAlarm()
+
+    def showAlarm(self) -> None:
+        self.alarm_display_label.setText(self.highest_alarm.get_message())
+        self.display(5)
+
+    def silenceAlarm(self):
+        self.alarm_handler.acknowledge_alarm(self.highest_alarm)
+        self.shown_alarm = None
+        self.update_ui_alarms()
+        self.display(0)
 
     def updateMainDisplays(self) -> None:
         t_now = time.time()
@@ -438,21 +452,6 @@ class MainWindow(QWidget):
         self.patient_page_label.setText( f"Current Patient: Patient {self.new_patient_id_display}")
         self.patient_page_label.update()
         # self.generate_new_patient_id_page_button.hide()
-
-    #TODO: doesn't support multiple alarms at once
-    def showAlarm(self, code: int) -> None:
-        self.shownAlarmCode = code
-        self.alarm_display_label.setText(self.alarms.getDisplay(code))
-        self.display(5)
-
-    def silenceAlarm(self):
-        alarms_dict = self.alarms.to_dict()
-        alarms_items = list(alarms_dict.items())
-        alarms_dict[alarms_items[self.shownAlarmCode][0]] = False
-        self.alarms.from_dict(alarms_dict)
-        self.comms_handler.new_alarms  #TODO complete this line, silence for given duration to Arduino
-        self.shownAlarmCode = None
-        self.display(0)
 
     def confirmStop(self):
         self.display(7)
