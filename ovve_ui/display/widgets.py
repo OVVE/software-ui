@@ -700,6 +700,7 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
     window.alarm_display_label.setAlignment(Qt.AlignCenter)
     window.alarm_display_label.setWordWrap(True)
     window.alarm_display_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.alarm_display_label.setFixedWidth(400)
 
     alarm_silence_button = window.makeSimpleDisplayButton(
         f"Silence for {window.settings.silence_time} min.",
@@ -707,7 +708,7 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
         ),
-        size=(130, 65))
+        size=(200, 65))
     alarm_silence_button.clicked.connect(lambda: window.silenceAlarm())
 
     h_box_6top.addWidget(alarm_page_label)
