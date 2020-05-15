@@ -248,13 +248,14 @@ class MainWindow(QWidget):
 
     def update_ui_alarms(self) -> None:
         if self.alarm_handler.alarms_pending() > 0:
-            if self.shown_alarm is None:
+            if self.shown_alarm is None: #There is no alarm currently shown, so show something
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
 
             elif not self.shown_alarm.isSamePrior(self.alarm_handler.get_highest_priority_alarm()):
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
+
 
     def showAlarm(self) -> None:
         self.alarm_display_label.setText(self.shown_alarm.get_message())
@@ -263,8 +264,8 @@ class MainWindow(QWidget):
     def silenceAlarm(self) -> None:
         self.alarm_handler.acknowledge_alarm(self.shown_alarm)
         self.shown_alarm = None
-        self.update_ui_alarms()
         self.display(0)
+        self.update_ui_alarms()
 
     def updateMainDisplays(self) -> None:
         t_now = time.time()
@@ -432,9 +433,6 @@ class MainWindow(QWidget):
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio_enum))
 
-    def changeAlarm(self, new_val) -> None:
-        self.local_settings.alarm_mode = new_val
-
     def changeStartStop(self) -> None:
         if self.settings.run_state == 0:
             self.settings.run_state = 1
@@ -494,13 +492,6 @@ class MainWindow(QWidget):
         self.display(0)
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
-        self.updatePageDisplays()
-
-    def commitAlarm(self) -> None:
-        self.settings.alarm_mode = self.local_settings.alarm_mode
-        self.alarm_button_main.updateValue(self.settings.get_alarm_display())
-        self.display(0)
-        self.passChanges()
         self.updatePageDisplays()
 
     def commitNewPatientID(self) -> None:
