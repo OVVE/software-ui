@@ -47,8 +47,8 @@ class CommsLink(QThread):
         self.logger.debug("Got updated settings from UI")
         self.logger.debug(self.settings.to_JSON())
 
-    def update_alarm_ackbits(self, ackbits: int) -> None:
-        print("Commslink got ackbits :" + str(ackbits))
+    def set_alarm_ackbits(self, ackbits: int) -> None:
+        self.logger.debug("Commslink got ackbits :" + str(ackbits))
         # If an alarm is not active, do not ack it
         self.ackbits = ackbits & self.alarmbits
 
