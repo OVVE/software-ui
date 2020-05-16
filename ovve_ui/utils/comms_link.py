@@ -136,25 +136,12 @@ class CommsLink(QThread):
                 # we can log only raw packets in production
                 self.logger.log(25, json.dumps(inpkt))
                 self.in_pkt.from_bytes(byteData)
-                self.alarmbits = self.in_pkt.from_bytes(byteData)
+                self.alarmbits = self.in_pkt.data["alarm_bits"]
 
                 self.new_params.emit(self.in_pkt.to_params())
                 self.new_alarms.emit(self.alarmbits)
 
-                self.create_cmd_pkt()
-
-                # TEMP:  If we got an alarm, wait ackDelay before
-                # acknowledging the alarms and 2 * ackDelay before
-                # resetting the ack. Then wait for a new alarm
-                
-                if shouldAck:
-                    td = time.time() - ackDelayStart
-                    if (td > ackDelay):
-                        self.cmd_pkt.data["alarm_bits"] = 0xFFFFFFFF
-                    if (td > ackDelay * 2):
-                        self.cmd_pkt.data["alarm_bits"] = 0
-                        shouldAck = False
-                
+                self.create_cmd_pkt()  
                 
                 cmd_byteData = self.cmd_pkt.to_bytes()
 
