@@ -21,7 +21,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 class CommsLink(QThread):
     new_params = pyqtSignal(Params)
-    new_alarms = pyqtSignal(dict)
+    new_alarms = pyqtSignal(int)
 
     def __init__(self, port: str) -> None:
         QThread.__init__(self)
