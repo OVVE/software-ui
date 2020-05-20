@@ -85,8 +85,8 @@ class CommsLink(QThread):
     def create_cmd_pkt(self):
         self.settings_lock.acquire()
 
-        self.cmd_pkt.data['mode_value'] = self.cmd_pkt.calculate_mode(
-            self.settings.mode, self.settings.run_state)
+        self.cmd_pkt.data['mode_value'] = self.settings.mode
+        self.cmd_pkt.data['command'] = self.cmd_pkt.pack_command(self.settings.run_state, 0)
         self.cmd_pkt.data['sequence_count'] = self.in_pkt.data[
             'sequence_count']
         self.cmd_pkt.data['respiratory_rate_set'] = self.settings.resp_rate

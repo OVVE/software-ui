@@ -59,18 +59,9 @@ class OutPacket():
 
         return cmd_byteData
         
-    def calculate_mode(self, in_mode, run_state) -> int:
-         # VC_CMV_NON_ASSISTED_OFF = 0
-        # VC_CMV_NON_ASSISTED_ON = 128
-        # VC_CMV_ASSISTED_OFF = 1
-        # VC_CMV_ASSISTED_OFF = 129
-        # SIMV_OFF = 3
-        # SIMV_ON = 130
-        # get the updates from settings 
-        # Set the mode value byte which also includes start bit
-    
-
-        return  (in_mode & 0x7f | (run_state << 7) & 0x80)
+    def pack_command(self, run_state, upgrade_fw) -> int:
+        return (((run_state == 1) << 0) |
+                ((upgrade_fw == 1) << 4))
 
 
     def ie_fraction_to_fixed(self, ie_fraction: float) -> int:
