@@ -83,7 +83,7 @@ class InPacket():
         params.resp_rate_set = self.data['respiratory_rate_set']
         params.tv_meas = Units.ecu_to_ml(self.data['tidal_volume_measured'])
         params.tv_set = Units.ecu_to_ml(self.data['tidal_volume_set'])
-        params.ie_ratio_meas = self.data['ie_ratio_measured']
+        params.ie_ratio_meas = ie_fixed_to_fraction(self.data['ie_ratio_measured'])
         params.ie_ratio_set = self.data['ie_ratio_set']
         params.peep = Units.ecu_to_cmh2o(self.data['peep_value_measured'])
         params.ppeak = Units.ecu_to_cmh2o(self.data['peak_pressure_measured'])
