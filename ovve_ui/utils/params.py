@@ -236,7 +236,7 @@ class Params():
 
     @high_volume_limit.setter
     def high_volume_limit(self, value: int) -> None:
-        self._param["high_volume__limit"] = value
+        self._param["high_volume_limit"] = value
 
     @property
     def low_volume_limit(self) -> int:
