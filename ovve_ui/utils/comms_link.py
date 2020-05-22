@@ -31,7 +31,7 @@ class CommsLink(QThread):
         self.packet_version = 1
         self.BAUD = 38400
         self.PORT = port
-        self.SER_TIMEOUT = 0.065
+        self.SER_TIMEOUT = 0.150
         self.SER_WRITE_TIMEOUT = 0.03
         self.SER_INTER_TIMEOUT = 0.01
         self.SER_MAX_REREADS = 30
