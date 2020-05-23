@@ -88,6 +88,8 @@ class MainWindow(QWidget):
             "9": QWidget(),
         }
         self.shown_alarm = None
+        self.lastDismissedTime = None
+        self.newAlarmDelay = 0.5 #measured in seconds
 
         self.initalizeAndAddStackWidgets()
 
@@ -252,14 +254,17 @@ class MainWindow(QWidget):
             if self.shown_alarm is None: #There is no alarm currently shown, so show something if it comes
                 self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
-                self.showAlarm()
+                if self.lastDismissedTime is not None:
+                    if time.time() - self.lastDismissedTime > self.newAlarmDelay:
+                        self.showAlarm()
 
             elif not self.shown_alarm.isSamePrior(self.alarm_handler.get_highest_priority_alarm()):
                 self.logger.debug("Pending2 : " + str(self.alarm_handler.alarms_pending()))
                 #the alarm that we're showing isn't the highest priority one
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
-                self.showAlarm()
-
+                if self.lastDismissedTime is not None:
+                    if time.time() - self.lastDismissedTime > self.newAlarmDelay:
+                        self.showAlarm()
 
     def showAlarm(self) -> None:
         self.alarm_display_label.setText(self.shown_alarm.get_message())
@@ -270,7 +275,7 @@ class MainWindow(QWidget):
         self.display(0)
         self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
         self.shown_alarm = None
-        print(self.dismissedAlarms)
+        self.lastDismissedTime = time.time()
         self.update_ui_alarms()
 
     def updateMainDisplays(self) -> None:
