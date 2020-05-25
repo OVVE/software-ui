@@ -146,23 +146,28 @@ class AlarmHandler(QtCore.QObject):
         self._lock.acquire()
     
         self._active_alarmbits = alarmbits
-        
+ 
+        # Zero the ack bits that are no longer active
+        self._ack_alarmbits &= self._active_alarmbits
+ 
         # Iterate through the bits and set all active alarms
+        # If we've already acked the alarm, do not put another
+        # copy into the queue
+        ackbits = self._ack_alarmbits
         pos = 0
         while (pos < 32):
-            bit = alarmbits & 1
-            if bit == 1:
+            alarmbit = alarmbits & 1
+            ackbit = ackbits & 1
+            if alarmbit == 1 and ackbit == 0:
                 try:
                     alarmtype = AlarmType(pos)
                     self._set_alarm(alarmtype)
                 except ValueError:
                     self.logger.debug("Got invalid alarm bit at pos " + str(pos))
             alarmbits = alarmbits >> 1
+            ackbits = ackbits >> 1
             pos += 1
-
-        # Zero the ack bits that are no longer active
-        self._ack_alarmbits &= self._active_alarmbits
-       
+      
         self._lock.release()
     
     '''
