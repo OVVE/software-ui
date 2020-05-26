@@ -136,6 +136,8 @@ class PageSettings:
         alarmSilenceButtonColor: str = '#C5C5C5',
         topBarSetting: TextSetting = TextSetting("Arial", 16, True),
         setDatetimeSetting: TextSetting = TextSetting("Arial Black", 36, True),
+        alarmLimitLabelSetting: TextSetting = TextSetting("Arial", 18, False),
+        alarmLimitValueSetting: TextSetting = TextSetting("Arial Black", 24, True),
     ):
 
         self.mainLabelFont = mainLabelSetting.font
@@ -157,6 +159,9 @@ class PageSettings:
         self.alarmSilenceButtonColor = alarmSilenceButtonColor
         self.topBarFont = topBarSetting.font
         self.setDatetimeFont = setDatetimeSetting.font
+        self.alarmLimitLabelFont = alarmLimitLabelSetting.font
+        self.alarmLimitValueFont = alarmLimitValueSetting.font
+
 
 
         def getCancelBorderPen(self) -> QPen:

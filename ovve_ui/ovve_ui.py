@@ -33,7 +33,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
                              initializeGraphWidget, initializeSettingsWidget,
                              initializeConfirmStopWidget, initializeChangePatientWidget,
-                             initializeChangeDatetimeWidget)
+                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget)
 from utils.params import Params
 from utils.settings import Settings
 from utils.Alarm import Alarm, AlarmHandler
@@ -77,11 +77,11 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,11)}
+        self.page = {str(i): QWidget() for i in range(1,12)}
 
         self.shown_alarm = None
 
-        self.initalizeAndAddStackWidgets()
+        self.initializeAndAddStackWidgets()
 
         layout.setContentsMargins(10, 10, 10, 10)
         self.setLayout(layout)
@@ -214,7 +214,7 @@ class MainWindow(QWidget):
                            rect_settings=self.ui_settings.display_rect_settings
                            if rect_settings is None else rect_settings)
 
-    def initalizeAndAddStackWidgets(self) -> None:
+    def initializeAndAddStackWidgets(self) -> None:
         initializeGraphWidget(self)
         initializeModeWidget(self)
         initializeRespiratoryRateWidget(self)
@@ -225,6 +225,7 @@ class MainWindow(QWidget):
         initializeConfirmStopWidget(self)
         initializeChangePatientWidget(self)
         initializeChangeDatetimeWidget(self)
+        initializeAlarmLimitWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -492,6 +493,67 @@ class MainWindow(QWidget):
         self.passChanges()
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
+
+
+    def decrementHighPressureAlarmLimit(self) -> None:
+        self.settings.high_pressure_limit -= 1
+        self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
+        self.passChanges()
+
+    def incrementHighPressureAlarmLimit(self) -> None:
+        self.settings.high_pressure_limit += 1
+        self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
+        self.passChanges()
+
+    def decrementLowPressureAlarmLimit(self) -> None:
+        self.settings.low_pressure_limit -= 1
+        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+        self.passChanges()
+
+    def incrementLowPressureAlarmLimit(self) -> None:
+        self.settings.low_pressure_limit += 1
+        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+        self.passChanges()
+
+    def decrementHighVolumeAlarmLimit(self) -> None:
+        self.settings.high_volume_limit -= 1
+        self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
+        self.passChanges()
+
+    def incrementHighVolumeAlarmLimit(self) -> None:
+        self.settings.high_volume_limit += 1
+        self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
+        self.passChanges()
+
+    def decrementLowVolumeAlarmLimit(self) -> None:
+        self.settings.low_volume_limit -= 1
+        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+        self.passChanges()
+
+    def incrementLowVolumeAlarmLimit(self) -> None:
+        self.settings.low_volume_limit += 1
+        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+        self.passChanges()
+
+    def decrementHighRRAlarmLimit(self) -> None:
+        self.settings.high_resp_rate_limit -= 1
+        self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
+        self.passChanges()
+
+    def incrementHighRRAlarmLimit(self) -> None:
+        self.settings.high_resp_rate_limit += 1
+        self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
+        self.passChanges()
+
+    def decrementLowRRAlarmLimit(self) -> None:
+        self.settings.low_resp_rate_limit -= 1
+        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+        self.passChanges()
+
+    def incrementLowRRAlarmLimit(self) -> None:
+        self.settings.low_resp_rate_limit += 1
+        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+        self.passChanges()
 
     def commitNewPatientID(self) -> None:
         self.logger.debug(f"Old patient ID {self.patient_id}")
