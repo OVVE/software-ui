@@ -7,7 +7,7 @@ from os import path
 import numpy as np
 import pyqtgraph as pg
 
-from PyQt5.QtWidgets import (QWidget, QHBoxLayout, QVBoxLayout, QStackedWidget,
+from PyQt5.QtWidgets import (QWidget, QTabWidget, QHBoxLayout, QVBoxLayout, QStackedWidget,
                              QLabel)
 from PyQt5.QtCore import Qt
 
@@ -50,7 +50,7 @@ def initializeHomeScreenWidget(
     window.main_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
 
 
-    window.main_datetime_label = QLabel(window.dateTime.toString()[:-8])
+    window.main_datetime_label = QLabel(window.datetime.toString()[:-8])
     window.main_datetime_label.setFont(window.ui_settings.page_settings.topBarFont)
     window.main_datetime_label.setStyleSheet("QLabel {color: #000000 ;}")
 
@@ -730,6 +730,7 @@ def initializeSettingsWidget(window: MainWindow) -> None:
     h_box_7mid1 = QHBoxLayout()
     h_box_7mid1_v1 = QVBoxLayout()
     h_box_7mid1_v2 = QVBoxLayout()
+    h_box_7mid2 = QHBoxLayout()
     h_box_7bottom = QHBoxLayout()
 
     h_box_7top.setAlignment(Qt.AlignCenter)
@@ -758,6 +759,15 @@ def initializeSettingsWidget(window: MainWindow) -> None:
         size=(150, 65))
     settings_change_patient_button.clicked.connect(lambda: window.display(8))
 
+    settings_change_datetime_button = window.makeSimpleDisplayButton(
+        "Change Date/Time",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(150, 65))
+    settings_change_datetime_button.clicked.connect(lambda: window.display(9))
+
     settings_back_button = window.makeSimpleDisplayButton(
         "Back to Main",
         button_settings=SimpleButtonSettings(
@@ -770,13 +780,13 @@ def initializeSettingsWidget(window: MainWindow) -> None:
     h_box_7top.addWidget(settings_page_label)
     h_box_7mid1_v1.addWidget(window.settings_patient_label)
     h_box_7mid1_v2.addWidget(settings_change_patient_button)
+    h_box_7mid1_v2.addWidget(settings_change_datetime_button)
     h_box_7bottom.addWidget(settings_back_button)
     h_box_7mid1.addLayout(h_box_7mid1_v1)
     h_box_7mid1.addLayout(h_box_7mid1_v2)
 
-    v_box_7.addLayout(h_box_7top)
-    v_box_7.addLayout(h_box_7mid1)
-    v_box_7.addLayout(h_box_7bottom)
+    for h_box in [h_box_7top, h_box_7mid1,h_box_7mid2, h_box_7bottom]:
+        v_box_7.addLayout(h_box)
 
     window.page["7"].setLayout(v_box_7)
 
@@ -924,3 +934,233 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
     v_box_9.addLayout(h_box_9bottom)
 
     window.page["9"].setLayout(v_box_9)
+
+def initializeChangeDatetimeWidget(window: MainWindow) -> None:
+    page_settings = window.ui_settings.page_settings
+    window.new_date = window.datetime.date()
+    window.new_time = window.datetime.time()
+
+    v_box_10 = QVBoxLayout()
+    h_box_10top = QVBoxLayout()
+    h_box_10mid = QVBoxLayout()
+    h_box_10bottom = QVBoxLayout()
+
+    h_box_10top.setAlignment(Qt.AlignCenter)
+    h_box_10mid.setAlignment(Qt.AlignCenter)
+    h_box_10bottom.setAlignment(Qt.AlignCenter)
+
+    change_datetime_main_label = QLabel("Set Date/Time")
+    change_datetime_main_label.setFont(page_settings.mainLabelFont)
+    change_datetime_main_label.setWordWrap(True)
+    change_datetime_main_label.setAlignment(Qt.AlignCenter)
+    change_datetime_main_label.setFixedWidth(400)
+    change_datetime_main_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+    change_datetime_tab_widget = QTabWidget()
+
+
+    date_tab_widget = QWidget()
+    date_tab_widget.setFixedHeight(300)
+
+    date_tab_v_box = QVBoxLayout()
+    date_tab_h_box_1 = QHBoxLayout()
+    date_tab_v_box_11 = QVBoxLayout()
+    date_tab_v_box_12 = QVBoxLayout()
+    date_tab_v_box_13 = QVBoxLayout()
+    date_tab_h_box_2 = QHBoxLayout()
+
+    date_tab_month_increment = window.makeSimpleDisplayButton(
+        "+",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    date_tab_month_increment.setFixedWidth(50)
+    date_tab_month_increment.clicked.connect(window.incrementMonth)
+
+    date_tab_month_decrement = window.makeSimpleDisplayButton(
+        "-",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    date_tab_month_decrement.setFixedWidth(50)
+    date_tab_month_decrement.clicked.connect(window.decrementMonth)
+
+    date_tab_day_increment = window.makeSimpleDisplayButton(
+        "+",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    date_tab_day_increment.setFixedWidth(50)
+    date_tab_day_increment.clicked.connect(window.incrementDay)
+
+    date_tab_day_decrement = window.makeSimpleDisplayButton(
+        "-",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    date_tab_day_decrement.setFixedWidth(50)
+    date_tab_day_decrement.clicked.connect(window.decrementDay)
+
+    date_tab_year_increment = window.makeSimpleDisplayButton(
+        "+",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    date_tab_year_increment.setFixedWidth(50)
+    date_tab_year_increment.clicked.connect(window.incrementYear)
+
+    date_tab_year_decrement = window.makeSimpleDisplayButton(
+        "-",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    date_tab_year_decrement.setFixedWidth(50)
+    date_tab_year_decrement.clicked.connect(window.decrementYear)
+
+    window.date_tab_month_label = QLabel(str(window.datetime.date().month()))
+    window.date_tab_day_label = QLabel(str(window.datetime.date().day()))
+    window.date_tab_year_label = QLabel(str(window.datetime.date().year()))
+
+
+    window.date_tab_year_label.setFixedWidth(200)
+
+
+    date_tab_cancel = window.makeSimpleDisplayButton(
+        "CANCEL",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.cancelColor,
+            borderColor=page_settings.cancelColor,
+            valueSetting=page_settings.cancelSetting,
+            valueColor="#FFFFFF"))
+    date_tab_cancel.clicked.connect(window.cancelDate)
+
+    date_tab_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+    date_tab_apply.clicked.connect(window.commitDate)
+
+    for date_tab_label in [window.date_tab_month_label,
+                           window.date_tab_day_label,
+                           window.date_tab_year_label]:
+        date_tab_label.setFont(page_settings.setDatetimeFont)
+        date_tab_label.setAlignment(Qt.AlignCenter)
+
+    date_tab_month_increment_wrapper = QHBoxLayout()
+    date_tab_month_increment_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_month_increment_wrapper.addWidget(date_tab_month_increment)
+
+    date_tab_month_decrement_wrapper = QHBoxLayout()
+    date_tab_month_decrement_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_month_decrement_wrapper.addWidget(date_tab_month_decrement)
+
+    date_tab_v_box_11.addLayout(date_tab_month_increment_wrapper)
+    date_tab_v_box_11.addWidget(window.date_tab_month_label)
+    date_tab_v_box_11.addLayout(date_tab_month_decrement_wrapper)
+    date_tab_v_box_11.setAlignment(Qt.AlignHCenter)
+
+
+    date_tab_day_increment_wrapper = QHBoxLayout()
+    date_tab_day_increment_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_day_increment_wrapper.addWidget(date_tab_day_increment)
+
+    date_tab_day_decrement_wrapper = QHBoxLayout()
+    date_tab_day_decrement_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_day_decrement_wrapper.addWidget(date_tab_day_decrement)
+
+    date_tab_v_box_12.addLayout(date_tab_day_increment_wrapper)
+    date_tab_v_box_12.addWidget(window.date_tab_day_label)
+    date_tab_v_box_12.addLayout(date_tab_day_decrement_wrapper)
+    date_tab_v_box_12.setAlignment(Qt.AlignHCenter)
+
+
+    date_tab_year_increment_wrapper = QHBoxLayout()
+    date_tab_year_increment_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_year_increment_wrapper.addWidget(date_tab_year_increment)
+
+    date_tab_year_decrement_wrapper = QHBoxLayout()
+    date_tab_year_decrement_wrapper.setAlignment(Qt.AlignCenter)
+    date_tab_year_decrement_wrapper.addWidget(date_tab_year_decrement)
+
+    date_tab_v_box_13.addLayout(date_tab_year_increment_wrapper)
+    date_tab_v_box_13.addWidget(window.date_tab_year_label)
+    date_tab_v_box_13.addLayout(date_tab_year_decrement_wrapper)
+    date_tab_v_box_13.setAlignment(Qt.AlignHCenter)
+
+
+    for v_layout in [date_tab_v_box_11, date_tab_v_box_12, date_tab_v_box_13]:
+        v_layout.setAlignment(Qt.AlignCenter)
+        date_tab_h_box_1.addLayout(v_layout)
+
+    date_tab_h_box_2.addWidget(date_tab_cancel)
+    date_tab_h_box_2.addWidget(date_tab_apply)
+
+    date_tab_v_box.addLayout(date_tab_h_box_1)
+    date_tab_v_box.addLayout(date_tab_h_box_2)
+    date_tab_widget.setLayout(date_tab_v_box)
+
+
+
+    change_datetime_tab_widget.addTab(date_tab_widget, "Set Date")
+
+
+    time_cancel = window.makeSimpleDisplayButton(
+        "CANCEL",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor= page_settings.cancelColor,
+            borderColor=page_settings.cancelColor,
+            valueSetting=page_settings.cancelSetting,
+            valueColor="#FFFFFF"))
+    time_cancel.clicked.connect(window.cancelNewPatientID)
+
+    time_apply = window.makeSimpleDisplayButton(
+        "APPLY TIME",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor= page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+    time_apply.clicked.connect(window.commitNewPatientID)
+
+    datetime_back = window.makeSimpleDisplayButton(
+        "Back to Settings",
+        button_settings= SimpleButtonSettings(
+            valueSetting= page_settings.cancelSetting,
+            fillColor= page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
+    datetime_back.clicked.connect(lambda: window.display(6))
+
+    h_box_10mid.addWidget(change_datetime_tab_widget)
+    h_box_10bottom.addWidget(datetime_back)
+
+    v_box_10.addLayout(h_box_10top)
+    v_box_10.addLayout(h_box_10mid)
+    v_box_10.addLayout(h_box_10bottom)
+
+    window.page["10"].setLayout(v_box_10)
