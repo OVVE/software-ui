@@ -1388,11 +1388,9 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
         value_label.setFont(page_settings.alarmLimitValueFont)
         value_label.setAlignment(Qt.AlignCenter)
 
-
     for h_box in [h_box_11_1, h_box_11_2, h_box_11_3,
                   h_box_11_4, h_box_11_5, h_box_11_6]:
         h_box.setAlignment(Qt.AlignCenter)
         v_box_11.addLayout(h_box)
-
 
     window.page["11"].setLayout(v_box_11)
