@@ -135,7 +135,7 @@ class PageSettings:
         commitCancelButtonSpacing: int = 100,
         alarmSilenceButtonColor: str = '#C5C5C5',
         topBarSetting: TextSetting = TextSetting("Arial", 16, True),
-        setDatetimeSetting: TextSetting = TextSetting("Arial Black", 50, True),
+        setDatetimeSetting: TextSetting = TextSetting("Arial Black", 36, True),
     ):
 
         self.mainLabelFont = mainLabelSetting.font
