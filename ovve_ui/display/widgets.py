@@ -1368,10 +1368,10 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
 
     window.low_rr_limit_value_label = QLabel(str(window.settings.low_resp_rate_limit))
 
-    h_box_11_6_1.addWidget(high_rr_limit_label)
-    h_box_11_6_2.addWidget(window.high_rr_decrement_button)
-    h_box_11_6_2.addWidget(window.high_rr_limit_value_label)
-    h_box_11_6_2.addWidget(window.high_rr_increment_button)
+    h_box_11_6_1.addWidget(low_rr_limit_label)
+    h_box_11_6_2.addWidget(window.low_rr_decrement_button)
+    h_box_11_6_2.addWidget(window.low_rr_limit_value_label)
+    h_box_11_6_2.addWidget(window.low_rr_increment_button)
 
     h_box_11_6.addLayout(h_box_11_6_1)
     h_box_11_6.addLayout(h_box_11_6_2)
