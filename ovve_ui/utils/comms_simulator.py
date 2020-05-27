@@ -80,7 +80,7 @@ class CommsSimulator(QThread):
                 params.battery_level = random.randint(0, 100)
                 self.new_params.emit(params)
 
-                if (self.seqnum % 50 == 0):
+                if (self.seqnum % 300 == 0):
                     alarmindex = random.randrange(len(list(AlarmType)))
                     alarmtype = list(AlarmType)[alarmindex]
                     self.alarmbits |= 1 << alarmtype.value
