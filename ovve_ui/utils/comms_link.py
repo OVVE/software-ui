@@ -32,7 +32,7 @@ class CommsLink(QThread):
         self.logger = logging.getLogger()
         self.settings = Settings()
         self.settings_lock = Lock()
-        self.packet_version = 1
+        self.packet_version = 4
         self.BAUD = 125000
         self.PORT = port
         self.SER_TIMEOUT = 0.065
@@ -60,7 +60,7 @@ class CommsLink(QThread):
             os.makedirs(self.dirName)
         dateStr=datetime.now().isoformat(timespec='minutes')
         self.binaryLogFile=open(str(self.dirName)+"/["+dateStr+"] binary.log","wb+")
-        self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","w+")
+        self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","wb+")
         
 
     def update_settings(self, settings_dict: dict) -> None:
@@ -176,7 +176,8 @@ class CommsLink(QThread):
         if ((self.lastSeq+1!=sequenceNo) and (self.lastSeq!=-1)):
                 self.logger.debug('Error in sequence -> likely packet drop')
                 self.statSeqError+=1
-                self.lastSeq=sequenceNo
+
+        self.lastSeq=sequenceNo
 
         if packetType==0x01:
             inpkt = {}
@@ -190,10 +191,6 @@ class CommsLink(QThread):
             self.new_params.emit(self.in_pkt.to_params(sequenceNo))
             self.new_alarms.emit(self.alarmbits)
        
-            if ((self.lastSeq+1!=sequenceNo) and (self.lastSeq!=-1)):
-                self.logger.debug('Error in sequence -> likely packet drop')
-                self.statSeqError+=1
-
             self.create_cmd_pkt()
             cmd_byteData = self.cmd_pkt.to_bytes()
             outpkt = {}
@@ -205,7 +202,7 @@ class CommsLink(QThread):
             
         elif packetType==0x80:
             byteData+=b'\n'
-            self.textLogFile.write(str(byteData.decode('utf-8')))
+            self.textLogFile.write(byteData) #str(byteData.decode('utf-8')))
             self.textLogFile.flush()
 
 
@@ -240,7 +237,7 @@ class CommsLink(QThread):
             self.statPrintCnt+=1
             if (self.statPrintCnt==200):
                 self.logger.warning('Serial TX-Stat: OK:' + str(self.statPacketTxCntOk)+' Fail:'+str(self.statPacketTxFailCnt))
-                self.logger.warning('Serial RX-Stat: OK:' + str(self.statPacketRxCntOk)+' Fail:'+str(self.statPacketRxCntCrcFail+self.statPacketRxCntHeaderFail+self.statPacketRxCntLenFail)+' Fail(Seq):'+str(self.statSeqError))
+                self.logger.warning('Serial RX-Stat: OK:' + str(self.statPacketRxCntOk)+' Fail (CRC):'+str(self.statPacketRxCntCrcFail)+' (Hdr):'+str(self.statPacketRxCntHeaderFail)+'Len:'+str(self.statPacketRxCntLenFail)+' Fail(Seq):'+str(self.statSeqError))
                 self.statPrintCnt=0
             sleep(0.01) #check every 10ms for new data packets
 
@@ -266,7 +263,7 @@ class CommsLink(QThread):
             return False
 
     #read a chunk of data
-    def read_all(self, port, chunk_size=1024):
+    def read_all(self, port, chunk_size=512):
         """Read all characters on the serial port and return them."""
         if not port.isOpen():
             raise SerialException('Serial is diconnected')

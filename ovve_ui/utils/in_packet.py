@@ -42,7 +42,7 @@ class InPacket():
         self.data['battery_level'] = byteData[2] & 0x7F
         self.data['reserved'] = byteData[3]
         self.data['respiratory_rate_set']=int.from_bytes(byteData[4:6], byteorder='little')
-        self.data['respiratory_rate_measured']=int.from_bytes(byteData[6:10], byteorder='little')
+        self.data['respiratory_rate_measured']=int.from_bytes(byteData[6:8], byteorder='little')
         self.data['tidal_volume_set']=int.from_bytes(byteData[8:10], byteorder='little', signed=True)
         self.data['tidal_volume_measured']=int.from_bytes(byteData[10:12], byteorder='little', signed=True)
         self.data['ie_ratio_set']=int.from_bytes(byteData[12:14], byteorder='little')
