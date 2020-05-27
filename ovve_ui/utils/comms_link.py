@@ -8,6 +8,7 @@ import sys
 from time import sleep
 import codecs
 import struct
+import crc16
 
 from utils.params import Params
 from utils.settings import Settings
@@ -29,16 +30,27 @@ class CommsLink(QThread):
         self.settings = Settings()
         self.settings_lock = Lock()
         self.packet_version = 1
-        self.BAUD = 38400
+        self.BAUD = 125000
         self.PORT = port
-        self.SER_TIMEOUT = 0.150
-        self.SER_WRITE_TIMEOUT = 0.03
-        self.SER_INTER_TIMEOUT = 0.01
+        self.SER_TIMEOUT = 0.065
+        self.SER_WRITE_TIMEOUT = None
+        self.SER_INTER_TIMEOUT = None
         self.SER_MAX_REREADS = 30
         self.ser = 0
         self.FALLBACK_IE = float(1 / 1.5)
+        self.rxState=0
+        self.lastSeq=-1
         self.alarmbits = 0
         self.ackbits = 0
+        #statistics
+        self.statSeqError=0
+        self.statPacketRxCntOk=0
+        self.statPacketRxCntCrcFail=0
+        self.statPacketRxCntLenFail=0
+        self.statPacketRxCntHeaderFail=0
+        self.statPacketTxCntOk=0
+        self.statPacketTxFailCnt=0
+        self.statPrintCnt=0
 
     def update_settings(self, settings_dict: dict) -> None:
         self.settings_lock.acquire()
@@ -52,43 +64,80 @@ class CommsLink(QThread):
         # If an alarm is not active, do not ack it
         self.ackbits = ackbits & self.alarmbits
 
+    #receive state machine per byte. Calls processPacket for each successful packet
+    def handleRxByte(self, byte) -> None:
+        if self.rxState == 0:
+            if byte== 0x26:
+                self.rxState=1
+        elif self.rxState == 1:
+            if byte== 0x56:
+                self.rxState=2
+            elif byte!= 0x26:
+                self.rxState=0
+                self.statPacketRxCntHeaderFail+=1
+        elif self.rxState == 2:
+            if byte== 0x7E:
+                self.rxState=3
+            else:
+                self.rxState=0
+                self.statPacketRxCntHeaderFail+=1
+        elif self.rxState==3:
+            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), 0xffff)
+            self.seqNum=byte
+            self.rxState=4
+        elif self.rxState==4:
+            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
+            self.seqNum+=byte<<8
+            self.rxState=5
+        elif self.rxState==5:
+            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
+            if byte!=4:
+                self.rxState=0
+            else:
+                self.rxState=6
+        elif self.rxState==6:
+            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
+            self.msgType=byte
+            self.rxState=7
+            self.rxCnt=0
+            self.rxData=bytearray()
+        elif self.rxState==7:
+            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
+            self.packetLen=byte
+            if (self.packetLen<128):
+                self.rxState=8
+            else:
+                self.statPacketRxCntLenFail+=1
+                self.rxState=0
+        elif self.rxState==8:
+            self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
+            self.rxData.append(byte)
+            self.rxCnt+=1
+            if self.rxCnt==self.packetLen:
+                self.rxState=9
+        elif self.rxState==9:
+            self.recCrc=byte
+            self.rxState=10
+        elif self.rxState==10:
+            self.recCrc|=byte<<8
+            if self.recCrc==self.crcCalc:
+                self.statPacketRxCntOk+=1
+                self.processPacket(self.rxData,self.msgType,self.seqNum)
+            else:
+                self.logger.debug("Got packet with wrong CRC! Rec: "+str(self.recCrc)+" Calc: "+str(self.crcCalc))
+                self.statPacketRxCntCrcFail+=1
+            self.rxState=0
+        
     def get_bytes_from_serial(self) -> str:
         byteData = b''
-        rereadCount = 0
-        while len(bytearray(
-                byteData)) != 56 and rereadCount < self.SER_MAX_REREADS:
-            byteData = self.read_all(self.ser, 56)
-            if len(bytearray(byteData)) < 56:
-                self.logger.debug("reread " + str(rereadCount))
-            rereadCount += 1
-
-        self.ser.flush()
+        byteData = self.read_all(self.ser)
         return byteData
-
-    def check_sequence(self, byteData) -> bool:
-        if byteData[0:2] == b'\x00\x00':
-            prevSeq = -1
-            currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
-        else:
-            prevSeq = (int.from_bytes(byteData[0:2], byteorder='little') - 1)
-            currentSeq = int.from_bytes(byteData[0:2], byteorder='little')
-
-        if currentSeq != (prevSeq + 1):
-            self.logger.warning("Sequence Error! cur:" + str(self.currentSeq) +
-                                " prev:" + str(self.prevSeq))
-            seqOK = False
-        else:
-            seqOK = True
-
-        return seqOK
 
     def create_cmd_pkt(self):
         self.settings_lock.acquire()
 
         self.cmd_pkt.data['mode_value'] = self.settings.mode
         self.cmd_pkt.data['command'] = self.cmd_pkt.pack_command(self.settings.run_state, 0)
-        self.cmd_pkt.data['sequence_count'] = self.in_pkt.data[
-            'sequence_count']
         self.cmd_pkt.data['respiratory_rate_set'] = self.settings.resp_rate
         self.cmd_pkt.data['tidal_volume_set'] = Units.ml_to_ecu(
             self.settings.tv)
@@ -111,59 +160,59 @@ class CommsLink(QThread):
 
         self.settings_lock.release()
 
+    def processPacket(self, byteData, packetType, sequenceNo):
+        #handle public data packet
+        if packetType==0x01:
+            inpkt = {}
+            inpkt['type'] = "inpkt"
+            inpkt['bytes'] = str(byteData)
+            self.logger.log(25, json.dumps(inpkt))
+            self.in_pkt.from_bytes(byteData)
+
+            self.alarmbits = self.in_pkt.data["alarm_bits"]
+
+            self.new_params.emit(self.in_pkt.to_params(sequenceNo))
+            self.new_alarms.emit(self.alarmbits)
+       
+            if ((self.lastSeq+1!=sequenceNo) and (self.lastSeq!=-1)):
+                self.logger.debug('Error in sequence -> likely packet drop')
+                self.statSeqError+=1
+
+            self.create_cmd_pkt()
+            cmd_byteData = self.cmd_pkt.to_bytes()
+            outpkt = {}
+            outpkt['type'] = "outpkt"
+            outpkt['bytes'] = str(cmd_byteData)
+            self.logger.log(25, json.dumps(outpkt))
+            self.sendPkts(cmd_byteData,sequenceNo)
+
+            self.lastSeq=sequenceNo
+
 
     #This function processes the serial data from Arduino and sends ACK
     def process_SerialData(self) -> None:
         params = Params()
         params_str = params.to_JSON()
         params_dict = json.loads(params_str)
-        error_count = 0
-        validData = False
-
+        
         self.in_pkt = InPacket()
         self.cmd_pkt = OutPacket()
         self.crc = CRC()
 
         self.ser.reset_input_buffer()
 
-        validData = False
-        valid_pkt_count = 0
-
         while True:
             byteData = self.get_bytes_from_serial()
-            seqOK = self.check_sequence(byteData)
-            crcOK = self.crc.check_crc(byteData)
 
-            inpkt = {}
-            inpkt['type'] = "inpkt"
-            inpkt['bytes'] = str(byteData)
-            
-            if crcOK and seqOK:
-                # Log raw packet data at a level betwen INFO and WARNING so that
-                # we can log only raw packets in production
-                self.logger.log(25, json.dumps(inpkt))
-                self.in_pkt.from_bytes(byteData)
-                self.alarmbits = self.in_pkt.data["alarm_bits"]
-
-                self.new_params.emit(self.in_pkt.to_params())
-                self.new_alarms.emit(self.alarmbits)
-
-                self.create_cmd_pkt()  
-                
-                cmd_byteData = self.cmd_pkt.to_bytes()
-
-                outpkt = {}
-                outpkt['type'] = "outpkt"
-                outpkt['bytes'] = str(cmd_byteData)
-                self.logger.log(25, json.dumps(outpkt))
-                self.sendPkts(cmd_byteData)
-                valid_pkt_count += 1
-            else:
-                self.logger.warning("BAD PACKET: " + json.dumps(inpkt))
-                error_count += 1
-
-            self.logger.debug('Dropped packets count ' + str(error_count))
-            self.logger.debug('Valid packets count ' + str(valid_pkt_count))
+            for byte in byteData:
+                self.handleRxByte(byte)
+            #do some statistics logging regularly
+            self.statPrintCnt+=1
+            if (self.statPrintCnt==200):
+                self.logger.warning('Serial TX-Stat: OK:' + str(self.statPacketTxCntOk)+' Fail:'+str(self.statPacketTxFailCnt))
+                self.logger.warning('Serial RX-Stat: OK:' + str(self.statPacketRxCntOk)+' Fail:'+str(self.statPacketRxCntCrcFail+self.statPacketRxCntHeaderFail+self.statPacketRxCntLenFail)+' Fail(Seq):'+str(self.statSeqError))
+                self.statPrintCnt=0
+            sleep(0.01) #check every 10ms for new data packets
 
     def init_serial(self) -> False:
 
@@ -186,7 +235,8 @@ class CommsLink(QThread):
         except serial.SerialException:
             return False
 
-    def read_all(self, port, chunk_size=200):
+    #read a chunk of data
+    def read_all(self, port, chunk_size=1024):
         """Read all characters on the serial port and return them."""
         if not port.isOpen():
             raise SerialException('Serial is diconnected')
@@ -195,44 +245,43 @@ class CommsLink(QThread):
 
         read_buffer = b''
 
-        while True:
-            # Read in chunks. Each chunk will wait as long as specified by
-            # timeout. Increase chunk_size to fail quicker
-            byte_chunk = port.read(size=chunk_size)
-            #sleep(0.001)
-            read_buffer += byte_chunk
-            if not len(byte_chunk) == chunk_size:
-                break
-        #port.reset_input_buffer()
+        read_buffer+= port.read(size=chunk_size)
+
         return read_buffer
 
-    def sendPkts(self, cmd_byteData: bytes) -> None:
+    #send a packet
+    def sendPkts(self, cmd_byteData: bytes,sequenceNo) -> None:
         # Write to serial port
         # TO DO put in separate function
-        if (len(bytearray(cmd_byteData))) == 34:
-            #self.ser.write_timeout = (0.30)
-            try:
-                i = 0
 
-                for i in range(len(cmd_byteData)):
-                    self.ser.write(cmd_byteData[i:i + 1])
+        try:
+            
+            self.ser.write(bytes([ 0x26,0x56,0x7e ]))
+            self.ser.write(sequenceNo.to_bytes(2,'little'))
+            txCrc=crc16.crc16xmodem(sequenceNo.to_bytes(2,'little'), 0xFFFF)
+            self.ser.write(bytes([ 4 ]))
+            txCrc=crc16.crc16xmodem(bytes([ 4 ]), txCrc)
+            self.ser.write(bytes([ 0x02 ]))
+            txCrc=crc16.crc16xmodem(bytes([ 0x02 ]), txCrc)
+            self.ser.write(len(cmd_byteData).to_bytes(1,'little'))
+            txCrc=crc16.crc16xmodem(len(cmd_byteData).to_bytes(1,'little'), txCrc)
 
-                self.logger.debug("Packet Written:")
-                self.logger.debug(''.join(r'\x' + hex(letter)[2:]
-                                          for letter in cmd_byteData))
-                self.logger.debug("Sent back SEQ and CRC: ")
-                self.logger.debug(
-                    int.from_bytes(cmd_byteData[0:2], byteorder='little'))
-                self.logger.debug(
-                    int.from_bytes(cmd_byteData[32:], byteorder='little'))
-                self.ser.reset_output_buffer()
-                return True
+            for i in range(len(cmd_byteData)):
+                txCrc=crc16.crc16xmodem(cmd_byteData[i:i + 1], txCrc)
+                self.ser.write(cmd_byteData[i:i + 1])
+            self.ser.write(txCrc.to_bytes(2,'little'))
 
-            except serial.SerialException:
-                self.logger.exception('Serial write error')
-                return False
-        else:
-            self.logger.warning('Data packet too long')
+            self.logger.debug("Packet Written:")
+            self.logger.debug("Sent back SEQ and CRC: ")
+            self.logger.debug(sequenceNo)
+            self.logger.debug(txCrc)
+            self.statPacketTxCntOk+=1
+            return True
+
+        except serial.SerialException:
+            self.statPacketTxFailCnt+=1
+            self.logger.exception('Serial write error')
+            return False
 
     def run(self) -> None:
         if self.init_serial():

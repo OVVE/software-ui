@@ -5,9 +5,7 @@ from utils.crc import CRC
 class OutPacket():
     def __init__(self) -> None:
         self.crc = CRC()
-        self.data = {'sequence_count': 0,               # bytes 0 - 1 - rpi unsigned short int
-            'packet_version': 3,                         # byte 2      - rpi unsigned char
-            'packet_type': 2, 
+        self.data = {
             'mode_value': 0,                             # byte 3      - rpi unsigned char
             'command': 0,
             'reserved': 0,
@@ -22,17 +20,13 @@ class OutPacket():
             'high_respiratory_rate_limit_set': 0,
             'low_respiratory_rate_limit_set': 0,
             'alarm_bits':   0,              # bytes 16 - 19
-            'crc':   0 }                    # bytes 20 - 21 - rpi unsigned short int 
+            }                    # bytes 20 - 21 - rpi unsigned short int 
 
     def to_bytes(self) -> bytes:
         # create the return packet
         endian = "little"
         cmd_byteData = b""
         #packet_version = 1
-
-        cmd_byteData += bytes(self.data['sequence_count'].to_bytes(2, endian))
-        cmd_byteData += bytes(self.data['packet_version'].to_bytes(1, endian))
-        cmd_byteData += bytes(self.data['packet_type'].to_bytes(1, endian))
         cmd_byteData += bytes(self.data['mode_value'].to_bytes(1, endian))        
         cmd_byteData += bytes(self.data['command'].to_bytes(1, endian))  
         cmd_byteData += bytes(self.data['reserved'].to_bytes(2, endian))   
@@ -48,14 +42,6 @@ class OutPacket():
         cmd_byteData += bytes(self.data['low_respiratory_rate_limit_set'].to_bytes(2, endian))        
         # TO DO set alarmbits correctly if sequence or CRC failed
         cmd_byteData += bytes(self.data['alarm_bits'].to_bytes(4, endian))
-
-        #Get CRC
-        calcCRC = self.crc.crccitt(cmd_byteData.hex())
-        # flip the bits - note that this will be 32 bit hex - do we will only send the first 2 later
-        CRCtoSend = struct.pack('<Q', int(calcCRC, base=16))
-
-        #send only 2 bytes
-        cmd_byteData += CRCtoSend[0:2]
 
         return cmd_byteData
         
