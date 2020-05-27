@@ -1379,12 +1379,14 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
     for label in [high_pressure_limit_label, low_pressure_limit_label,
                   high_volume_limit_label,low_volume_limit_label,
                   high_rr_limit_label,low_rr_limit_label]:
+        label.setStyleSheet("QLabel {color: #000000 ;}")
         label.setFont(page_settings.alarmLimitLabelFont)
         label.setAlignment(Qt.AlignCenter)
 
     for value_label in [window.high_pressure_limit_value_label, window.low_pressure_limit_value_label,
                         window.high_volume_limit_value_label, window.low_volume_limit_value_label,
                         window.high_rr_limit_value_label, window.low_rr_limit_value_label]:
+        value_label.setStyleSheet("QLabel {color: #000000 ;}")
         value_label.setFont(page_settings.alarmLimitValueFont)
         value_label.setAlignment(Qt.AlignCenter)
 
