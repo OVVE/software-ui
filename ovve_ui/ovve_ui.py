@@ -88,6 +88,7 @@ class MainWindow(QWidget):
             "9": QWidget(),
         }
         self.shown_alarm = None
+        self.prev_index = None
 
         self.initalizeAndAddStackWidgets()
 
@@ -262,15 +263,17 @@ class MainWindow(QWidget):
 
 
     def showAlarm(self) -> None:
+        self.prev_index = self.stack.currentIndex()
         self.disableMainButtons()
         self.alarm_display_label.setText(self.shown_alarm.get_message())
         self.display(5)
 
     def silenceAlarm(self) -> None:
         self.alarm_handler.acknowledge_alarm(self.shown_alarm)
-        self.display(0)
+        self.display(self.prev_index)
         self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
         self.shown_alarm = None
+        self.prev_index = None
         self.enableMainButtons()
         self.update_ui_alarms()
 
