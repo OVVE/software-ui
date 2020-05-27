@@ -1187,6 +1187,8 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
     h_box_11_6_1 = QHBoxLayout() #low RR label wrapper
     h_box_11_6_2 = QHBoxLayout() #low RR buttons wrapper
 
+    h_box_11_7 = QHBoxLayout() #back button
+
 
     high_pressure_limit_label = QLabel("Upper Pressure Alarm")
     window.high_pressure_decrement_button = window.makeSimpleDisplayButton(
@@ -1390,8 +1392,19 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
         value_label.setFont(page_settings.alarmLimitValueFont)
         value_label.setAlignment(Qt.AlignCenter)
 
+    alarm_limits_back = window.makeSimpleDisplayButton(
+        "Back to Settings",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
+    alarm_limits_back.clicked.connect(lambda: window.display(6))
+    h_box_11_7.addWidget(alarm_limits_back)
+
     for h_box in [h_box_11_1, h_box_11_2, h_box_11_3,
-                  h_box_11_4, h_box_11_5, h_box_11_6]:
+                  h_box_11_4, h_box_11_5, h_box_11_6,
+                  h_box_11_7]:
         h_box.setAlignment(Qt.AlignCenter)
         v_box_11.addLayout(h_box)
 
