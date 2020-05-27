@@ -262,6 +262,7 @@ class MainWindow(QWidget):
 
 
     def showAlarm(self) -> None:
+        self.disableMainButtons()
         self.alarm_display_label.setText(self.shown_alarm.get_message())
         self.display(5)
 
@@ -270,8 +271,25 @@ class MainWindow(QWidget):
         self.display(0)
         self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
         self.shown_alarm = None
-        print(self.dismissedAlarms)
+        self.enableMainButtons()
         self.update_ui_alarms()
+
+    def enableMainButtons(self) -> None:
+        self.mode_button_main.setEnabled(True)
+        self.resp_rate_button_main.setEnabled(True)
+        self.tv_button_main.setEnabled(True)
+        self.ie_button_main.setEnabled(True)
+        self.start_stop_button_main.setEnabled(True)
+        self.settings_button_main.setEnabled(True)
+
+
+    def disableMainButtons(self) -> None:
+        self.mode_button_main.setEnabled(False)
+        self.resp_rate_button_main.setEnabled(False)
+        self.tv_button_main.setEnabled(False)
+        self.ie_button_main.setEnabled(False)
+        self.start_stop_button_main.setEnabled(False)
+        self.settings_button_main.setEnabled(False)
 
     def updateMainDisplays(self) -> None:
         t_now = time.time()
