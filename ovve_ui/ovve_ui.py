@@ -614,25 +614,25 @@ class MainWindow(QWidget):
 
     def incrementMonth(self) -> None:
         self.new_date = self.new_date.addMonths(1)
-        self.date_tab_month_label.setText(str(self.new_date.month()))
+        self.date_month_label.setText(str(self.new_date.month()))
         if self.new_date.month == 1:
             self.new_date = self.new_date.addYears(-1)
 
     def decrementMonth(self) -> None:
         self.new_date = self.new_date.addMonths(-1)
-        self.date_tab_month_label.setText(str(self.new_date.month()))
+        self.date_month_label.setText(str(self.new_date.month()))
         if self.new_date.month == 12:
             self.new_date = self.new_date.addYears(1)
 
     def incrementDay(self) -> None:
         self.new_date = self.new_date.addDays(1)
-        self.date_tab_day_label.setText(str(self.new_date.day()))
+        self.date_day_label.setText(str(self.new_date.day()))
         if self.new_date.day == 1:
             self.new_date = self.new_date.addMonths(-1)
 
     def decrementDay(self) -> None:
         self.new_date = self.new_date.addDays(-1)
-        self.date_tab_day_label.setText(str(self.new_date.day()))
+        self.date_day_label.setText(str(self.new_date.day()))
         if self.new_date.day() == self.new_date.daysInMonth():
             self.new_date = self.new_date.addMonths(1)
             self.new_date = self.new_date.setDate(self.new_date.year(),
@@ -641,17 +641,17 @@ class MainWindow(QWidget):
 
     def incrementYear(self) -> None:
         self.new_date = self.new_date.addYears(1)
-        self.date_tab_year_label.setText(str(self.new_date.year()))
+        self.date_year_label.setText(str(self.new_date.year()))
 
     def decrementYear(self) -> None:
         self.new_date = self.new_date.addYears(-1)
-        self.date_tab_year_label.setText(str(self.new_date.year()))
+        self.date_year_label.setText(str(self.new_date.year()))
 
     def cancelDate(self) -> None:
         self.new_date = self.datetime.date()
-        self.date_tab_month_label.setText(str(self.new_date.month()))
-        self.date_tab_day_label.setText(str(self.new_date.day()))
-        self.date_tab_year_label.setText(str(self.new_date.year()))
+        self.date_month_label.setText(str(self.new_date.month()))
+        self.date_day_label.setText(str(self.new_date.day()))
+        self.date_year_label.setText(str(self.new_date.year()))
 
     def commitDate(self) -> None:
         self.datetime.setDate(self.new_date)
