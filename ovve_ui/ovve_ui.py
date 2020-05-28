@@ -232,7 +232,8 @@ class MainWindow(QWidget):
             self.stack.addWidget(self.page[i])
 
     def display(self, i) -> None:
-        self.stack.setCurrentIndex(i)
+        if type(i) != NoneType:
+            self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
