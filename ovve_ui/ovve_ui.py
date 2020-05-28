@@ -232,8 +232,7 @@ class MainWindow(QWidget):
             self.stack.addWidget(self.page[i])
 
     def display(self, i) -> None:
-        if type(i) != NoneType:
-            self.stack.setCurrentIndex(i)
+        self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
@@ -265,8 +264,9 @@ class MainWindow(QWidget):
 
     def silenceAlarm(self) -> None:
         self.alarm_handler.acknowledge_alarm(self.shown_alarm)
-        self.display(self.prev_index)
-        self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
+        if self.prev_index!=None:
+            self.display(self.prev_index)
+            self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
         self.shown_alarm = None
         self.prev_index = None
         self.enableMainButtons()

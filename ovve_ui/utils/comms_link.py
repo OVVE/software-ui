@@ -33,7 +33,7 @@ class CommsLink(QThread):
         self.settings = Settings()
         self.settings_lock = Lock()
         self.packet_version = 4
-        self.BAUD = 125000
+        self.BAUD = 500000
         self.PORT = port
         self.SER_TIMEOUT = 0.065
         self.SER_WRITE_TIMEOUT = None
@@ -115,7 +115,7 @@ class CommsLink(QThread):
         elif self.rxState==7:
             self.crcCalc = crc16.crc16xmodem(byte.to_bytes(1, 'little'), self.crcCalc)
             self.packetLen=byte #store length
-            if (self.packetLen<128): #128 is max
+            if (self.packetLen<=128): #128 is max
                 self.rxState=8
             else:
                 self.statPacketRxCntLenFail+=1
@@ -201,8 +201,7 @@ class CommsLink(QThread):
 
             
         elif packetType==0x80:
-            byteData+=b'\n'
-            self.textLogFile.write(byteData) #str(byteData.decode('utf-8')))
+            self.textLogFile.write(byteData) 
             self.textLogFile.flush()
 
 
