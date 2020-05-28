@@ -588,17 +588,13 @@ class MainWindow(QWidget):
         self.main_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
 
 
-        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
-        if not os.path.exists(self.logpath):
-            os.makedirs(self.logpath)
-
         self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
         self.logger.removeHandler(self.fh)
         self.fh = TimedRotatingFileHandler(self.logfileroot,
                                       when='H',
                                       interval=1,
                                       backupCount=336)
-        self.fh.setLevel(logging.INFO)
+        self.fh.setLevel(25)
         self.fh.setFormatter(self.formatter)
         self.logger.addHandler(self.fh)
 
