@@ -102,14 +102,14 @@ class MainWindow(QWidget):
 
         # The TimedRotatingFileHandler will write a new file each hour
         # After two weeks, the oldest logs will start being deleted
-        fh = TimedRotatingFileHandler(self.logfileroot,
+        self.fh = TimedRotatingFileHandler(self.logfileroot,
                                       when='H',
                                       interval=1,
                                       backupCount=336)
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
-        fh.setLevel(logging.DEBUG)
+        self.fh.setLevel(logging.INFO)
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
@@ -118,13 +118,13 @@ class MainWindow(QWidget):
         # TODO: Create a custom handler for Ignition
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter(
+        self.formatter = logging.Formatter(
             '%(asctime)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
+        self.fh.setFormatter(self.formatter)
+        ch.setFormatter(self.formatter)
 
         # add the handlers to the logger
-        self.logger.addHandler(fh)
+        self.logger.addHandler(self.fh)
         self.logger.addHandler(ch)
 
         if not is_sim:
@@ -587,6 +587,20 @@ class MainWindow(QWidget):
         self.settings_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
         self.main_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
 
+
+        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
+        if not os.path.exists(self.logpath):
+            os.makedirs(self.logpath)
+
+        self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
+        self.logger.removeHandler(self.fh)
+        self.fh = TimedRotatingFileHandler(self.logfileroot,
+                                      when='H',
+                                      interval=1,
+                                      backupCount=336)
+        self.fh.setLevel(logging.INFO)
+        self.fh.setFormatter(self.formatter)
+        self.logger.addHandler(self.fh)
 
         self.generate_new_patient_id_page_button.show()
         self.display(6)
