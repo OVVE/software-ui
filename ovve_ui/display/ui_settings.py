@@ -124,6 +124,7 @@ class PageSettings:
         valueColor: str = '#000000',
         unitColor: str = '#C5C5C5',
         changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
+        changeButtonFillColor: str = '#FFFFFF',
         changeButtonValueColor: str = '#C5C5C5',
         changeButtonBorderColor: str = '#C5C5C5',
         valueLabelWidth: int = 210,
@@ -147,6 +148,7 @@ class PageSettings:
         self.valueColor = valueColor
         self.unitColor = unitColor
         self.changeButtonTextSetting = changeButtonTextSetting
+        self.changeButtonFillColor = changeButtonFillColor
         self.changeButtonValueColor = changeButtonValueColor
         self.changeButtonBorderColor = changeButtonBorderColor
         self.valueLabelWidth = valueLabelWidth

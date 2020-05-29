@@ -14,6 +14,7 @@ from PyQt5.QtCore import Qt
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
+from display.selectors import AlarmLimitSelector
 
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')
@@ -155,6 +156,7 @@ def initializeHomeScreenWidget(
     h_box_1right.addWidget(window.main_battery_icon)
 
     h_box_1right.setSpacing(0)
+
 
 
     for button in [window.mode_button_main,
@@ -1157,240 +1159,52 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
     page_settings = window.ui_settings.page_settings
 
     v_box_11 = QVBoxLayout() #main layout
+    h_box_11_back = QHBoxLayout() #back button
 
-    h_box_11_1 = QHBoxLayout() #high press.
-    h_box_11_1_1 = QHBoxLayout() #high press. label wrapper
-    h_box_11_1_2 = QHBoxLayout() #high press. buttons wrapper
+    window.high_pressure_limit_selector = AlarmLimitSelector(window=window,
+                                                            main_label_text="Upper Pressure Alarm",
+                                                            value=window.settings.high_pressure_limit,
+                                                            dec_func=window.decrementHighPressureAlarmLimit,
+                                                            inc_func=window.incrementHighPressureAlarmLimit
+                                                            )
 
-    h_box_11_2 = QHBoxLayout() #low press.
-    h_box_11_2_1 = QHBoxLayout() #low press. label wrapper
-    h_box_11_2_2 = QHBoxLayout() #low press. buttons wrapper
-
-
-    h_box_11_3 = QHBoxLayout() #high vol.
-    h_box_11_3_1 = QHBoxLayout() #high vol. label wrapper
-    h_box_11_3_2 = QHBoxLayout() #high vol. buttons wrapper
-
-
-
-    h_box_11_4 = QHBoxLayout() #low vol.
-    h_box_11_4_1 = QHBoxLayout() #low vol. label wrapper
-    h_box_11_4_2 = QHBoxLayout() #low vol. buttons wrapper
+    window.low_pressure_limit_selector = AlarmLimitSelector(window=window,
+                                                           main_label_text="Lower Pressure Alarm",
+                                                           value=window.settings.low_pressure_limit,
+                                                           dec_func=window.decrementLowPressureAlarmLimit,
+                                                           inc_func=window.incrementLowPressureAlarmLimit
+                                                           )
 
 
-    h_box_11_5 = QHBoxLayout() #high RR
-    h_box_11_5_1 = QHBoxLayout() #high RR label wrapper
-    h_box_11_5_2 = QHBoxLayout() #high RR buttons wrapper
+    window.high_volume_limit_selector = AlarmLimitSelector(window=window,
+                                                          main_label_text="Upper Volume Alarm",
+                                                          value=window.settings.high_volume_limit,
+                                                          dec_func=window.decrementHighVolumeAlarmLimit,
+                                                          inc_func=window.incrementHighVolumeAlarmLimit
+                                                          )
+
+    window.low_volume_limit_selector = AlarmLimitSelector(window=window,
+                                                      main_label_text="Lower Volume Alarm",
+                                                      value=window.settings.low_volume_limit,
+                                                      dec_func=window.decrementLowVolumeAlarmLimit,
+                                                      inc_func=window.incrementLowVolumeAlarmLimit
+                                                      )
 
 
-    h_box_11_6 = QHBoxLayout() #low RR
-    h_box_11_6_1 = QHBoxLayout() #low RR label wrapper
-    h_box_11_6_2 = QHBoxLayout() #low RR buttons wrapper
+    window.high_rr_limit_selector = AlarmLimitSelector(window=window,
+                                                      main_label_text="Upper Resp. Rate Alarm",
+                                                      value=window.settings.high_resp_rate_limit,
+                                                      dec_func=window.decrementHighRRAlarmLimit,
+                                                      inc_func=window.incrementHighRRAlarmLimit
+                                                      )
 
-    h_box_11_7 = QHBoxLayout() #back button
+    window.low_rr_limit_selector = AlarmLimitSelector(window = window,
+                                                      main_label_text = "Lower Resp. Rate Alarm",
+                                                      value = window.settings.low_resp_rate_limit,
+                                                      dec_func = window.decrementLowRRAlarmLimit,
+                                                      inc_func = window.incrementLowRRAlarmLimit
+                                                      )
 
-
-    high_pressure_limit_label = QLabel("Upper Pressure Alarm")
-    window.high_pressure_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_pressure_decrement_button.clicked.connect(window.decrementHighPressureAlarmLimit)
-
-    window.high_pressure_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_pressure_increment_button.clicked.connect(window.incrementHighPressureAlarmLimit)
-
-    window.high_pressure_limit_value_label = QLabel(str(window.settings.high_pressure_limit))
-
-    h_box_11_1_1.addWidget(high_pressure_limit_label)
-    h_box_11_1_2.addWidget(window.high_pressure_decrement_button)
-    h_box_11_1_2.addWidget(window.high_pressure_limit_value_label)
-    h_box_11_1_2.addWidget(window.high_pressure_increment_button)
-
-    h_box_11_1.addLayout(h_box_11_1_1)
-    h_box_11_1.addLayout(h_box_11_1_2)
-
-
-    low_pressure_limit_label = QLabel("Lower Pressure Alarm")
-
-    window.low_pressure_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_pressure_decrement_button.clicked.connect(window.decrementLowPressureAlarmLimit)
-
-    window.low_pressure_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_pressure_increment_button.clicked.connect(window.incrementLowPressureAlarmLimit)
-
-    window.low_pressure_limit_value_label = QLabel(str(window.settings.low_pressure_limit))
-
-    h_box_11_2_1.addWidget(low_pressure_limit_label)
-    h_box_11_2_2.addWidget(window.low_pressure_decrement_button)
-    h_box_11_2_2.addWidget(window.low_pressure_limit_value_label)
-    h_box_11_2_2.addWidget(window.low_pressure_increment_button)
-
-    h_box_11_2.addLayout(h_box_11_2_1)
-    h_box_11_2.addLayout(h_box_11_2_2)
-
-    high_volume_limit_label = QLabel("Upper Volume Alarm")
-    window.high_volume_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_volume_decrement_button.clicked.connect(window.decrementHighVolumeAlarmLimit)
-
-    window.high_volume_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_volume_increment_button.clicked.connect(window.incrementHighVolumeAlarmLimit)
-
-    window.high_volume_limit_value_label = QLabel(str(window.settings.high_volume_limit))
-
-    h_box_11_3_1.addWidget(high_volume_limit_label)
-    h_box_11_3_2.addWidget(window.high_volume_decrement_button)
-    h_box_11_3_2.addWidget(window.high_volume_limit_value_label)
-    h_box_11_3_2.addWidget(window.high_volume_increment_button)
-
-    h_box_11_3.addLayout(h_box_11_3_1)
-    h_box_11_3.addLayout(h_box_11_3_2)
-
-    low_volume_limit_label = QLabel("Lower Volume Alarm")
-    window.low_volume_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_volume_decrement_button.clicked.connect(window.decrementLowVolumeAlarmLimit)
-
-    window.low_volume_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_volume_increment_button.clicked.connect(window.incrementLowVolumeAlarmLimit)
-
-    window.low_volume_limit_value_label = QLabel(str(window.settings.low_volume_limit))
-
-    h_box_11_4_1.addWidget(low_volume_limit_label)
-    h_box_11_4_2.addWidget(window.low_volume_decrement_button)
-    h_box_11_4_2.addWidget(window.low_volume_limit_value_label)
-    h_box_11_4_2.addWidget(window.low_volume_increment_button)
-
-    h_box_11_4.addLayout(h_box_11_4_1)
-    h_box_11_4.addLayout(h_box_11_4_2)
-
-    high_rr_limit_label = QLabel("Upper Resp. Rate Alarm")
-    window.high_rr_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_rr_decrement_button.clicked.connect(window.decrementHighRRAlarmLimit)
-
-    window.high_rr_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_rr_increment_button.clicked.connect(window.incrementHighRRAlarmLimit)
-
-    window.high_rr_limit_value_label = QLabel(str(window.settings.high_resp_rate_limit))
-
-    h_box_11_5_1.addWidget(high_rr_limit_label)
-    h_box_11_5_2.addWidget(window.high_rr_decrement_button)
-    h_box_11_5_2.addWidget(window.high_rr_limit_value_label)
-    h_box_11_5_2.addWidget(window.high_rr_increment_button)
-
-    h_box_11_5.addLayout(h_box_11_5_1)
-    h_box_11_5.addLayout(h_box_11_5_2)
-
-    low_rr_limit_label = QLabel("Lower Resp. Rate Alarm")
-    window.low_rr_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_rr_decrement_button.clicked.connect(window.decrementLowRRAlarmLimit)
-
-    window.low_rr_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_rr_increment_button.clicked.connect(window.incrementLowRRAlarmLimit)
-
-    window.low_rr_limit_value_label = QLabel(str(window.settings.low_resp_rate_limit))
-
-    h_box_11_6_1.addWidget(low_rr_limit_label)
-    h_box_11_6_2.addWidget(window.low_rr_decrement_button)
-    h_box_11_6_2.addWidget(window.low_rr_limit_value_label)
-    h_box_11_6_2.addWidget(window.low_rr_increment_button)
-
-    h_box_11_6.addLayout(h_box_11_6_1)
-    h_box_11_6.addLayout(h_box_11_6_2)
-
-    for label in [high_pressure_limit_label, low_pressure_limit_label,
-                  high_volume_limit_label,low_volume_limit_label,
-                  high_rr_limit_label,low_rr_limit_label]:
-        label.setStyleSheet("QLabel {color: #000000 ;}")
-        label.setFont(page_settings.alarmLimitLabelFont)
-        label.setAlignment(Qt.AlignCenter)
-
-    for value_label in [window.high_pressure_limit_value_label, window.low_pressure_limit_value_label,
-                        window.high_volume_limit_value_label, window.low_volume_limit_value_label,
-                        window.high_rr_limit_value_label, window.low_rr_limit_value_label]:
-        value_label.setStyleSheet("QLabel {color: #000000 ;}")
-        value_label.setFont(page_settings.alarmLimitValueFont)
-        value_label.setAlignment(Qt.AlignCenter)
 
     alarm_limits_back = window.makeSimpleDisplayButton(
         "Back to Settings",
@@ -1400,12 +1214,26 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
         ),
         size=(200, 65))
     alarm_limits_back.clicked.connect(lambda: window.display(6))
-    h_box_11_7.addWidget(alarm_limits_back)
+    h_box_11_back.addWidget(alarm_limits_back)
+    h_box_11_back.setAlignment(Qt.AlignCenter)
 
-    for h_box in [h_box_11_1, h_box_11_2, h_box_11_3,
-                  h_box_11_4, h_box_11_5, h_box_11_6,
-                  h_box_11_7]:
-        h_box.setAlignment(Qt.AlignCenter)
-        v_box_11.addLayout(h_box)
+
+    for alarm_selector in [window.high_pressure_limit_selector,
+                           window.low_pressure_limit_selector,
+                           window.high_volume_limit_selector,
+                           window.low_volume_limit_selector,
+                           window.high_rr_limit_selector,
+                           window.low_rr_limit_selector,
+                           ]:
+
+        v_box_11.addWidget(alarm_selector)
+
+    v_box_11.addLayout(h_box_11_back)
+    v_box_11.setSpacing(10)
+    v_box_11.setContentsMargins(0,0,0,0)
+
+
+
+
 
     window.page["11"].setLayout(v_box_11)
