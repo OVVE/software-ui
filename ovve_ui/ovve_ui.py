@@ -32,10 +32,11 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeTidalVolumeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
                              initializeGraphWidget, initializeSettingsWidget,
-                             initializeConfirmStopWidget, initializeChangePatientWidget)
+                             initializeConfirmStopWidget, initializeChangePatientWidget,
+                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget)
 from utils.params import Params
 from utils.settings import Settings
-from utils.alarms import Alarms
+from utils.Alarm import Alarm, AlarmHandler
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
@@ -70,29 +71,18 @@ class MainWindow(QWidget):
         self.ui_settings = UISettings()
         self.ptr = 0
 
-        self.dateTime = QDateTime.currentDateTime()
+        self.datetime = QDateTime.currentDateTime()
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {
-            "1": QWidget(),
-            "2": QWidget(),
-            "3": QWidget(),
-            "4": QWidget(),
-            "5": QWidget(),
-            "6": QWidget(),
-            "7": QWidget(),
-            "8": QWidget(),
-            "9": QWidget(),
-        }
-        self.alarms = Alarms()
-        self.shownAlarmCode = None
+        self.page = {str(i): QWidget() for i in range(1,12)}
 
+        self.shown_alarm = None
+        self.prev_index = None
 
-
-        self.initalizeAndAddStackWidgets()
+        self.initializeAndAddStackWidgets()
 
         layout.setContentsMargins(10, 10, 10, 10)
         self.setLayout(layout)
@@ -142,10 +132,16 @@ class MainWindow(QWidget):
         else:
             self.comms_handler = CommsSimulator()
 
+        self.alarm_handler = AlarmHandler()
+        self.comms_handler.new_alarms.connect(self.alarm_handler.set_active_alarms)
+        self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.set_alarm_ackbits)
+        self.dismissedAlarms = []
+
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
+
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -200,7 +196,7 @@ class MainWindow(QWidget):
             button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
 
-    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None):
+    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None) -> PicButton:
         return PicButton(filename, size = size)
 
     def makeDisplayRect(
@@ -219,7 +215,7 @@ class MainWindow(QWidget):
                            rect_settings=self.ui_settings.display_rect_settings
                            if rect_settings is None else rect_settings)
 
-    def initalizeAndAddStackWidgets(self) -> None:
+    def initializeAndAddStackWidgets(self) -> None:
         initializeGraphWidget(self)
         initializeModeWidget(self)
         initializeRespiratoryRateWidget(self)
@@ -229,6 +225,8 @@ class MainWindow(QWidget):
         initializeSettingsWidget(self)
         initializeConfirmStopWidget(self)
         initializeChangePatientWidget(self)
+        initializeChangeDatetimeWidget(self)
+        initializeAlarmLimitWidget(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -240,17 +238,56 @@ class MainWindow(QWidget):
         self.params = params
         if self.params.run_state > 0:
             self.logger.info(self.params.to_JSON())
+            self.update_ui_alarms()
             self.updateMainDisplays()
             self.updateGraphs()
 
-    def update_ui_alarms(self, alarms_dict: dict) -> None:
-        self.alarms = Alarms()
-        self.alarms.from_dict(alarms_dict)
-        self.logger.info(self.alarms.to_JSON())
-        for i in range(len(alarms_dict)):
-            if list(alarms_dict.items()
-                    )[i][1]:  #TODO: Revisit this for multi alarm handling
-                self.showAlarm(i)
+    def update_ui_alarms(self) -> None:
+        if self.alarm_handler.alarms_pending() > 0:
+            if self.shown_alarm is None: #There is no alarm currently shown, so show something if it comes
+                self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
+                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
+                self.showAlarm()
+
+            elif not self.shown_alarm.isSamePrior(self.alarm_handler.get_highest_priority_alarm()):
+                self.logger.debug("Pending2 : " + str(self.alarm_handler.alarms_pending()))
+                #the alarm that we're showing isn't the highest priority one
+                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
+                self.showAlarm()
+
+
+    def showAlarm(self) -> None:
+        self.prev_index = self.stack.currentIndex()
+        self.disableMainButtons()
+        self.alarm_display_label.setText(self.shown_alarm.get_message())
+        self.display(5)
+
+    def silenceAlarm(self) -> None:
+        self.alarm_handler.acknowledge_alarm(self.shown_alarm)
+        if self.prev_index!=None:
+            self.display(self.prev_index)
+            self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
+        self.shown_alarm = None
+        self.prev_index = None
+        self.enableMainButtons()
+        self.update_ui_alarms()
+
+    def enableMainButtons(self) -> None:
+        self.mode_button_main.setEnabled(True)
+        self.resp_rate_button_main.setEnabled(True)
+        self.tv_button_main.setEnabled(True)
+        self.ie_button_main.setEnabled(True)
+        self.start_stop_button_main.setEnabled(True)
+        self.settings_button_main.setEnabled(True)
+
+
+    def disableMainButtons(self) -> None:
+        self.mode_button_main.setEnabled(False)
+        self.resp_rate_button_main.setEnabled(False)
+        self.tv_button_main.setEnabled(False)
+        self.ie_button_main.setEnabled(False)
+        self.start_stop_button_main.setEnabled(False)
+        self.settings_button_main.setEnabled(False)
 
     def updateMainDisplays(self) -> None:
         t_now = time.time()
@@ -418,9 +455,6 @@ class MainWindow(QWidget):
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio_enum))
 
-    def changeAlarm(self, new_val) -> None:
-        self.local_settings.alarm_mode = new_val
-
     def changeStartStop(self) -> None:
         if self.settings.run_state == 0:
             self.settings.run_state = 1
@@ -439,32 +473,17 @@ class MainWindow(QWidget):
         self.patient_page_label.update()
         # self.generate_new_patient_id_page_button.hide()
 
-    #TODO: doesn't support multiple alarms at once
-    def showAlarm(self, code: int) -> None:
-        self.shownAlarmCode = code
-        self.alarm_display_label.setText(self.alarms.getDisplay(code))
-        self.display(5)
-
-    def silenceAlarm(self):
-        alarms_dict = self.alarms.to_dict()
-        alarms_items = list(alarms_dict.items())
-        alarms_dict[alarms_items[self.shownAlarmCode][0]] = False
-        self.alarms.from_dict(alarms_dict)
-        self.comms_handler.new_alarms  #TODO complete this line, silence for given duration to Arduino
-        self.shownAlarmCode = None
-        self.display(0)
-
-    def confirmStop(self):
+    def confirmStop(self) -> None:
         self.display(7)
 
-    def stopVentilation(self):
+    def stopVentilation(self) -> None:
         self.settings.run_state = 0
         self.start_stop_button_main.updateValue("START")
         self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
         self.display(0)
 
-    def commitMode(self):
+    def commitMode(self) -> None:
         self.settings.mode = self.local_settings.mode
         self.mode_button_main.updateValue(
             self.get_mode_display(self.settings.mode))
@@ -497,15 +516,71 @@ class MainWindow(QWidget):
         self.local_settings = deepcopy(self.settings)
         self.updatePageDisplays()
 
-    def commitAlarm(self) -> None:
-        self.settings.alarm_mode = self.local_settings.alarm_mode
-        self.alarm_button_main.updateValue(self.settings.get_alarm_display())
-        self.display(0)
+
+    def decrementHighPressureAlarmLimit(self) -> None:
+        self.settings.high_pressure_limit -= 1
+        self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
         self.passChanges()
-        self.updatePageDisplays()
+
+    def incrementHighPressureAlarmLimit(self) -> None:
+        self.settings.high_pressure_limit += 1
+        self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
+        self.passChanges()
+
+    def decrementLowPressureAlarmLimit(self) -> None:
+        self.settings.low_pressure_limit -= 1
+        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+        self.passChanges()
+
+    def incrementLowPressureAlarmLimit(self) -> None:
+        self.settings.low_pressure_limit += 1
+        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+        self.passChanges()
+
+    def decrementHighVolumeAlarmLimit(self) -> None:
+        self.settings.high_volume_limit -= 1
+        self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
+        self.passChanges()
+
+    def incrementHighVolumeAlarmLimit(self) -> None:
+        self.settings.high_volume_limit += 1
+        self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
+        self.passChanges()
+
+    def decrementLowVolumeAlarmLimit(self) -> None:
+        self.settings.low_volume_limit -= 1
+        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+        self.passChanges()
+
+    def incrementLowVolumeAlarmLimit(self) -> None:
+        self.settings.low_volume_limit += 1
+        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+        self.passChanges()
+
+    def decrementHighRRAlarmLimit(self) -> None:
+        self.settings.high_resp_rate_limit -= 1
+        self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
+        self.passChanges()
+
+    def incrementHighRRAlarmLimit(self) -> None:
+        self.settings.high_resp_rate_limit += 1
+        self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
+        self.passChanges()
+
+    def decrementLowRRAlarmLimit(self) -> None:
+        self.settings.low_resp_rate_limit -= 1
+        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+        self.passChanges()
+
+    def incrementLowRRAlarmLimit(self) -> None:
+        self.settings.low_resp_rate_limit += 1
+        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+        self.passChanges()
 
     def commitNewPatientID(self) -> None:
+        self.logger.debug(f"Old patient ID {self.patient_id}")
         self.patient_id = self.new_patient_id
+        self.logger.debug(f"New patient ID {self.patient_id}")
         self.new_patient_id = None
         self.patient_id_display = self.new_patient_id_display
         self.new_patient_id_display = self.patient_id_display
@@ -530,12 +605,57 @@ class MainWindow(QWidget):
         self.generate_new_patient_id_page_button.show()
         self.display(6)
 
-    def cancelNewPatientID(self):
+    def cancelNewPatientID(self) -> None:
         self.new_patient_id = None
         self.new_patient_id_display = None
         self.patient_page_label.setText( f"Current Patient: Patient {self.patient_id_display}")
         self.generate_new_patient_id_page_button.show()
         self.display(6)
+
+    def incrementMonth(self) -> None:
+        self.new_date = self.new_date.addMonths(1)
+        self.date_month_label.setText(str(self.new_date.month()))
+        if self.new_date.month == 1:
+            self.new_date = self.new_date.addYears(-1)
+
+    def decrementMonth(self) -> None:
+        self.new_date = self.new_date.addMonths(-1)
+        self.date_month_label.setText(str(self.new_date.month()))
+        if self.new_date.month == 12:
+            self.new_date = self.new_date.addYears(1)
+
+    def incrementDay(self) -> None:
+        self.new_date = self.new_date.addDays(1)
+        self.date_day_label.setText(str(self.new_date.day()))
+        if self.new_date.day == 1:
+            self.new_date = self.new_date.addMonths(-1)
+
+    def decrementDay(self) -> None:
+        self.new_date = self.new_date.addDays(-1)
+        self.date_day_label.setText(str(self.new_date.day()))
+        if self.new_date.day() == self.new_date.daysInMonth():
+            self.new_date = self.new_date.addMonths(1)
+            self.new_date = self.new_date.setDate(self.new_date.year(),
+                                                 self.new_date.month(),
+                                                 self.new_date.daysInMonth())
+
+    def incrementYear(self) -> None:
+        self.new_date = self.new_date.addYears(1)
+        self.date_year_label.setText(str(self.new_date.year()))
+
+    def decrementYear(self) -> None:
+        self.new_date = self.new_date.addYears(-1)
+        self.date_year_label.setText(str(self.new_date.year()))
+
+    def cancelDate(self) -> None:
+        self.new_date = self.datetime.date()
+        self.date_month_label.setText(str(self.new_date.month()))
+        self.date_day_label.setText(str(self.new_date.day()))
+        self.date_year_label.setText(str(self.new_date.year()))
+
+    def commitDate(self) -> None:
+        self.datetime.setDate(self.new_date)
+        self.main_datetime_label.setText(self.datetime.toString()[:-8])
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
@@ -554,7 +674,7 @@ class MainWindow(QWidget):
             self, settings_callback: Callable[[Settings], None]) -> None:
         self.settings_callback = settings_callback
 
-    def closeEvent(self, *args, **kwargs):
+    def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
     def keyPressEvent(self, event):

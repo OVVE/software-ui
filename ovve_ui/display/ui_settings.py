@@ -134,7 +134,10 @@ class PageSettings:
         commitColor: str = "#3cb371",
         commitCancelButtonSpacing: int = 100,
         alarmSilenceButtonColor: str = '#C5C5C5',
-        topBarTextSetting: TextSetting = TextSetting("Arial", 16, True),
+        topBarSetting: TextSetting = TextSetting("Arial", 16, True),
+        setDatetimeSetting: TextSetting = TextSetting("Arial Black", 36, True),
+        alarmLimitLabelSetting: TextSetting = TextSetting("Arial", 18, False),
+        alarmLimitValueSetting: TextSetting = TextSetting("Arial Black", 24, True),
     ):
 
         self.mainLabelFont = mainLabelSetting.font
@@ -154,7 +157,12 @@ class PageSettings:
         self.commitColor = commitColor
         self.commitCancelButtonSpacing = commitCancelButtonSpacing
         self.alarmSilenceButtonColor = alarmSilenceButtonColor
-        self.topBarFont = topBarTextSetting.font
+        self.topBarFont = topBarSetting.font
+        self.setDatetimeFont = setDatetimeSetting.font
+        self.alarmLimitLabelFont = alarmLimitLabelSetting.font
+        self.alarmLimitValueFont = alarmLimitValueSetting.font
+
+
 
         def getCancelBorderPen(self) -> QPen:
             return QPen(QColor(self.cancelColor))
