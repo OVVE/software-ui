@@ -1,0 +1,37 @@
+name: Unit Testing for UI Interface
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master and develop branch
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Download PyQt5's dependencies
+    - name: Download PyQt5 Dependencies
+      run: python3 -m pip install setuptools
+
+    # Download our packages dependencies
+    - name: Download PyQt5
+      run: sudo apt install python3-pyqt5
+    
+    - name: Download Other Package Dependencies
+      run: python3 -m pip install numpy pyqtgraph crc16
+
+    - name: Check Package Dependency Installation
+      run:
+        python3 -m pip list | grep -F numpy &&
+        python3 -m pip list | grep -F pyqtgraph &&
+        python3 -m pip list | grep -F crc16 &&
+        python3 -c "import PyQt5; print(PyQt5.__doc__)"
