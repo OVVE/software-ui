@@ -10,13 +10,13 @@ from utils.Alarm import AlarmType
 from utils.in_packet import InPacket
 from utils.out_packet import OutPacket
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide2 import QtCore
+from PySide2.QtCore import QThread, Signal
 from copy import deepcopy
 
 class CommsSimulator(QThread):
-    new_params = pyqtSignal(Params)
-    new_alarms = pyqtSignal(int)
+    new_params = Signal(Params)
+    new_alarms = Signal(int)
 
     def __init__(self) -> None:
         QThread.__init__(self)

@@ -1,6 +1,6 @@
 import time
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSignal
+from PySide2 import QtCore
+from PySide2.QtCore import Signal
 from utils.Alarm import *
 import random
 
@@ -8,7 +8,7 @@ import random
   Simulates what should happen in comms handler
 '''
 class AlarmEmitter(QtCore.QThread):
-    new_alarm_signal = pyqtSignal(int)
+    new_alarm_signal = Signal(int)
 
     def __init__(self, handler: AlarmHandler):
         super().__init__()

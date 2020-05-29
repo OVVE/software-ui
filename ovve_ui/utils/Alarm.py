@@ -3,7 +3,7 @@ import time
 from enum import Enum
 from queue import PriorityQueue
 from typing import List
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import Signal
 from PyQt5 import QtCore
 from threading import RLock
 
@@ -126,7 +126,7 @@ class AlarmQueue(List):
         return len(self)
         
 class AlarmHandler(QtCore.QObject):
-    acknowledge_alarm_signal = pyqtSignal(int)
+    acknowledge_alarm_signal = Signal(int)
 
     def __init__(self) -> None:
         super().__init__()

@@ -20,12 +20,12 @@ from utils.in_packet import InPacket
 from utils.out_packet import OutPacket
 from utils.crc import CRC
 from utils.units import Units
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide2.QtCore import QThread, Signal
 
 
 class CommsLink(QThread):
-    new_params = pyqtSignal(Params)
-    new_alarms = pyqtSignal(int)
+    new_params = Signal(Params)
+    new_alarms = Signal(int)
 
     def __init__(self, port: str) -> None:
         QThread.__init__(self)
