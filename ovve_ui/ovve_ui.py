@@ -125,7 +125,10 @@ class MainWindow(QWidget):
 
         # add the handlers to the logger
         self.logger.addHandler(self.fh)
-        self.logger.addHandler(ch)
+
+        # Only log to console in dev mode
+        if (self.dev_mode):
+            self.logger.addHandler(ch)
 
         if not is_sim:
             self.comms_handler = CommsLink(port)
