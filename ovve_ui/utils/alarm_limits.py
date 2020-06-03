@@ -24,19 +24,19 @@ class AlarmLimitType(Enum):
 
 class AlarmLimits:
     def __init__(self, window):
-        self.pressure_increment = 1
-        self.resp_rate_increment = 1
+        pressure_increment = 1
+        resp_rate_increment = 1
 
         self.alarm_limits = {
             AlarmLimitType.HIGH_PRESSURE: AlarmLimit("Upper Pressure Alarm",
                                                      window.settings.high_pressure_limit,
-                                                     increment= self.pressure_increment,
+                                                     increment= pressure_increment,
                                                      warning_limit=40,
                                                      hard_limit = 60),
 
             AlarmLimitType.LOW_PRESSURE: AlarmLimit("Lower Pressure Alarm",
                                                      window.settings.low_pressure_limit,
-                                                     increment= self.pressure_increment,
+                                                     increment= pressure_increment,
                                                      hard_limit=0),
 
             AlarmLimitType.HIGH_VOLUME: AlarmLimit("Upper Volume Alarm",
@@ -49,11 +49,11 @@ class AlarmLimits:
 
             AlarmLimitType.HIGH_RESP_RATE: AlarmLimit("Upper Resp. Rate Alarm",
                                                    window.settings.high_resp_rate_limit,
-                                                   increment = self.resp_rate_increment),
+                                                   increment = resp_rate_increment),
 
             AlarmLimitType.LOW_RESP_RATE: AlarmLimit("Lower Resp. Rate Alarm",
                                                   window.settings.low_resp_rate_limit,
-                                                  increment=self.resp_rate_increment,
+                                                  increment= resp_rate_increment,
                                                   hard_limit= 0)
         }
 

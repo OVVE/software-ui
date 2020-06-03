@@ -40,6 +40,8 @@ from utils.Alarm import Alarm, AlarmHandler
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
+from utils.alarm_limits import AlarmLimit, AlarmLimits, AlarmLimitType
+
 
 
 class MainWindow(QWidget):
@@ -81,6 +83,8 @@ class MainWindow(QWidget):
 
         self.shown_alarm = None
         self.prev_index = None
+
+        self.alarm_limits = AlarmLimits(self).alarm_limits
 
         self.initializeAndAddStackWidgets()
 

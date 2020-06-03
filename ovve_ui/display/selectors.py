@@ -8,11 +8,12 @@ from PyQt5.QtWidgets import QAbstractButton, QVBoxLayout, QHBoxLayout, QLabel
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
+from utils.alarm_limits import AlarmLimit, AlarmLimits
 
 MainWindow = TypeVar('MainWindow')
 
 class AlarmLimitSelector(QWidget):
-    def __init__(self,  window: MainWindow, , parent = None):
+    def __init__(self,  window: MainWindow, alarmLimit: AlarmLimit, parent = None):
         QWidget.__init__(self, parent=parent)
         self.page_settings = window.ui_settings.page_settings
         button_settings = SimpleButtonSettings(
@@ -22,12 +23,12 @@ class AlarmLimitSelector(QWidget):
                 valueColor=self.page_settings.changeButtonValueColor)
 
         self.window = window
-        self.main_label_text = main_label_text
-        self.value = value
-        self.increment = increment
-        self.settable = settable
-        self.warning_limit = warning_limit
-        self.hard_limit = hard_limit
+        self.main_label_text = alarmLimit.name
+        self.value = alarmLimit.value
+        self.increment = alarmLimit.increment
+        self.settable = alarmLimit.settable
+        self.warning_limit = alarmLimit.warning_limit
+        self.hard_limit = alarmLimit.hard_limit
 
         self.outer_layout = QHBoxLayout()
         self.left_inner_layout =  QHBoxLayout()

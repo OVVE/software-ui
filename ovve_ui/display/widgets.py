@@ -16,6 +16,9 @@ from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  TextSetting)
 from display.selectors import AlarmLimitSelector
 
+from utils.alarm_limits import AlarmLimit, AlarmLimits, AlarmLimitType
+
+
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')
 
@@ -1158,45 +1161,6 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
     v_box_11 = QVBoxLayout() #main layout
     h_box_11_back = QHBoxLayout() #back button
 
-    window.high_pressure_limit_selector = AlarmLimitSelector(window=window,
-                                                            main_label_text="Upper Pressure Alarm",
-                                                            value=window.settings.high_pressure_limit,
-                                                             increment=window.settings.pressure_alarm_limit_increment
-                                                             )
-
-    window.low_pressure_limit_selector = AlarmLimitSelector(window=window,
-                                                           main_label_text="Lower Pressure Alarm",
-                                                           value=window.settings.low_pressure_limit,
-                                                           increment = window.settings.pressure_alarm_limit_increment
-                                                           )
-
-
-    window.high_volume_limit_selector = AlarmLimitSelector(window=window,
-                                                          main_label_text="Upper Volume Alarm",
-                                                          value=window.settings.high_volume_limit,
-                                                            settable = False
-                                                            )
-
-    window.low_volume_limit_selector = AlarmLimitSelector(window=window,
-                                                      main_label_text="Lower Volume Alarm",
-                                                      value=window.settings.low_volume_limit,
-                                                      settable = False
-                                                      )
-
-
-    window.high_rr_limit_selector = AlarmLimitSelector(window=window,
-                                                      main_label_text="Upper Resp. Rate Alarm",
-                                                      value=window.settings.high_resp_rate_limit,
-                                                      increment = window.settings.resp_rate_alarm_limit_increment,
-                                                      )
-
-    window.low_rr_limit_selector = AlarmLimitSelector(window = window,
-                                                      main_label_text = "Lower Resp. Rate Alarm",
-                                                      value = window.settings.low_resp_rate_limit,
-                                                      increment = window.settings.resp_rate_alarm_limit_increment,
-                                                      )
-
-
     alarm_limits_back = window.makeSimpleDisplayButton(
         "Back to Settings",
         button_settings=SimpleButtonSettings(
@@ -1208,19 +1172,15 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
     h_box_11_back.addWidget(alarm_limits_back)
     h_box_11_back.setAlignment(Qt.AlignCenter)
 
-
-    for alarm_selector in [window.high_pressure_limit_selector,
-                           window.low_pressure_limit_selector,
-                           window.high_volume_limit_selector,
-                           window.low_volume_limit_selector,
-                           window.high_rr_limit_selector,
-                           window.low_rr_limit_selector,
-                           ]:
-
-        v_box_11.addWidget(alarm_selector)
+    makeAndAddAllAlarmSelectors(window, v_box_11)
 
     v_box_11.addLayout(h_box_11_back)
     v_box_11.setSpacing(10)
     v_box_11.setContentsMargins(0,0,0,0)
 
     window.page["11"].setLayout(v_box_11)
+
+def makeAndAddAllAlarmSelectors(window, layout):
+    for type in AlarmLimitType:
+        selector = AlarmLimitSelector(window, window.alarm_limits[type])
+        layout.addWidget(selector)
