@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QAbstractButton, QVBoxLayout, QHBoxLayout, QLabel
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
-from utils.alarm_limits import AlarmLimit, AlarmLimits, AlarmLimitType
+from utils.alarm_limits import AlarmLimits, AlarmLimitType
 
 MainWindow = TypeVar('MainWindow')
 

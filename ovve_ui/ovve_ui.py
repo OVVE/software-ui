@@ -40,7 +40,7 @@ from utils.Alarm import Alarm, AlarmHandler
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
-from utils.alarm_limits import AlarmLimit, AlarmLimits, AlarmLimitType
+from utils.alarm_limits import AlarmLimits, AlarmLimitType
 
 
 

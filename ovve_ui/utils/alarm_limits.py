@@ -2,17 +2,6 @@ from utils.settings import Settings
 import typing
 from enum import Enum
 
-class AlarmLimit:
-    def __init__(self, name, value, increment = None,
-                 settable = True, warning_limit = None, hard_limit = None):
-        self.name = name
-        self.value = value
-        self.increment = increment
-        self.settable = settable
-        self.warning_limit = warning_limit
-        self.hard_limit = hard_limit
-
-
 class AlarmLimitType(Enum):
     HIGH_PRESSURE = 0
     LOW_PRESSURE = 1

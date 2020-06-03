@@ -16,7 +16,7 @@ from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  TextSetting)
 from display.selectors import AlarmLimitSelector
 
-from utils.alarm_limits import AlarmLimit, AlarmLimits, AlarmLimitType
+from utils.alarm_limits import AlarmLimits, AlarmLimitType
 
 
 # Used for documentation purposes only
