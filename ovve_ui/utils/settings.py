@@ -3,7 +3,7 @@ Settings that are sent to MCU
 """
 import json
 from typing import List
-
+from utils.alarm_limit_type import AlarmLimitType
 
 class Settings():
     def __init__(self) -> None:
@@ -17,12 +17,14 @@ class Settings():
         self.ie_ratio_enum: int = 0
 
         #TODO: Adjust these default values
-        self.high_pressure_limit: int = 40
-        self.low_pressure_limit: int = 0
-        self.high_volume_limit: int = 800
-        self.low_volume_limit: int = 0
-        self.high_resp_rate_limit: int = 20
-        self.low_resp_rate_limit: int = 0
+        self.alarm_limit_values = {
+            AlarmLimitType.HIGH_PRESSURE: 40,
+            AlarmLimitType.LOW_PRESSURE: 0,
+            AlarmLimitType.HIGH_VOLUME: 800,
+            AlarmLimitType.LOW_VOLUME: 0,
+            AlarmLimitType.HIGH_RESP_RATE: 20,
+            AlarmLimitType.LOW_RESP_RATE: 0,
+        }
 
         self.silence_time: int = 2  #Number of minutes for which alarm is silenced
 
@@ -40,12 +42,12 @@ class Settings():
         j['tv'] = self.tv
         j['resp_rate'] = self.resp_rate
         j['ie_ratio_enum'] = self.ie_ratio_enum
-        j['high_pressure_limit'] = self.high_pressure_limit
-        j['low_pressure_limit'] = self.low_pressure_limit
-        j['high_volume_limit'] = self.high_volume_limit
-        j['low_volume_limit'] = self.low_volume_limit
-        j['high_resp_rate_limit'] = self.high_resp_rate_limit
-        j['low_resp_rate_limit'] = self.low_resp_rate_limit
+        j['high_pressure_limit'] = self.alarm_limit_values[AlarmLimitType.HIGH_PRESSURE]
+        j['low_pressure_limit'] = self.alarm_limit_values[AlarmLimitType.LOW_PRESSURE]
+        j['high_volume_limit'] = self.alarm_limit_values[AlarmLimitType.HIGH_VOLUME]
+        j['low_volume_limit'] = self.alarm_limit_values[AlarmLimitType.LOW_VOLUME]
+        j['high_resp_rate_limit'] = self.alarm_limit_values[AlarmLimitType.HIGH_RESP_RATE]
+        j['low_resp_rate_limit'] = self.alarm_limit_values[AlarmLimitType.LOW_RESP_RATE]
         return json.dumps(j)
 
     #TODO: add error handling for bad dict keys
@@ -55,12 +57,12 @@ class Settings():
         self.tv = settings_dict['tv']
         self.resp_rate = settings_dict['resp_rate']
         self.ie_ratio_enum = settings_dict['ie_ratio_enum']
-        self.high_pressure_limit = settings_dict['high_pressure_limit']
-        self.low_pressure_limit = settings_dict['low_pressure_limit']
-        self.high_volume_limit = settings_dict['high_volume_limit']
-        self.low_volume_limit = settings_dict['low_volume_limit']
-        self.high_resp_rate_limit = settings_dict['high_resp_rate_limit']
-        self.low_resp_rate_limit = settings_dict['low_resp_rate_limit']
+        self.alarm_limit_values[AlarmLimitType.HIGH_PRESSURE] = settings_dict['high_pressure_limit']
+        self.alarm_limit_values[AlarmLimitType.LOW_PRESSURE] = settings_dict['low_pressure_limit']
+        self.alarm_limit_values[AlarmLimitType.HIGH_VOLUME] = settings_dict['high_volume_limit']
+        self.alarm_limit_values[AlarmLimitType.LOW_VOLUME] = settings_dict['low_volume_limit']
+        self.alarm_limit_values[AlarmLimitType.HIGH_RESP_RATE] = settings_dict['high_resp_rate_limit']
+        self.alarm_limit_values[AlarmLimitType.LOW_RESP_RATE] = settings_dict['low_resp_rate_limit']
 
     def from_json(self, j_str: str) -> None:
         j = json.loads(j_str)

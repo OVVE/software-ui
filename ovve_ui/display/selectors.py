@@ -8,7 +8,9 @@ from PyQt5.QtWidgets import QAbstractButton, QVBoxLayout, QHBoxLayout, QLabel
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
-from utils.alarm_limits import AlarmLimits, AlarmLimitType
+from utils.alarm_limits import AlarmLimits
+from utils.alarm_limit_type import AlarmLimitType
+
 
 MainWindow = TypeVar('MainWindow')
 
@@ -23,7 +25,8 @@ class AlarmLimitSelector(QWidget):
                 valueColor=self.page_settings.changeButtonValueColor)
 
         self.window = window
-        self.properties = window.alarm_limits[alarmLimitType]
+        self.alarmLimitType = alarmLimitType
+        self.properties = window.alarm_limits[self.alarmLimitType]
 
         self.outer_layout = QHBoxLayout()
         self.left_inner_layout =  QHBoxLayout()
@@ -37,7 +40,7 @@ class AlarmLimitSelector(QWidget):
             size=(50, 50),
             button_settings=button_settings)
 
-        self.value_label = QLabel(str(self.properties["value"]))
+        self.value_label = QLabel(str(self.window.settings.alarm_limit_values[self.alarmLimitType]))
         self.styleValueLabel()
 
         self.inc_button = self.window.makeSimpleDisplayButton(
@@ -89,19 +92,19 @@ class AlarmLimitSelector(QWidget):
         # TODO: check hard limit
         # TODO: check warning limit
         if self.properties["settable"]:
-            self.properties["value"]+=self.properties["increment"]
+            self.window.settings.alarm_limit_values[self.alarmLimitType]+=self.properties["increment"]
             self.updateValue()
 
     def decrementValue(self):
         # TODO: check hard limit
         # TODO: check warning limit
         if self.properties["settable"]:
-            self.properties["value"]-=self.properties["increment"]
+            self.window.settings.alarm_limit_values[self.alarmLimitType]-=self.properties["increment"]
             self.updateValue()
 
 
     def updateValue(self):
-        self.value_label.setText(str(self.properties["value"]))
+        self.value_label.setText(str(self.window.settings.alarm_limit_values[self.alarmLimitType]))
         self.value_label.update()
         self.window.passChanges()
 
