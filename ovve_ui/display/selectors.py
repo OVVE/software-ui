@@ -8,12 +8,12 @@ from PyQt5.QtWidgets import QAbstractButton, QVBoxLayout, QHBoxLayout, QLabel
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
-from utils.alarm_limits import AlarmLimit, AlarmLimits
+from utils.alarm_limits import AlarmLimit, AlarmLimits, AlarmLimitType
 
 MainWindow = TypeVar('MainWindow')
 
 class AlarmLimitSelector(QWidget):
-    def __init__(self,  window: MainWindow, alarmLimit: AlarmLimit, parent = None):
+    def __init__(self,  window: MainWindow, alarmLimitType: AlarmLimitType, parent = None):
         QWidget.__init__(self, parent=parent)
         self.page_settings = window.ui_settings.page_settings
         button_settings = SimpleButtonSettings(
@@ -23,18 +23,13 @@ class AlarmLimitSelector(QWidget):
                 valueColor=self.page_settings.changeButtonValueColor)
 
         self.window = window
-        self.main_label_text = alarmLimit.name
-        self.value = alarmLimit.value
-        self.increment = alarmLimit.increment
-        self.settable = alarmLimit.settable
-        self.warning_limit = alarmLimit.warning_limit
-        self.hard_limit = alarmLimit.hard_limit
+        self.properties = window.alarm_limits[alarmLimitType]
 
         self.outer_layout = QHBoxLayout()
         self.left_inner_layout =  QHBoxLayout()
         self.right_inner_layout =  QHBoxLayout()
 
-        self.main_label = QLabel(self.main_label_text)
+        self.main_label = QLabel(self.properties["name"])
         self.styleMainLabel()
 
         self.dec_button = self.window.makeSimpleDisplayButton(
@@ -42,7 +37,7 @@ class AlarmLimitSelector(QWidget):
             size=(50, 50),
             button_settings=button_settings)
 
-        self.value_label = QLabel(str(self.value))
+        self.value_label = QLabel(str(self.properties["value"]))
         self.styleValueLabel()
 
         self.inc_button = self.window.makeSimpleDisplayButton(
@@ -82,7 +77,7 @@ class AlarmLimitSelector(QWidget):
         self.dec_button.setSizePolicy(inc_dec_size_policy)
         self.inc_button.setSizePolicy(inc_dec_size_policy)
 
-        if self.settable:
+        if self.properties["settable"]:
             self.dec_button.clicked.connect(self.decrementValue)
             self.inc_button.clicked.connect(self.incrementValue)
 
@@ -93,20 +88,20 @@ class AlarmLimitSelector(QWidget):
     def incrementValue(self):
         # TODO: check hard limit
         # TODO: check warning limit
-        if self.settable:
-            self.value+=self.increment
+        if self.properties["settable"]:
+            self.properties["value"]+=self.properties["increment"]
             self.updateValue()
 
     def decrementValue(self):
         # TODO: check hard limit
         # TODO: check warning limit
-        if self.settable:
-            self.value -= self.increment
+        if self.properties["settable"]:
+            self.properties["value"]-=self.properties["increment"]
             self.updateValue()
 
 
     def updateValue(self):
-        self.value_label.setText(str(self.value))
+        self.value_label.setText(str(self.properties["value"]))
         self.value_label.update()
         self.window.passChanges()
 

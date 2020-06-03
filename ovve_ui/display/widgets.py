@@ -1182,5 +1182,5 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
 
 def makeAndAddAllAlarmSelectors(window, layout):
     for limit_type in AlarmLimitType:
-        selector = AlarmLimitSelector(window, window.alarm_limits[limit_type])
+        selector = AlarmLimitSelector(window, limit_type)
         layout.addWidget(selector)

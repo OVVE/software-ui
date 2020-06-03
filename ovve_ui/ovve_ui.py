@@ -612,6 +612,7 @@ class MainWindow(QWidget):
     def passChanges(self) -> None:
         #self.settings_callback(self.settings)
         settings_str = self.settings.to_JSON()
+        print(settings_str)
         self.logger.info(settings_str)
         j = json.loads(settings_str)
         self.new_settings_signal.emit(j)
