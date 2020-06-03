@@ -1156,8 +1156,6 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     window.page["10"].setLayout(v_box_10)
 
 def initializeAlarmLimitWidget(window: MainWindow) -> None:
-    page_settings = window.ui_settings.page_settings
-
     v_box_11 = QVBoxLayout() #main layout
     h_box_11_back = QHBoxLayout() #back button
 
