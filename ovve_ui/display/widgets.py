@@ -1223,8 +1223,4 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
     v_box_11.setSpacing(10)
     v_box_11.setContentsMargins(0,0,0,0)
 
-
-
-
-
     window.page["11"].setLayout(v_box_11)

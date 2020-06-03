@@ -12,8 +12,7 @@ from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
 MainWindow = TypeVar('MainWindow')
 
 class AlarmLimitSelector(QWidget):
-    def __init__(self,  window: MainWindow, main_label_text, value, increment = None,
-                 settable = True, warning_limit = None, hard_limit = None, parent = None):
+    def __init__(self,  window: MainWindow, , parent = None):
         QWidget.__init__(self, parent=parent)
         self.page_settings = window.ui_settings.page_settings
         button_settings = SimpleButtonSettings(
