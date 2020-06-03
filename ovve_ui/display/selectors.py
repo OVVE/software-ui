@@ -12,50 +12,44 @@ from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
 MainWindow = TypeVar('MainWindow')
 
 class AlarmLimitSelector(QWidget):
-    def __init__(self,  window: MainWindow, main_label_text, value, dec_func, inc_func, parent = None):
+    def __init__(self,  window: MainWindow, main_label_text, value, increment = None,
+                 settable = True, warning_limit = None, hard_limit = None, parent = None):
         QWidget.__init__(self, parent=parent)
-        page_settings = window.ui_settings.page_settings
+        self.page_settings = window.ui_settings.page_settings
         button_settings = SimpleButtonSettings(
-                fillColor= page_settings.changeButtonFillColor,
-                borderColor=page_settings.changeButtonBorderColor,
-                valueSetting=page_settings.changeButtonTextSetting,
-                valueColor=page_settings.changeButtonValueColor)
+                fillColor= self.page_settings.changeButtonFillColor,
+                borderColor=self.page_settings.changeButtonBorderColor,
+                valueSetting=self.page_settings.changeButtonTextSetting,
+                valueColor=self.page_settings.changeButtonValueColor)
 
+        self.window = window
         self.main_label_text = main_label_text
         self.value = value
-        self.dec_func = dec_func
-        self.inc_func = inc_func
+        self.increment = increment
+        self.settable = settable
+        self.warning_limit = warning_limit
+        self.hard_limit = hard_limit
+
         self.outer_layout = QHBoxLayout()
         self.left_inner_layout =  QHBoxLayout()
         self.right_inner_layout =  QHBoxLayout()
 
-
         self.main_label = QLabel(self.main_label_text)
+        self.styleMainLabel()
 
-        self.main_label.setStyleSheet("QLabel {color: #000000 ;}")
-        self.main_label.setFont(page_settings.alarmLimitLabelFont)
-        self.main_label.setAlignment(Qt.AlignLeft)
-        self.main_label.setFixedWidth(300)
-
-        self.dec_button = window.makeSimpleDisplayButton(
+        self.dec_button = self.window.makeSimpleDisplayButton(
             "-",
             size=(50, 50),
             button_settings=button_settings)
-        self.dec_button.clicked.connect(self.dec_func)
 
         self.value_label = QLabel(str(self.value))
+        self.styleValueLabel()
 
-        self.value_label.setStyleSheet("QLabel {color: #000000 ;}")
-        self.value_label.setFont(page_settings.alarmLimitValueFont)
-        self.value_label.setAlignment(Qt.AlignCenter)
-        self.value_label.setFixedWidth(100)
-
-        self.inc_button = window.makeSimpleDisplayButton(
+        self.inc_button = self.window.makeSimpleDisplayButton(
             "+",
             size=(50, 50),
             button_settings=button_settings)
-        self.inc_button.clicked.connect(self.inc_func)
-
+        self.connectOrHideButtons()
 
         self.left_inner_layout.addWidget(self.main_label)
         for widget in [self.dec_button, self.value_label, self.inc_button]:
@@ -70,9 +64,50 @@ class AlarmLimitSelector(QWidget):
         self.outer_layout.setAlignment(Qt.AlignCenter)
         self.setLayout(self.outer_layout)
 
-    def updateValue(self, value: int):
-        self.value = value
+    def styleMainLabel(self):
+        self.main_label.setStyleSheet("QLabel {color: #000000 ;}")
+        self.main_label.setFont(self.page_settings.alarmLimitLabelFont)
+        self.main_label.setAlignment(Qt.AlignLeft)
+        self.main_label.setFixedWidth(300)
+
+    def styleValueLabel(self):
+        self.value_label.setStyleSheet("QLabel {color: #000000 ;}")
+        self.value_label.setFont(self.page_settings.alarmLimitValueFont)
+        self.value_label.setAlignment(Qt.AlignCenter)
+        self.value_label.setFixedWidth(100)
+
+    def connectOrHideButtons(self):
+        inc_dec_size_policy = self.dec_button.sizePolicy()
+        inc_dec_size_policy.setRetainSizeWhenHidden(True)
+        self.dec_button.setSizePolicy(inc_dec_size_policy)
+        self.inc_button.setSizePolicy(inc_dec_size_policy)
+
+        if self.settable:
+            self.dec_button.clicked.connect(self.decrementValue)
+            self.inc_button.clicked.connect(self.incrementValue)
+
+        else:
+            self.inc_button.hide()
+            self.dec_button.hide()
+
+    def incrementValue(self):
+        # TODO: check hard limit
+        # TODO: check warning limit
+        if self.settable:
+            self.value+=self.increment
+            self.updateValue()
+
+    def decrementValue(self):
+        # TODO: check hard limit
+        # TODO: check warning limit
+        if self.settable:
+            self.value -= self.increment
+            self.updateValue()
+
+
+    def updateValue(self):
         self.value_label.setText(str(self.value))
         self.value_label.update()
+        self.window.passChanges()
 
 

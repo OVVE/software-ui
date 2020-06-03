@@ -1145,7 +1145,6 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
         size=(200, 50))
     datetime_back.clicked.connect(lambda: window.display(6))
 
-
     h_box_10mid.addWidget(change_datetime_stack_widget)
     h_box_10bottom.addWidget(datetime_back)
 
@@ -1162,45 +1161,39 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
     window.high_pressure_limit_selector = AlarmLimitSelector(window=window,
                                                             main_label_text="Upper Pressure Alarm",
                                                             value=window.settings.high_pressure_limit,
-                                                            dec_func=window.decrementHighPressureAlarmLimit,
-                                                            inc_func=window.incrementHighPressureAlarmLimit
-                                                            )
+                                                             increment=window.settings.pressure_alarm_limit_increment
+                                                             )
 
     window.low_pressure_limit_selector = AlarmLimitSelector(window=window,
                                                            main_label_text="Lower Pressure Alarm",
                                                            value=window.settings.low_pressure_limit,
-                                                           dec_func=window.decrementLowPressureAlarmLimit,
-                                                           inc_func=window.incrementLowPressureAlarmLimit
+                                                           increment = window.settings.pressure_alarm_limit_increment
                                                            )
 
 
     window.high_volume_limit_selector = AlarmLimitSelector(window=window,
                                                           main_label_text="Upper Volume Alarm",
                                                           value=window.settings.high_volume_limit,
-                                                          dec_func=window.decrementHighVolumeAlarmLimit,
-                                                          inc_func=window.incrementHighVolumeAlarmLimit
-                                                          )
+                                                            settable = False
+                                                            )
 
     window.low_volume_limit_selector = AlarmLimitSelector(window=window,
                                                       main_label_text="Lower Volume Alarm",
                                                       value=window.settings.low_volume_limit,
-                                                      dec_func=window.decrementLowVolumeAlarmLimit,
-                                                      inc_func=window.incrementLowVolumeAlarmLimit
+                                                      settable = False
                                                       )
 
 
     window.high_rr_limit_selector = AlarmLimitSelector(window=window,
                                                       main_label_text="Upper Resp. Rate Alarm",
                                                       value=window.settings.high_resp_rate_limit,
-                                                      dec_func=window.decrementHighRRAlarmLimit,
-                                                      inc_func=window.incrementHighRRAlarmLimit
+                                                      increment = window.settings.resp_rate_alarm_limit_increment,
                                                       )
 
     window.low_rr_limit_selector = AlarmLimitSelector(window = window,
                                                       main_label_text = "Lower Resp. Rate Alarm",
                                                       value = window.settings.low_resp_rate_limit,
-                                                      dec_func = window.decrementLowRRAlarmLimit,
-                                                      inc_func = window.incrementLowRRAlarmLimit
+                                                      increment = window.settings.resp_rate_alarm_limit_increment,
                                                       )
 
 
