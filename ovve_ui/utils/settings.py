@@ -16,13 +16,18 @@ class Settings():
         self.tv: int = 475
         self.ie_ratio_enum: int = 0
 
-        #TODO: Come up with sensible default values for these, currently completely made up
-        self.high_pressure_limit: int = 50
-        self.low_pressure_limit: int = 10
+        #TODO: Adjust these default values
+        self.high_pressure_limit: int = 40
+        self.low_pressure_limit: int = 0
         self.high_volume_limit: int = 800
         self.low_volume_limit: int = 0
         self.high_resp_rate_limit: int = 20
         self.low_resp_rate_limit: int = 0
+
+        #TODO: Find a proper home for these as well as proper values
+        self.pressure_alarm_limit_increment = 1
+        self.volume_alarm_limit_increment = 25
+        self.resp_rate_alarm_limit_increment = 1
 
         self.silence_time: int = 2  #Number of minutes for which alarm is silenced
 
