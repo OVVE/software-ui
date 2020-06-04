@@ -47,7 +47,8 @@ class AlarmLimitSelector(QWidget):
             "+",
             size=(50, 50),
             button_settings=button_settings)
-        self.connectOrHideButtons()
+
+
 
         self.left_inner_layout.addWidget(self.main_label)
         for widget in [self.dec_button, self.value_label, self.inc_button]:
@@ -58,9 +59,13 @@ class AlarmLimitSelector(QWidget):
             inner_layout.setAlignment(Qt.AlignCenter)
             self.outer_layout.addLayout(inner_layout)
 
+
+
         self.setFixedHeight(65)
         self.outer_layout.setAlignment(Qt.AlignCenter)
         self.setLayout(self.outer_layout)
+        self.connectOrHideButtons()
+
 
     def styleMainLabel(self):
         self.main_label.setStyleSheet("QLabel {color: #000000 ;}")
@@ -75,14 +80,19 @@ class AlarmLimitSelector(QWidget):
         self.value_label.setFixedWidth(100)
 
     def connectOrHideButtons(self):
-        inc_dec_size_policy = self.dec_button.sizePolicy()
-        inc_dec_size_policy.setRetainSizeWhenHidden(True)
-        self.dec_button.setSizePolicy(inc_dec_size_policy)
-        self.inc_button.setSizePolicy(inc_dec_size_policy)
+        dec_size_policy = self.dec_button.sizePolicy()
+        dec_size_policy.setRetainSizeWhenHidden(True)
+
+        inc_size_policy = self.dec_button.sizePolicy()
+        inc_size_policy.setRetainSizeWhenHidden(True)
+
+        self.dec_button.setSizePolicy(dec_size_policy)
+        self.inc_button.setSizePolicy(inc_size_policy)
 
         if self.properties["settable"]:
             self.dec_button.clicked.connect(self.decrementValue)
             self.inc_button.clicked.connect(self.incrementValue)
+            self.checkIfHideShowButtons()
 
         else:
             self.inc_button.hide()
@@ -94,6 +104,7 @@ class AlarmLimitSelector(QWidget):
         if self.properties["settable"]:
             self.window.settings.alarm_limit_values[self.alarmLimitType]+=self.properties["increment"]
             self.updateValue()
+            self.checkIfHideShowButtons()
 
     def decrementValue(self):
         # TODO: check hard limit
@@ -101,6 +112,32 @@ class AlarmLimitSelector(QWidget):
         if self.properties["settable"]:
             self.window.settings.alarm_limit_values[self.alarmLimitType]-=self.properties["increment"]
             self.updateValue()
+            self.checkIfHideShowButtons()
+
+    def checkIfHideShowButtons(self):
+        if self.properties["hard_limit"] is not None:
+
+            if self.properties["low"]:
+                if self.window.settings.alarm_limit_values[self.alarmLimitType] \
+                        - self.properties["increment"] < self.properties["hard_limit"]:
+                    self.dec_button.hide()
+
+                else:
+                    if self.properties["settable"]:
+                        if not self.dec_button.isVisible():
+                            self.dec_button.show()
+
+
+            elif not self.properties["low"]:
+                if self.window.settings.alarm_limit_values[self.alarmLimitType] \
+                        + self.properties["increment"] > self.properties["hard_limit"]:
+                    self.inc_button.hide()
+
+
+                else:
+                    if self.properties["settable"]:
+                        if not self.inc_button.isVisible():
+                            self.inc_button.show()
 
 
     def updateValue(self):
