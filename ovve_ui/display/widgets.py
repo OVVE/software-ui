@@ -1192,3 +1192,48 @@ def makeAndAddAllAlarmSelectors(window, layout):
     for limit_type in AlarmLimitType:
         window.alarmLimitSelectors[limit_type].setPairSelector()
 
+
+def initializeAlarmLimitWarningWidget(window: MainWindow) -> None:
+    v_box_12 = QVBoxLayout() #main layout
+    h_box_12_1 = QHBoxLayout() #warning
+    h_box_12_2 = QHBoxLayout() #back/confirm button
+
+    page_settings = window.ui_settings.page_settings
+
+    alarm_limit_warning_label = QLabel("Warning: you are setting a upper pressure alarm limit exceeding 40 cmH20. Continue?")
+    alarm_limit_warning_label.setFont(page_settings.mainLabelFont)
+    alarm_limit_warning_label.setAlignment(Qt.AlignCenter)
+    alarm_limit_warning_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+    alarm_limit_warning_cancel = window.makeSimpleDisplayButton(
+        "CANCEL",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.cancelColor,
+            borderColor=page_settings.cancelColor,
+            valueSetting=page_settings.cancelSetting,
+            valueColor="#FFFFFF"))
+
+    #TODO: Connect
+
+    alarm_limit_warning_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 90),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+    #TODO: Connect
+
+    h_box_12_1.addWidget(alarm_limit_warning_label)
+    h_box_12_2.addWidget(alarm_limit_warning_cancel)
+    h_box_12_2.addWidget(alarm_limit_warning_apply)
+
+
+    for h_box in [h_box_12_1, h_box_12_2]:
+        h_box.setAlignment(Qt.AlignCenter)
+        v_box_12.addLayout(h_box)
+
+    window.page["12"].setLayout(v_box_12)
+

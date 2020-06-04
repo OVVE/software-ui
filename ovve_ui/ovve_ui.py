@@ -81,7 +81,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,12)}
+        self.page = {str(i): QWidget() for i in range(1,13)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -668,6 +668,16 @@ class MainWindow(QWidget):
 
             elif event.key() == QtCore.Qt.Key_I:
                 self.comms_handler.fireAlarm(6)
+
+    def alarmLimitWarning(self, alarmLimitType):
+        self.alarmLimitSelectors[alarmLimitType].decrementValue()
+        self.display(10)
+
+
+    def alarmLimitWarningAffirm(self, alarmLimitType):
+        self.display(10)
+
+
 
 
 def main() -> None:
