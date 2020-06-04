@@ -86,7 +86,7 @@ class MainWindow(QWidget):
         self.shown_alarm = None
         self.prev_index = None
 
-        self.alarm_limits = AlarmLimits(self).alarm_limits
+        self.alarm_limits = AlarmLimits().alarm_limits
 
         self.initializeAndAddStackWidgets()
 
@@ -511,6 +511,12 @@ class MainWindow(QWidget):
     def commitTidalVol(self) -> None:
         self.settings.tv = self.local_settings.tv
         self.tv_button_main.updateValue(self.settings.tv)
+        self.settings.alarm_limit_values[AlarmLimitType.HIGH_VOLUME] = 1.2 * self.settings.tv
+        self.settings.alarm_limit_values[AlarmLimitType.LOW_VOLUME] = 0.8 * self.settings.tv
+        self.alarmLimitSelectors[AlarmLimitType.HIGH_VOLUME].updateValue()
+        self.alarmLimitSelectors[AlarmLimitType.LOW_VOLUME].updateValue()
+
+
         self.display(0)
         self.passChanges()
         self.local_settings = deepcopy(self.settings)

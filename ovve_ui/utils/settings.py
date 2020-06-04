@@ -20,8 +20,8 @@ class Settings():
         self.alarm_limit_values = {
             AlarmLimitType.HIGH_PRESSURE: 40,
             AlarmLimitType.LOW_PRESSURE: 0,
-            AlarmLimitType.HIGH_VOLUME: 800,
-            AlarmLimitType.LOW_VOLUME: 0,
+            AlarmLimitType.HIGH_VOLUME: self.tv * 1.2,
+            AlarmLimitType.LOW_VOLUME: self.tv * 0.8,
             AlarmLimitType.HIGH_RESP_RATE: 20,
             AlarmLimitType.LOW_RESP_RATE: 0,
         }
