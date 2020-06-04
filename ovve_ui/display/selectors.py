@@ -40,7 +40,7 @@ class AlarmLimitSelector(QWidget):
             size=(50, 50),
             button_settings=button_settings)
 
-        self.value_label = QLabel(str(self.window.settings.alarm_limit_values[self.alarmLimitType]))
+        self.value_label = QLabel(str(round(self.window.settings.alarm_limit_values[self.alarmLimitType])))
         self.styleValueLabel()
 
         self.inc_button = self.window.makeSimpleDisplayButton(
@@ -104,7 +104,7 @@ class AlarmLimitSelector(QWidget):
 
 
     def updateValue(self):
-        self.value_label.setText(str(self.window.settings.alarm_limit_values[self.alarmLimitType]))
+        self.value_label.setText(str(round(self.window.settings.alarm_limit_values[self.alarmLimitType])))
         self.value_label.update()
         self.window.passChanges()
 
