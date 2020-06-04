@@ -24,6 +24,7 @@ class AlarmType(Enum):
     LOW_VOLUME = 11
     HIGH_RESP_RATE = 12
     LOW_RESP_RATE = 13
+    CONTINUOUS_PRESSURE = 14
     UI_COMMS_FAILURE = 16
     UI_HARDWARE_FAILURE = 17
     SETPOINT_MISMATCH = 24
@@ -43,6 +44,7 @@ class Alarm():
         AlarmType.LOW_VOLUME: "Volume IN detected exceeding the low volume limit",
         AlarmType.HIGH_RESP_RATE: "Respiratory rate exceeded the high rate limit",
         AlarmType.LOW_RESP_RATE: "Respiratory rate below the low rate limit",
+        AlarmType.LOW_PRESSURE: "Pressure stayed lower than 10cmH2O for more than 15s",
         AlarmType.UI_COMMS_FAILURE: "Communications are too unreliable to operate",
         AlarmType.UI_HARDWARE_FAILURE: "A hardware failure has been detected",
         AlarmType.SETPOINT_MISMATCH: "One or more setpoints does not match between UI and ECU"
@@ -79,13 +81,14 @@ class AlarmQueue(List):
         AlarmType.ESTOP_PRESSED: 6,
         AlarmType.HIGH_PRESSURE: 7,
         AlarmType.LOW_PRESSURE: 8,
-        AlarmType.HIGH_VOLUME: 9,
-        AlarmType.LOW_VOLUME: 10,
-        AlarmType.HIGH_RESP_RATE: 11,
-        AlarmType.LOW_RESP_RATE: 12,
-        AlarmType.UI_COMMS_FAILURE: 13,
-        AlarmType.UI_HARDWARE_FAILURE: 14,
-        AlarmType.SETPOINT_MISMATCH: 15,
+        AlarmType.CONTINUOUS_PRESSURE: 9,
+        AlarmType.HIGH_VOLUME: 10,
+        AlarmType.LOW_VOLUME: 11,
+        AlarmType.HIGH_RESP_RATE: 12,
+        AlarmType.LOW_RESP_RATE: 13,
+        AlarmType.UI_COMMS_FAILURE: 14,
+        AlarmType.UI_HARDWARE_FAILURE: 15,
+        AlarmType.SETPOINT_MISMATCH: 16,
     }
 
     def __init__(self) -> None:
