@@ -1,9 +1,8 @@
-from utils.settings import Settings
 import typing
 from utils.alarm_limit_type import AlarmLimitType
 
 class AlarmLimits:
-    def __init__(self, window):
+    def __init__(self):
         pressure_increment = 1
         resp_rate_increment = 1
 
