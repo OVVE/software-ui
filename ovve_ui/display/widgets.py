@@ -1188,3 +1188,7 @@ def makeAndAddAllAlarmSelectors(window, layout):
         selector = AlarmLimitSelector(window, limit_type)
         window.alarmLimitSelectors[limit_type] = selector
         layout.addWidget(selector)
+
+    for limit_type in AlarmLimitType:
+        window.alarmLimitSelectors[limit_type].setPairSelector()
+

@@ -27,6 +27,7 @@ class AlarmLimitSelector(QWidget):
         self.window = window
         self.alarmLimitType = alarmLimitType
         self.properties = window.alarm_limits[self.alarmLimitType]
+        self.pair_selector = None
 
         self.outer_layout = QHBoxLayout()
         self.left_inner_layout =  QHBoxLayout()
@@ -114,21 +115,33 @@ class AlarmLimitSelector(QWidget):
             self.updateValue()
             self.checkIfHideShowButtons()
 
-    def checkIfHideShowButtons(self):
-        if self.properties["hard_limit"] is not None:
+    def checkIfHideShowButtons(self, rec_call = False):
 
-            if self.properties["low"]:
+        if self.properties["low"]:
+            if self.properties["hard_limit"] is not None:
+
                 if self.window.settings.alarm_limit_values[self.alarmLimitType] \
                         - self.properties["increment"] < self.properties["hard_limit"]:
                     self.dec_button.hide()
 
                 else:
                     if self.properties["settable"]:
-                        if not self.dec_button.isVisible():
-                            self.dec_button.show()
+                        self.dec_button.show()
+
+            if self.window.settings.alarm_limit_values[self.alarmLimitType] \
+                    + self.properties["increment"] >= \
+                    self.window.settings.alarm_limit_values[self.properties["pair"]]:
+
+                self.inc_button.hide()
+
+            else:
+                if self.properties["settable"]:
+                    self.inc_button.show()
 
 
-            elif not self.properties["low"]:
+        elif not self.properties["low"]:
+            if self.properties["hard_limit"] is not None:
+
                 if self.window.settings.alarm_limit_values[self.alarmLimitType] \
                         + self.properties["increment"] > self.properties["hard_limit"]:
                     self.inc_button.hide()
@@ -136,9 +149,24 @@ class AlarmLimitSelector(QWidget):
 
                 else:
                     if self.properties["settable"]:
-                        if not self.inc_button.isVisible():
-                            self.inc_button.show()
+                        self.inc_button.show()
 
+            if self.window.settings.alarm_limit_values[self.alarmLimitType] \
+                    - self.properties["increment"] <= \
+                    self.window.settings.alarm_limit_values[self.properties["pair"]]:
+
+                self.dec_button.hide()
+
+            else:
+                if self.properties["settable"]:
+                    self.dec_button.show()
+
+        if self.pair_selector is not None and not rec_call:
+            self.pair_selector.checkIfHideShowButtons(True)
+            print("reached")
+
+    def setPairSelector(self):
+        self.pair_selector = self.window.alarmLimitSelectors[self.properties["pair"]]
 
     def updateValue(self):
         self.value_label.setText(str(round(self.window.settings.alarm_limit_values[self.alarmLimitType])))
