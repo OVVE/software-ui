@@ -163,7 +163,6 @@ class AlarmLimitSelector(QWidget):
 
         if self.pair_selector is not None and not rec_call:
             self.pair_selector.checkIfHideShowButtons(True)
-            print("reached")
 
     def setPairSelector(self):
         self.pair_selector = self.window.alarmLimitSelectors[self.properties["pair"]]
