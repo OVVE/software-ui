@@ -44,7 +44,7 @@ class AlarmLimits:
                                             "increment": resp_rate_increment,
                                            "settable": True,
                                            "warning_limit": None,
-                                           "hard_limit": None,
+                                           "hard_limit": 37,
                                             "low": False,
                                            "pair": AlarmLimitType.LOW_RESP_RATE},
 
@@ -52,7 +52,7 @@ class AlarmLimits:
                                             "increment": resp_rate_increment,
                                            "settable": True,
                                            "warning_limit": None,
-                                           "hard_limit": 0,
+                                           "hard_limit": 3,
                                             "low": True,
                                            "pair": AlarmLimitType.HIGH_RESP_RATE},
         }
