@@ -13,6 +13,13 @@ class AlarmLimits:
                 "low": AlarmLimitType.LOW_PRESSURE,
                 "high": AlarmLimitType.HIGH_PRESSURE
             },
+            AlarmLimitPair.VOLUME: {
+                "short_name": "Volume",
+                "full_name": "Volume Alarm Setpoint",
+                "low": AlarmLimitType.LOW_VOLUME,
+                "high": AlarmLimitType.HIGH_VOLUME
+            },
+
             AlarmLimitPair.RESP_RATE: {
                 "short_name": "Resp. Rate",
                 "full_name": "Resp. Rate Alarm Setpoint",

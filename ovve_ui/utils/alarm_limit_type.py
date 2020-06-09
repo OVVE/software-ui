@@ -10,4 +10,5 @@ class AlarmLimitType(Enum):
 
 class AlarmLimitPair(Enum):
     PRESSURE = 0
-    RESP_RATE = 1
+    VOLUME = 1
+    RESP_RATE = 2
