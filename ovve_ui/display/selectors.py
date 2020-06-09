@@ -11,17 +11,21 @@ from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType, AlarmLimitPair
 
-
 MainWindow = TypeVar('MainWindow')
 
+
 class AlarmLimitSelectorPair(QWidget):
-    def __init__(self, window: MainWindow, alarmLimitPair:  AlarmLimitPair ,parent = None):
+    def __init__(self,
+                 window: MainWindow,
+                 alarmLimitPair: AlarmLimitPair,
+                 parent=None):
         QWidget.__init__(self, parent=parent)
         self.page_settings = window.ui_settings.page_settings
         self.window = window
         self.properties = window.alarm_limit_pairs[alarmLimitPair]
         self.low_selector = window.alarmLimitSelectors[self.properties["low"]]
-        self.high_selector = window.alarmLimitSelectors[self.properties["high"]]
+        self.high_selector = window.alarmLimitSelectors[
+            self.properties["high"]]
 
         self.outer_layout = QHBoxLayout()
         self.inner_layouts = {}
@@ -49,15 +53,19 @@ class AlarmLimitSelectorPair(QWidget):
         self.main_label.setWordWrap(True)
         self.main_label.setFixedHeight(150)
 
+
 class AlarmLimitSelector(QWidget):
-    def __init__(self,  window: MainWindow, alarmLimitType: AlarmLimitType, parent = None):
+    def __init__(self,
+                 window: MainWindow,
+                 alarmLimitType: AlarmLimitType,
+                 parent=None):
         QWidget.__init__(self, parent=parent)
         self.page_settings = window.ui_settings.page_settings
         button_settings = SimpleButtonSettings(
-                fillColor= self.page_settings.changeButtonFillColor,
-                borderColor=self.page_settings.changeButtonBorderColor,
-                valueSetting=self.page_settings.changeButtonTextSetting,
-                valueColor=self.page_settings.changeButtonValueColor)
+            fillColor=self.page_settings.changeButtonFillColor,
+            borderColor=self.page_settings.changeButtonBorderColor,
+            valueSetting=self.page_settings.changeButtonTextSetting,
+            valueColor=self.page_settings.changeButtonValueColor)
 
         self.window = window
         self.alarmLimitType = alarmLimitType
@@ -70,19 +78,21 @@ class AlarmLimitSelector(QWidget):
         self.styleMainLabel()
 
         self.dec_button = self.window.makeSimpleDisplayButton(
-            "-",
-            size=(50, 50),
-            button_settings=button_settings)
+            "-", size=(50, 50), button_settings=button_settings)
 
-        self.value_label = QLabel(str(round(self.window.settings.alarm_limit_values[self.alarmLimitType])))
+        self.value_label = QLabel(
+            str(
+                round(self.window.settings.alarm_limit_values[
+                    self.alarmLimitType])))
         self.styleValueLabel()
 
         self.inc_button = self.window.makeSimpleDisplayButton(
-            "+",
-            size=(50, 50),
-            button_settings=button_settings)
+            "+", size=(50, 50), button_settings=button_settings)
 
-        for widget in [self.inc_button, self.value_label, self.dec_button, self.main_label]:
+        for widget in [
+                self.inc_button, self.value_label, self.dec_button,
+                self.main_label
+        ]:
             wrapper = QHBoxLayout()
             wrapper.setAlignment(Qt.AlignCenter)
             wrapper.addWidget(widget)
@@ -126,9 +136,12 @@ class AlarmLimitSelector(QWidget):
     def incrementValue(self):
         # TODO: check warning limit
         if self.properties["settable"]:
-            self.window.settings.alarm_limit_values[self.alarmLimitType]+=self.properties["increment"]
+            self.window.settings.alarm_limit_values[
+                self.alarmLimitType] += self.properties["increment"]
             if self.properties["warning_limit"] is not None:
-                if self.window.settings.alarm_limit_values[self.alarmLimitType] > self.properties["warning_limit"]:
+                if self.window.settings.alarm_limit_values[
+                        self.
+                        alarmLimitType] > self.properties["warning_limit"]:
                     self.window.warn(self.properties["warning_msg"], 10)
             self.updateValue()
             self.checkIfHideShowButtons()
@@ -136,14 +149,17 @@ class AlarmLimitSelector(QWidget):
     def decrementValue(self):
         # TODO: check warning limit
         if self.properties["settable"]:
-            self.window.settings.alarm_limit_values[self.alarmLimitType]-=self.properties["increment"]
+            self.window.settings.alarm_limit_values[
+                self.alarmLimitType] -= self.properties["increment"]
             if self.properties["warning_limit"] is not None:
-                if self.window.settings.alarm_limit_values[self.alarmLimitType] > self.properties["warning_limit"]:
+                if self.window.settings.alarm_limit_values[
+                        self.
+                        alarmLimitType] > self.properties["warning_limit"]:
                     self.window.warn(self.properties["warning_msg"], 10)
             self.updateValue()
             self.checkIfHideShowButtons()
 
-    def checkIfHideShowButtons(self, rec_call = False):
+    def checkIfHideShowButtons(self, rec_call=False):
 
         if self.properties["low"]:
             if self.properties["hard_limit"] is not None:
@@ -166,14 +182,12 @@ class AlarmLimitSelector(QWidget):
                 if self.properties["settable"]:
                     self.inc_button.show()
 
-
         elif not self.properties["low"]:
             if self.properties["hard_limit"] is not None:
 
                 if self.window.settings.alarm_limit_values[self.alarmLimitType] \
                         + self.properties["increment"] > self.properties["hard_limit"]:
                     self.inc_button.hide()
-
 
                 else:
                     if self.properties["settable"]:
@@ -193,11 +207,13 @@ class AlarmLimitSelector(QWidget):
             self.pair_selector.checkIfHideShowButtons(True)
 
     def setPairSelector(self):
-        self.pair_selector = self.window.alarmLimitSelectors[self.properties["pair"]]
+        self.pair_selector = self.window.alarmLimitSelectors[
+            self.properties["pair"]]
 
     def updateValue(self):
-        self.value_label.setText(str(round(self.window.settings.alarm_limit_values[self.alarmLimitType])))
+        self.value_label.setText(
+            str(
+                round(self.window.settings.alarm_limit_values[
+                    self.alarmLimitType])))
         self.value_label.update()
         self.window.passChanges()
-
-

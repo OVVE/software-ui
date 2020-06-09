@@ -5,6 +5,7 @@ import json
 from typing import List
 from utils.alarm_limit_type import AlarmLimitType
 
+
 class Settings():
     def __init__(self) -> None:
         self.run_state: int = 0
@@ -42,12 +43,18 @@ class Settings():
         j['tv'] = self.tv
         j['resp_rate'] = self.resp_rate
         j['ie_ratio_enum'] = self.ie_ratio_enum
-        j['high_pressure_limit'] = self.alarm_limit_values[AlarmLimitType.HIGH_PRESSURE]
-        j['low_pressure_limit'] = self.alarm_limit_values[AlarmLimitType.LOW_PRESSURE]
-        j['high_volume_limit'] = self.alarm_limit_values[AlarmLimitType.HIGH_VOLUME]
-        j['low_volume_limit'] = self.alarm_limit_values[AlarmLimitType.LOW_VOLUME]
-        j['high_resp_rate_limit'] = self.alarm_limit_values[AlarmLimitType.HIGH_RESP_RATE]
-        j['low_resp_rate_limit'] = self.alarm_limit_values[AlarmLimitType.LOW_RESP_RATE]
+        j['high_pressure_limit'] = self.alarm_limit_values[
+            AlarmLimitType.HIGH_PRESSURE]
+        j['low_pressure_limit'] = self.alarm_limit_values[
+            AlarmLimitType.LOW_PRESSURE]
+        j['high_volume_limit'] = self.alarm_limit_values[
+            AlarmLimitType.HIGH_VOLUME]
+        j['low_volume_limit'] = self.alarm_limit_values[
+            AlarmLimitType.LOW_VOLUME]
+        j['high_resp_rate_limit'] = self.alarm_limit_values[
+            AlarmLimitType.HIGH_RESP_RATE]
+        j['low_resp_rate_limit'] = self.alarm_limit_values[
+            AlarmLimitType.LOW_RESP_RATE]
         return json.dumps(j)
 
     #TODO: add error handling for bad dict keys
@@ -57,12 +64,18 @@ class Settings():
         self.tv = settings_dict['tv']
         self.resp_rate = settings_dict['resp_rate']
         self.ie_ratio_enum = settings_dict['ie_ratio_enum']
-        self.alarm_limit_values[AlarmLimitType.HIGH_PRESSURE] = settings_dict['high_pressure_limit']
-        self.alarm_limit_values[AlarmLimitType.LOW_PRESSURE] = settings_dict['low_pressure_limit']
-        self.alarm_limit_values[AlarmLimitType.HIGH_VOLUME] = settings_dict['high_volume_limit']
-        self.alarm_limit_values[AlarmLimitType.LOW_VOLUME] = settings_dict['low_volume_limit']
-        self.alarm_limit_values[AlarmLimitType.HIGH_RESP_RATE] = settings_dict['high_resp_rate_limit']
-        self.alarm_limit_values[AlarmLimitType.LOW_RESP_RATE] = settings_dict['low_resp_rate_limit']
+        self.alarm_limit_values[AlarmLimitType.HIGH_PRESSURE] = settings_dict[
+            'high_pressure_limit']
+        self.alarm_limit_values[
+            AlarmLimitType.LOW_PRESSURE] = settings_dict['low_pressure_limit']
+        self.alarm_limit_values[
+            AlarmLimitType.HIGH_VOLUME] = settings_dict['high_volume_limit']
+        self.alarm_limit_values[
+            AlarmLimitType.LOW_VOLUME] = settings_dict['low_volume_limit']
+        self.alarm_limit_values[AlarmLimitType.HIGH_RESP_RATE] = settings_dict[
+            'high_resp_rate_limit']
+        self.alarm_limit_values[AlarmLimitType.LOW_RESP_RATE] = settings_dict[
+            'low_resp_rate_limit']
 
     def from_json(self, j_str: str) -> None:
         j = json.loads(j_str)

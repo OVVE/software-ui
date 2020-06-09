@@ -20,21 +20,20 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget, QTabWidget,QMessageBox, QDialog)
+                             QWidget, QTabWidget, QMessageBox, QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton, PicButton
 from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
                                  SimpleButtonSettings, TextSetting, UISettings)
 from typing import Callable
-from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
-                             initializeRespiratoryRateWidget,
-                             initializeTidalVolumeWidget,
-                             initializeIERatioWidget, initializeAlarmWidget,
-                             initializeGraphWidget, initializeSettingsWidget,
-                             initializeConfirmStopWidget, initializeChangePatientWidget,
-                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
-                             initializeWarningScreen)
+from display.widgets import (
+    initializeHomeScreenWidget, initializeModeWidget,
+    initializeRespiratoryRateWidget, initializeTidalVolumeWidget,
+    initializeIERatioWidget, initializeAlarmWidget, initializeGraphWidget,
+    initializeSettingsWidget, initializeConfirmStopWidget,
+    initializeChangePatientWidget, initializeChangeDatetimeWidget,
+    initializeAlarmLimitWidget, initializeWarningScreen)
 from utils.params import Params
 from utils.settings import Settings
 from utils.Alarm import Alarm, AlarmHandler
@@ -43,8 +42,6 @@ from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType
-
-
 
 
 class MainWindow(QWidget):
@@ -67,7 +64,7 @@ class MainWindow(QWidget):
 
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
-        self.new_patient_id_display =1
+        self.new_patient_id_display = 1
         self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
 
         self.battery_img = "battery_grey_full"
@@ -82,7 +79,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,13)}
+        self.page = {str(i): QWidget() for i in range(1, 13)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -90,7 +87,6 @@ class MainWindow(QWidget):
         lim = AlarmLimits()
         self.alarm_limits = lim.alarm_limits
         self.alarm_limit_pairs = lim.alarm_limit_pairs
-
 
         self.initializeAndAddStackWidgets()
 
@@ -100,8 +96,6 @@ class MainWindow(QWidget):
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
 
-
-
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
             os.makedirs(self.logpath)
@@ -109,14 +103,15 @@ class MainWindow(QWidget):
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
 
-        self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
+        self.logfileroot = os.path.join(self.logpath,
+                                        str(self.patient_id) + ".log")
 
         # The TimedRotatingFileHandler will write a new file each hour
         # After two weeks, the oldest logs will start being deleted
         self.fh = TimedRotatingFileHandler(self.logfileroot,
-                                      when='H',
-                                      interval=1,
-                                      backupCount=336)
+                                           when='H',
+                                           interval=1,
+                                           backupCount=336)
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
@@ -147,15 +142,16 @@ class MainWindow(QWidget):
             self.comms_handler = CommsSimulator()
 
         self.alarm_handler = AlarmHandler()
-        self.comms_handler.new_alarms.connect(self.alarm_handler.set_active_alarms)
-        self.alarm_handler.acknowledge_alarm_signal.connect(self.comms_handler.set_alarm_ackbits)
+        self.comms_handler.new_alarms.connect(
+            self.alarm_handler.set_active_alarms)
+        self.alarm_handler.acknowledge_alarm_signal.connect(
+            self.comms_handler.set_alarm_ackbits)
         self.dismissedAlarms = []
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
-
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -173,7 +169,6 @@ class MainWindow(QWidget):
                 return str("1:" + str(r))
             # Otherwise, round to one decimal place
             return str("1:" + str(round(d, 1)))
-
 
     def get_ie_ratio_display(self, ie_ratio_enum: int) -> str:
         fractional_ie = self.settings.ie_ratio_switcher.get(ie_ratio_enum, -1)
@@ -210,8 +205,10 @@ class MainWindow(QWidget):
             button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
 
-    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None) -> PicButton:
-        return PicButton(filename, size = size)
+    def makePicButton(self,
+                      filename: str,
+                      size: Optional[Tuple[int, int]] = None) -> PicButton:
+        return PicButton(filename, size=size)
 
     def makeDisplayRect(
             self,
@@ -259,17 +256,21 @@ class MainWindow(QWidget):
 
     def update_ui_alarms(self) -> None:
         if self.alarm_handler.alarms_pending() > 0:
-            if self.shown_alarm is None: #There is no alarm currently shown, so show something if it comes
-                self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
-                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
+            if self.shown_alarm is None:  #There is no alarm currently shown, so show something if it comes
+                self.logger.debug("Pending : " +
+                                  str(self.alarm_handler.alarms_pending()))
+                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm(
+                )
                 self.showAlarm()
 
-            elif not self.shown_alarm.isSamePrior(self.alarm_handler.get_highest_priority_alarm()):
-                self.logger.debug("Pending2 : " + str(self.alarm_handler.alarms_pending()))
+            elif not self.shown_alarm.isSamePrior(
+                    self.alarm_handler.get_highest_priority_alarm()):
+                self.logger.debug("Pending2 : " +
+                                  str(self.alarm_handler.alarms_pending()))
                 #the alarm that we're showing isn't the highest priority one
-                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
+                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm(
+                )
                 self.showAlarm()
-
 
     def showAlarm(self) -> None:
         self.prev_index = self.stack.currentIndex()
@@ -279,9 +280,10 @@ class MainWindow(QWidget):
 
     def silenceAlarm(self) -> None:
         self.alarm_handler.acknowledge_alarm(self.shown_alarm)
-        if self.prev_index!=None:
+        if self.prev_index != None:
             self.display(self.prev_index)
-            self.dismissedAlarms.append((self.shown_alarm.alarm_type, self.shown_alarm.time, time.time()))
+            self.dismissedAlarms.append((self.shown_alarm.alarm_type,
+                                         self.shown_alarm.time, time.time()))
         self.shown_alarm = None
         self.prev_index = None
         self.enableMainButtons()
@@ -294,7 +296,6 @@ class MainWindow(QWidget):
         self.ie_button_main.setEnabled(True)
         self.start_stop_button_main.setEnabled(True)
         self.settings_button_main.setEnabled(True)
-
 
     def disableMainButtons(self) -> None:
         self.mode_button_main.setEnabled(False)
@@ -314,33 +315,38 @@ class MainWindow(QWidget):
             self.tv_button_main.updateValue(self.params.tv_set)
             self.ie_button_main.updateValue(
                 self.ie_fractional_to_ratio_str(self.params.ie_ratio_set))
-            self.resp_rate_display_main.updateValue(round(self.params.resp_rate_meas, 2))
+            self.resp_rate_display_main.updateValue(
+                round(self.params.resp_rate_meas, 2))
             self.peep_display_main.updateValue(round(self.params.peep, 1))
             self.tv_insp_display_main.updateValue(round(self.params.tv_insp))
             # self.tv_exp_display_main.updateValue(self.params.tv_exp)
             self.ppeak_display_main.updateValue(round(self.params.ppeak, 1))
             self.pplat_display_main.updateValue(round(self.params.pplat, 1))
-            self.main_battery_level_label.setText(f"{self.params.battery_level}%")
+            self.main_battery_level_label.setText(
+                f"{self.params.battery_level}%")
 
             if self.params.battery_level == 0:
                 self.battery_img = "battery_grey_0"
-            elif self.params.battery_level<=25:
+            elif self.params.battery_level <= 25:
                 self.battery_img = "battery_grey_25"
-            elif self.params.battery_level<=50:
+            elif self.params.battery_level <= 50:
                 self.battery_img = "battery_grey_50"
 
-            elif self.params.battery_level<=75:
+            elif self.params.battery_level <= 75:
                 self.battery_img = "battery_grey_75"
 
-            elif self.params.battery_level<=75:
+            elif self.params.battery_level <= 75:
                 self.battery_img = "battery_grey_75"
 
             else:
                 self.battery_img = "battery_grey_full"
 
-            self.main_battery_icon.updateValue(os.path.abspath(os.path.join(
-                os.path.dirname(__file__),
-                f"display/images/batteries/light_theme/{self.battery_img}")))
+            self.main_battery_icon.updateValue(
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        f"display/images/batteries/light_theme/{self.battery_img}"
+                    )))
 
             #TODO: Get battery level converted to percentage
 
@@ -356,8 +362,10 @@ class MainWindow(QWidget):
     def updateGraphs(self) -> None:
 
         self.pressure_data[self.graph_ptr] = self.params.pressure
-        self.pressure_graph_line.setData(self.pressure_data[:self.graph_ptr + 1])
-        self.pressure_graph_cache_line.setData(self.pressure_data[self.graph_ptr + 2:])
+        self.pressure_graph_line.setData(self.pressure_data[:self.graph_ptr +
+                                                            1])
+        self.pressure_graph_cache_line.setData(
+            self.pressure_data[self.graph_ptr + 2:])
         self.pressure_graph_cache_line.setPos(self.graph_ptr + 2, 0)
         self.pressure_graph_line.show()
 
@@ -373,8 +381,9 @@ class MainWindow(QWidget):
 
         self.volume_data[self.graph_ptr] = self.params.tv_meas
         self.volume_graph_line.setData(self.volume_data[:self.graph_ptr + 1])
-        self.volume_graph_cache_line.setData(self.volume_data[self.graph_ptr + 2:])
-        self.volume_graph_cache_line.setPos(self.graph_ptr+2, 0)
+        self.volume_graph_cache_line.setData(self.volume_data[self.graph_ptr +
+                                                              2:])
+        self.volume_graph_cache_line.setPos(self.graph_ptr + 2, 0)
         self.volume_graph_line.show()
 
         QtGui.QApplication.processEvents()
@@ -385,7 +394,7 @@ class MainWindow(QWidget):
             self.flow_graph_cache_line.setData(self.flow_data)
             self.flow_graph_cache_line.setPos(0, 0)
             self.flow_graph_cache_line.show()
-            self.flow_graph_line.setData(np.empty(0,))
+            self.flow_graph_line.setData(np.empty(0, ))
 
             QtGui.QApplication.processEvents()
 
@@ -484,7 +493,8 @@ class MainWindow(QWidget):
     def generateNewPatientID(self) -> None:
         self.new_patient_id = uuid.uuid4()
         self.new_patient_id_display += 1
-        self.patient_page_label.setText( f"Current Patient: Patient {self.new_patient_id_display}")
+        self.patient_page_label.setText(
+            f"Current Patient: Patient {self.new_patient_id_display}")
         self.patient_page_label.update()
         # self.generate_new_patient_id_page_button.hide()
 
@@ -517,11 +527,12 @@ class MainWindow(QWidget):
     def commitTidalVol(self) -> None:
         self.settings.tv = self.local_settings.tv
         self.tv_button_main.updateValue(self.settings.tv)
-        self.settings.alarm_limit_values[AlarmLimitType.HIGH_VOLUME] = 1.2 * self.settings.tv
-        self.settings.alarm_limit_values[AlarmLimitType.LOW_VOLUME] = 0.8 * self.settings.tv
+        self.settings.alarm_limit_values[
+            AlarmLimitType.HIGH_VOLUME] = 1.2 * self.settings.tv
+        self.settings.alarm_limit_values[
+            AlarmLimitType.LOW_VOLUME] = 0.8 * self.settings.tv
         self.alarmLimitSelectors[AlarmLimitType.HIGH_VOLUME].updateValue()
         self.alarmLimitSelectors[AlarmLimitType.LOW_VOLUME].updateValue()
-
 
         self.display(0)
         self.passChanges()
@@ -544,20 +555,22 @@ class MainWindow(QWidget):
         self.new_patient_id = None
         self.patient_id_display = self.new_patient_id_display
         self.new_patient_id_display = self.patient_id_display
-        self.settings_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
-        self.main_patient_label.setText( f"Current Patient: Patient {self.patient_id_display}")
-
+        self.settings_patient_label.setText(
+            f"Current Patient: Patient {self.patient_id_display}")
+        self.main_patient_label.setText(
+            f"Current Patient: Patient {self.patient_id_display}")
 
         self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
         if not os.path.exists(self.logpath):
             os.makedirs(self.logpath)
 
-        self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
+        self.logfileroot = os.path.join(self.logpath,
+                                        str(self.patient_id) + ".log")
         self.logger.removeHandler(self.fh)
         self.fh = TimedRotatingFileHandler(self.logfileroot,
-                                      when='H',
-                                      interval=1,
-                                      backupCount=336)
+                                           when='H',
+                                           interval=1,
+                                           backupCount=336)
         self.fh.setLevel(logging.INFO)
         self.fh.setFormatter(self.formatter)
         self.logger.addHandler(self.fh)
@@ -568,7 +581,8 @@ class MainWindow(QWidget):
     def cancelNewPatientID(self) -> None:
         self.new_patient_id = None
         self.new_patient_id_display = None
-        self.patient_page_label.setText( f"Current Patient: Patient {self.patient_id_display}")
+        self.patient_page_label.setText(
+            f"Current Patient: Patient {self.patient_id_display}")
         self.generate_new_patient_id_page_button.show()
         self.display(6)
 
@@ -596,8 +610,8 @@ class MainWindow(QWidget):
         if self.new_date.day() == self.new_date.daysInMonth():
             self.new_date = self.new_date.addMonths(1)
             self.new_date = self.new_date.setDate(self.new_date.year(),
-                                                 self.new_date.month(),
-                                                 self.new_date.daysInMonth())
+                                                  self.new_date.month(),
+                                                  self.new_date.daysInMonth())
 
     def incrementYear(self) -> None:
         self.new_date = self.new_date.addYears(1)
@@ -638,10 +652,10 @@ class MainWindow(QWidget):
         self.comms_handler.terminate()
 
     def pwrButtonPressed(self):
-        if self.settings.run_state == 1: #Ventilator is running
+        if self.settings.run_state == 1:  #Ventilator is running
             self.warn("You must stop ventilation before powering off", 0)
 
-        elif self.settings.run_state == 0: #Ventilator is stopped
+        elif self.settings.run_state == 0:  #Ventilator is stopped
             print("Powering off should happen")
             pass
 
