@@ -14,6 +14,9 @@ from utils.alarm_limit_type import AlarmLimitType
 
 MainWindow = TypeVar('MainWindow')
 
+class AlarmLimitSelectorPair(QWidget):
+    def __init__(self, short_name, full_name, low_selector, high_selector, parent = None):
+
 class AlarmLimitSelector(QWidget):
     def __init__(self,  window: MainWindow, alarmLimitType: AlarmLimitType, parent = None):
         QWidget.__init__(self, parent=parent)
