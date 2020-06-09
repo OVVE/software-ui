@@ -1206,3 +1206,36 @@ def makeandAddAllAlarmSelectors(window, tab_widget):
 
 
 
+
+def initializeWarningScreen(window: MainWindow) -> None:
+    v_box_12 = QVBoxLayout()
+    h_box_12_1 = QHBoxLayout()
+    h_box_12_2 = QHBoxLayout()
+    h_box_12_2.setAlignment(Qt.AlignCenter)
+
+    window.warning_label = QLabel("")
+    window.warning_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+    window.warning_label.setWordWrap(True)
+    window.warning_label.setAlignment(Qt.AlignCenter)
+    window.warning_label.setFixedHeight(150)
+    window.warning_label.setFixedWidth(400)
+    window.warning_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+    window.warning_ack_button = window.makeSimpleDisplayButton(
+        "OK",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
+    window.warning_ack_button.clicked.connect(lambda: window.display(0))
+
+    h_box_12_1.addWidget(window.warning_label)
+    h_box_12_2.addWidget(window.warning_ack_button)
+    v_box_12.addLayout(h_box_12_1)
+    v_box_12.addLayout(h_box_12_2)
+    window.page["12"].setLayout(v_box_12)
+
+
+

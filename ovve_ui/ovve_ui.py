@@ -33,7 +33,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
                              initializeGraphWidget, initializeSettingsWidget,
                              initializeConfirmStopWidget, initializeChangePatientWidget,
-                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget)
+                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
+                             initializeWarningScreen)
 from utils.params import Params
 from utils.settings import Settings
 from utils.Alarm import Alarm, AlarmHandler
@@ -98,6 +99,7 @@ class MainWindow(QWidget):
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
+
 
 
         # Create all directories in the log path
@@ -239,6 +241,7 @@ class MainWindow(QWidget):
         initializeChangePatientWidget(self)
         initializeChangeDatetimeWidget(self)
         initializeAlarmLimitWidget(self)
+        initializeWarningScreen(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -634,6 +637,19 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
+    def pwrButtonPressed(self):
+        if self.settings.run_state == 1: #Ventilator is running
+            self.warn("You must stop ventilation before powering off", 0)
+
+        elif self.settings.run_state == 0: #Ventilator is stopped
+            print("Powering off should happen")
+            pass
+
+    def warn(self, msg, back):
+        self.warning_label.setText(msg)
+        self.warning_ack_button.clicked.connect(lambda: self.display(back))
+        self.display(11)
+
     def keyPressEvent(self, event):
         if self.dev_mode:
             if event.key() == QtCore.Qt.Key_F:
@@ -671,15 +687,8 @@ class MainWindow(QWidget):
             elif event.key() == QtCore.Qt.Key_I:
                 self.comms_handler.fireAlarm(6)
 
-    def alarmLimitWarning(self, alarmLimitType):
-        self.alarmLimitSelectors[alarmLimitType].decrementValue()
-        self.display(10)
-
-
-    def alarmLimitWarningAffirm(self, alarmLimitType):
-        self.display(10)
-
-
+            elif event.key() == QtCore.Qt.Key_P:
+                self.pwrButtonPressed()
 
 
 def main() -> None:
