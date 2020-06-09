@@ -14,10 +14,10 @@ from PyQt5.QtCore import Qt
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
-from display.selectors import AlarmLimitSelector
+from display.selectors import AlarmLimitSelector, AlarmLimitSelectorPair
 
 from utils.alarm_limits import AlarmLimits
-from utils.alarm_limit_type import AlarmLimitType
+from utils.alarm_limit_type import AlarmLimitType, AlarmLimitPair
 
 
 
@@ -1160,8 +1160,15 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     window.page["10"].setLayout(v_box_10)
 
 def initializeAlarmLimitWidget(window: MainWindow) -> None:
+
     v_box_11 = QVBoxLayout() #main layout
+    h_box_11_top = QHBoxLayout()
     h_box_11_back = QHBoxLayout() #back button
+
+    alarm_limits_tabbed = QTabWidget()
+    makeandAddAllAlarmSelectors(window, alarm_limits_tabbed)
+
+    h_box_11_top.addWidget(alarm_limits_tabbed)
 
     alarm_limits_back = window.makeSimpleDisplayButton(
         "Back to Settings",
@@ -1169,71 +1176,33 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
         ),
-        size=(200, 65))
+        size=(150, 50))
+
     alarm_limits_back.clicked.connect(lambda: window.display(6))
     h_box_11_back.addWidget(alarm_limits_back)
     h_box_11_back.setAlignment(Qt.AlignCenter)
 
-    makeAndAddAllAlarmSelectors(window, v_box_11)
-
+    v_box_11.addLayout(h_box_11_top)
     v_box_11.addLayout(h_box_11_back)
     v_box_11.setSpacing(10)
     v_box_11.setContentsMargins(0,0,0,0)
 
     window.page["11"].setLayout(v_box_11)
 
-def makeAndAddAllAlarmSelectors(window, layout):
+def makeandAddAllAlarmSelectors(window, tab_widget):
     window.alarmLimitSelectors = {}
+    window.alarmLimitSelectorPairs = {}
     for limit_type in AlarmLimitType:
         selector = AlarmLimitSelector(window, limit_type)
         window.alarmLimitSelectors[limit_type] = selector
-        layout.addWidget(selector)
 
     for limit_type in AlarmLimitType:
         window.alarmLimitSelectors[limit_type].setPairSelector()
 
-
-def initializeAlarmLimitWarningWidget(window: MainWindow) -> None:
-    v_box_12 = QVBoxLayout() #main layout
-    h_box_12_1 = QHBoxLayout() #warning
-    h_box_12_2 = QHBoxLayout() #back/confirm button
-
-    page_settings = window.ui_settings.page_settings
-
-    alarm_limit_warning_label = QLabel("Warning: you are setting a upper pressure alarm limit exceeding 40 cmH20. Continue?")
-    alarm_limit_warning_label.setFont(page_settings.mainLabelFont)
-    alarm_limit_warning_label.setAlignment(Qt.AlignCenter)
-    alarm_limit_warning_label.setStyleSheet("QLabel {color: #000000 ;}")
-
-    alarm_limit_warning_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.cancelColor,
-            borderColor=page_settings.cancelColor,
-            valueSetting=page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
-
-    #TODO: Connect
-
-    alarm_limit_warning_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
-    #TODO: Connect
-
-    h_box_12_1.addWidget(alarm_limit_warning_label)
-    h_box_12_2.addWidget(alarm_limit_warning_cancel)
-    h_box_12_2.addWidget(alarm_limit_warning_apply)
+    for pair_type in AlarmLimitPair:
+        pair = AlarmLimitSelectorPair(window, pair_type)
+        window.alarmLimitSelectorPairs[pair_type] = pair
+        tab_widget.addTab(pair, pair.tab_str)
 
 
-    for h_box in [h_box_12_1, h_box_12_2]:
-        h_box.setAlignment(Qt.AlignCenter)
-        v_box_12.addLayout(h_box)
-
-    window.page["12"].setLayout(v_box_12)
 

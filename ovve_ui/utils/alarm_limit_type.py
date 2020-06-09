@@ -8,3 +8,6 @@ class AlarmLimitType(Enum):
     HIGH_RESP_RATE = 4
     LOW_RESP_RATE = 5
 
+class AlarmLimitPair(Enum):
+    PRESSURE = 0
+    RESP_RATE = 1
