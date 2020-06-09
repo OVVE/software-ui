@@ -153,10 +153,10 @@ class MainWindow(QWidget):
         # If running on the RPi, the GPIO library will be loaded      
         # Detect an active-low interrupt on BCM4
         if GPIO:
-            pwrPin = 4
+            self.pwrPin = 4
             GPIO.setmode(GPIO.BCM)
-            GPIO.setup(pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
+            GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
 
 
     def get_mode_display(self, mode):
@@ -694,7 +694,7 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
-    def pwrButtonPressed(self):
+    def pwrButtonPressed(self, pin):
         if self.settings.run_state == 1: #Ventilator is running
             self.warn("You must stop ventilation before powering off", 0)
 
@@ -745,7 +745,7 @@ class MainWindow(QWidget):
                 self.comms_handler.fireAlarm(6)
 
             elif event.key() == QtCore.Qt.Key_P:
-                self.pwrButtonPressed()
+                self.pwrButtonPressed(self.pwrPin)
 
 
 def main() -> None:
