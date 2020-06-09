@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class AlarmLimitType(Enum):
     HIGH_PRESSURE = 0
     LOW_PRESSURE = 1
@@ -7,6 +8,7 @@ class AlarmLimitType(Enum):
     LOW_VOLUME = 3
     HIGH_RESP_RATE = 4
     LOW_RESP_RATE = 5
+
 
 class AlarmLimitPair(Enum):
     PRESSURE = 0
