@@ -127,6 +127,9 @@ class AlarmLimitSelector(QWidget):
         # TODO: check warning limit
         if self.properties["settable"]:
             self.window.settings.alarm_limit_values[self.alarmLimitType]+=self.properties["increment"]
+            if self.properties["warning_limit"] is not None:
+                if self.window.settings.alarm_limit_values[self.alarmLimitType] > self.properties["warning_limit"]:
+                    self.window.warn(self.properties["warning_msg"], 10)
             self.updateValue()
             self.checkIfHideShowButtons()
 
@@ -134,6 +137,9 @@ class AlarmLimitSelector(QWidget):
         # TODO: check warning limit
         if self.properties["settable"]:
             self.window.settings.alarm_limit_values[self.alarmLimitType]-=self.properties["increment"]
+            if self.properties["warning_limit"] is not None:
+                if self.window.settings.alarm_limit_values[self.alarmLimitType] > self.properties["warning_limit"]:
+                    self.window.warn(self.properties["warning_msg"], 10)
             self.updateValue()
             self.checkIfHideShowButtons()
 
