@@ -7,6 +7,11 @@ import sys
 import time
 from timeit import default_timer as timer
 
+try:
+    import RPi.GPIO as GPIO
+except:
+    GPIO = None
+
 import uuid
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
@@ -91,8 +96,6 @@ class MainWindow(QWidget):
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
 
-
-
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
             os.makedirs(self.logpath)
@@ -146,6 +149,14 @@ class MainWindow(QWidget):
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
+
+        # If running on the RPi, the GPIO library will be loaded      
+        # Detect an active-low interrupt on BCM4
+        if GPIO:
+            pwrPin = 4
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
 
 
     def get_mode_display(self, mode):
