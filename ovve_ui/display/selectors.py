@@ -124,7 +124,6 @@ class AlarmLimitSelector(QWidget):
             self.dec_button.hide()
 
     def incrementValue(self):
-        # TODO: check hard limit
         # TODO: check warning limit
         if self.properties["settable"]:
             self.window.settings.alarm_limit_values[self.alarmLimitType]+=self.properties["increment"]
@@ -132,7 +131,6 @@ class AlarmLimitSelector(QWidget):
             self.checkIfHideShowButtons()
 
     def decrementValue(self):
-        # TODO: check hard limit
         # TODO: check warning limit
         if self.properties["settable"]:
             self.window.settings.alarm_limit_values[self.alarmLimitType]-=self.properties["increment"]
