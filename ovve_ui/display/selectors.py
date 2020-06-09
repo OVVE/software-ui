@@ -9,10 +9,45 @@ from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
 from utils.alarm_limits import AlarmLimits
-from utils.alarm_limit_type import AlarmLimitType
+from utils.alarm_limit_type import AlarmLimitType, AlarmLimitPair
 
 
 MainWindow = TypeVar('MainWindow')
+
+class AlarmLimitSelectorPair(QWidget):
+    def __init__(self, window: MainWindow, alarmLimitPair:  AlarmLimitPair ,parent = None):
+        QWidget.__init__(self, parent=parent)
+        self.page_settings = window.ui_settings.page_settings
+        self.window = window
+        self.properties = window.alarm_limit_pairs[alarmLimitPair]
+        self.low_selector = window.alarmLimitSelectors[self.properties["low"]]
+        self.high_selector = window.alarmLimitSelectors[self.properties["high"]]
+
+        self.outer_layout = QHBoxLayout()
+        self.inner_layouts = {}
+        for loc in ["left", "mid", "right"]:
+            self.inner_layouts[loc] = QVBoxLayout()
+
+        self.tab_str = self.properties["short_name"]
+        self.main_label = QLabel(self.properties["full_name"])
+        self.styleMainLabel()
+
+        self.inner_layouts["left"].addWidget(self.low_selector)
+        self.inner_layouts["mid"].addWidget(self.main_label)
+        self.inner_layouts["right"].addWidget(self.high_selector)
+
+        for key in self.inner_layouts:
+            self.inner_layouts[key].setAlignment(Qt.AlignCenter)
+            self.outer_layout.addLayout(self.inner_layouts[key])
+
+        self.setLayout(self.outer_layout)
+
+    def styleMainLabel(self):
+        self.main_label.setFont(self.page_settings.alarmLimitMainLabelFont)
+        self.main_label.setStyleSheet("QLabel {color: #000000 ;}")
+        self.main_label.setAlignment(Qt.AlignCenter)
+        self.main_label.setWordWrap(True)
+        self.main_label.setFixedHeight(150)
 
 class AlarmLimitSelector(QWidget):
     def __init__(self,  window: MainWindow, alarmLimitType: AlarmLimitType, parent = None):
@@ -29,9 +64,7 @@ class AlarmLimitSelector(QWidget):
         self.properties = window.alarm_limits[self.alarmLimitType]
         self.pair_selector = None
 
-        self.outer_layout = QHBoxLayout()
-        self.left_inner_layout =  QHBoxLayout()
-        self.right_inner_layout =  QHBoxLayout()
+        self.layout = QVBoxLayout()
 
         self.main_label = QLabel(self.properties["name"])
         self.styleMainLabel()
@@ -49,24 +82,15 @@ class AlarmLimitSelector(QWidget):
             size=(50, 50),
             button_settings=button_settings)
 
+        for widget in [self.inc_button, self.value_label, self.dec_button, self.main_label]:
+            wrapper = QHBoxLayout()
+            wrapper.setAlignment(Qt.AlignCenter)
+            wrapper.addWidget(widget)
+            self.layout.addLayout(wrapper)
 
-
-        self.left_inner_layout.addWidget(self.main_label)
-        for widget in [self.dec_button, self.value_label, self.inc_button]:
-            self.right_inner_layout.addWidget(widget)
-
-
-        for inner_layout in [self.left_inner_layout, self.right_inner_layout]:
-            inner_layout.setAlignment(Qt.AlignCenter)
-            self.outer_layout.addLayout(inner_layout)
-
-
-
-        self.setFixedHeight(65)
-        self.outer_layout.setAlignment(Qt.AlignCenter)
-        self.setLayout(self.outer_layout)
+        self.layout.setAlignment(Qt.AlignCenter)
+        self.setLayout(self.layout)
         self.connectOrHideButtons()
-
 
     def styleMainLabel(self):
         self.main_label.setStyleSheet("QLabel {color: #000000 ;}")
@@ -78,7 +102,7 @@ class AlarmLimitSelector(QWidget):
         self.value_label.setStyleSheet("QLabel {color: #000000 ;}")
         self.value_label.setFont(self.page_settings.alarmLimitValueFont)
         self.value_label.setAlignment(Qt.AlignCenter)
-        self.value_label.setFixedWidth(100)
+        # self.value_label.setFixedWidth(100)
 
     def connectOrHideButtons(self):
         dec_size_policy = self.dec_button.sizePolicy()

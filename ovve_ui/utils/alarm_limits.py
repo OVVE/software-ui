@@ -1,10 +1,28 @@
 import typing
-from utils.alarm_limit_type import AlarmLimitType
+from utils.alarm_limit_type import AlarmLimitType, AlarmLimitPair
 
 class AlarmLimits:
     def __init__(self):
         pressure_increment = 1
         resp_rate_increment = 1
+
+        self.alarm_limit_pairs = {
+            AlarmLimitPair.PRESSURE: {
+                "short_name": "Pressure",
+                "full_name": "Pressure Alarm Setpoint",
+                "low": AlarmLimitType.LOW_PRESSURE,
+                "high": AlarmLimitType.HIGH_PRESSURE
+            },
+            AlarmLimitPair.RESP_RATE: {
+                "short_name": "Resp. Rate",
+                "full_name": "Resp. Rate Alarm Setpoint",
+                "low": AlarmLimitType.LOW_RESP_RATE,
+                "high": AlarmLimitType.HIGH_RESP_RATE
+            },
+
+
+
+        }
 
 
         self.alarm_limits = {

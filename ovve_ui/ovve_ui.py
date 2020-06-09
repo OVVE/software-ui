@@ -20,7 +20,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget, QMessageBox, QDialog)
+                             QWidget, QTabWidget,QMessageBox, QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton, PicButton
 from display.rectangle import DisplayRect
@@ -86,7 +86,10 @@ class MainWindow(QWidget):
         self.shown_alarm = None
         self.prev_index = None
 
-        self.alarm_limits = AlarmLimits().alarm_limits
+        lim = AlarmLimits()
+        self.alarm_limits = lim.alarm_limits
+        self.alarm_limit_pairs = lim.alarm_limit_pairs
+
 
         self.initializeAndAddStackWidgets()
 
