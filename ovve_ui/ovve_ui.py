@@ -7,6 +7,11 @@ import sys
 import time
 from timeit import default_timer as timer
 
+try:
+    import RPi.GPIO as GPIO
+except:
+    GPIO = None
+
 import uuid
 from copy import deepcopy
 from logging.handlers import TimedRotatingFileHandler
@@ -152,6 +157,15 @@ class MainWindow(QWidget):
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
+
+        # If running on the RPi, the GPIO library will be loaded
+        # Detect an active-low interrupt on BCM4
+        if GPIO:
+            self.pwrPin = 4
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
+
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -651,8 +665,8 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
-    def pwrButtonPressed(self):
-        if self.settings.run_state == 1:  #Ventilator is running
+    def pwrButtonPressed(self, pin):
+        if self.settings.run_state == 1: #Ventilator is running
             self.warn("You must stop ventilation before powering off", 0)
 
         elif self.settings.run_state == 0:  #Ventilator is stopped
@@ -702,7 +716,7 @@ class MainWindow(QWidget):
                 self.comms_handler.fireAlarm(6)
 
             elif event.key() == QtCore.Qt.Key_P:
-                self.pwrButtonPressed()
+                self.pwrButtonPressed(self.pwrPin)
 
 
 def main() -> None:
