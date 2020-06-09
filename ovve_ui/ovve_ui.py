@@ -680,6 +680,12 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
+    def pwrButtonPressed(self):
+        if self.settings.run_state == 1: #Ventilator is running
+            pass
+        elif self.settings.run_state == 0: #Ventilator is stopped
+            pass
+
     def keyPressEvent(self, event):
         if self.dev_mode:
             if event.key() == QtCore.Qt.Key_F:
@@ -716,6 +722,9 @@ class MainWindow(QWidget):
 
             elif event.key() == QtCore.Qt.Key_I:
                 self.comms_handler.fireAlarm(6)
+
+            elif event.key() == QtCore.Qt.Key_P:
+                self.pwrButtonPressed()
 
 
 def main() -> None:
