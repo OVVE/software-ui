@@ -721,6 +721,8 @@ class MainWindow(QWidget):
         if self.sec_till_pwrOff == 0:
             if not self.dev_mode:
                 os.system("sudo poweroff")
+            else:
+                exit()
 
     def cancelPwrDown(self):
         self.display(0)
