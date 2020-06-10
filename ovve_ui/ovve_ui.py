@@ -39,7 +39,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeGraphWidget, initializeSettingsWidget,
                              initializeConfirmStopWidget, initializeChangePatientWidget,
                              initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
-                             initializeWarningScreen)
+                             initializeWarningScreen, initializePwrDownScreen)
 from utils.params import Params
 from utils.settings import Settings
 from utils.Alarm import Alarm, AlarmHandler
@@ -83,7 +83,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,13)}
+        self.page = {str(i): QWidget() for i in range(1,14)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -157,7 +157,8 @@ class MainWindow(QWidget):
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
-
+        else:
+            self.pwrPin = 4  #TODO: Remove this, this is just for development
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -244,6 +245,7 @@ class MainWindow(QWidget):
         initializeChangeDatetimeWidget(self)
         initializeAlarmLimitWidget(self)
         initializeWarningScreen(self)
+        initializePwrDownScreen(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -699,11 +701,25 @@ class MainWindow(QWidget):
             self.warn("You must stop ventilation before powering off", 0)
 
         elif self.settings.run_state == 0: #Ventilator is stopped
-            print("Powering off should happen")
-            pass
+            self.pwrOff()
 
-    def warn(self, msg, back):
-        self.warning_label.setText(msg)
+    def pwrOff(self):
+        self.display(12)
+        self.disableMainButtons()
+        pass
+
+    def pwrCountdown(self):
+        pass
+
+    def cancelPwrDown(self):
+        pass
+
+    def warn(self, main_msg, back, ack_msg = None ):
+        self.warning_label.setText(main_msg)
+        if ack_msg is not None:
+            self.warning_ack_button.updateValue(ack_msg)
+        else:
+            self.warning_ack_button.updateValue("OK")
         self.warning_ack_button.clicked.connect(lambda: self.display(back))
         self.display(11)
 

@@ -1440,5 +1440,35 @@ def initializeWarningScreen(window: MainWindow) -> None:
     v_box_12.addLayout(h_box_12_2)
     window.page["12"].setLayout(v_box_12)
 
+def initializePwrDownScreen(window: MainWindow) -> None:
+    v_box_13 = QVBoxLayout()
+    h_box_13_1 = QHBoxLayout()
+    h_box_13_2 = QHBoxLayout()
+    h_box_13_2.setAlignment(Qt.AlignCenter)
+
+    window.power_down_label = QLabel("Powering down in 5 seconds")
+    window.power_down_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+    window.power_down_label.setWordWrap(True)
+    window.power_down_label.setAlignment(Qt.AlignCenter)
+    window.power_down_label.setFixedHeight(150)
+    window.power_down_label.setFixedWidth(400)
+    window.power_down_label.setStyleSheet("QLabel {color: #000000 ;}")
+
+    window.pwr_down_cancel_button = window.makeSimpleDisplayButton(
+        "Cancel",
+        button_settings=SimpleButtonSettings(
+            valueSetting=window.ui_settings.page_settings.cancelSetting,
+            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
+        ),
+        size=(200, 65))
+    window.warning_ack_button.clicked.connect(lambda: window.cancelPwrDown)
+
+    h_box_13_1.addWidget(window.power_down_label)
+    h_box_13_2.addWidget(window.pwr_down_cancel_button)
+    v_box_13.addLayout(h_box_13_1)
+    v_box_13.addLayout(h_box_13_2)
+    window.page["13"].setLayout(v_box_13)
+
 
 
