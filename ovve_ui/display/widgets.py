@@ -1462,7 +1462,7 @@ def initializePwrDownScreen(window: MainWindow) -> None:
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
         ),
         size=(200, 65))
-    window.warning_ack_button.clicked.connect(lambda: window.cancelPwrDown)
+    window.pwr_down_cancel_button.clicked.connect(window.cancelPwrDown)
 
     h_box_13_1.addWidget(window.power_down_label)
     h_box_13_2.addWidget(window.pwr_down_cancel_button)
