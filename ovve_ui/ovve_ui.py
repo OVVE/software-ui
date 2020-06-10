@@ -719,12 +719,10 @@ class MainWindow(QWidget):
         self.power_down_label.update()
 
         if self.sec_till_pwrOff == 0:
-            print("Timer expired")
             if not self.dev_mode:
                 os.system("sudo poweroff")
 
     def cancelPwrDown(self):
-        print("reached")
         self.display(0)
         self.pwrDownTimer.stop()
         self.power_down_label.setText(f"Powering down in 5 seconds")
