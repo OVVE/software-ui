@@ -10,6 +10,7 @@ import pyqtgraph as pg
 from PyQt5.QtWidgets import (QWidget, QTabWidget, QHBoxLayout, QVBoxLayout,
                              QStackedWidget, QLabel)
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
@@ -1211,10 +1212,13 @@ def makeandAddAllAlarmSelectors(window, tab_widget):
     for limit_type in AlarmLimitType:
         window.alarmLimitSelectors[limit_type].setPairSelector()
 
+    count = 0
     for pair_type in AlarmLimitPair:
         pair = AlarmLimitSelectorPair(window, pair_type)
         window.alarmLimitSelectorPairs[pair_type] = pair
         tab_widget.addTab(pair, pair.tab_str)
+        tab_widget.tabBar().setTabTextColor(count, QColor(0,0,0))
+        count+=1
 
 
 def initializeWarningScreen(window: MainWindow) -> None:
