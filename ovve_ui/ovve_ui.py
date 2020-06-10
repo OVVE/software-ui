@@ -701,18 +701,34 @@ class MainWindow(QWidget):
             self.warn("You must stop ventilation before powering off", 0)
 
         elif self.settings.run_state == 0: #Ventilator is stopped
-            self.pwrOff()
+            self.beginPwrOff()
 
-    def pwrOff(self):
+    def beginPwrOff(self):
         self.display(12)
         self.disableMainButtons()
-        pass
+        self.sec_till_pwrOff = 5
+        self.pwrDownTimer = QTimer()
+        self.pwrDownTimer.start(1000)
+        self.pwrDownTimer.timeout.connect(self.pwrTimeout)
 
-    def pwrCountdown(self):
-        pass
+    def pwrTimeout(self):
+        self.sec_till_pwrOff-=1
+        self.power_down_label.setText(f"Powering down in {self.sec_till_pwrOff} seconds")
+        self.power_down_label.update()
+
+        if self.sec_till_pwrOff == 0:
+            print("Timer expired")
+            if not self.dev_mode:
+                os.system("sudo poweroff")
 
     def cancelPwrDown(self):
-        pass
+        print("reached")
+        self.display(0)
+        self.pwrDownTimer.stop()
+        self.sec_till_pwrOff = 5
+        self.power_down_label.setText(f"Powering down in {self.sec_till_pwrOff} seconds")
+        self.power_down_label.update()
+
 
     def warn(self, main_msg, back, ack_msg = None ):
         self.warning_label.setText(main_msg)
