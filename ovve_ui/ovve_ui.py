@@ -50,6 +50,7 @@ from utils.ranges import Ranges
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
+    pwr_button_pressed_signal = pyqtSignal()
 
     def __init__(self,
                  port: str,
@@ -159,6 +160,11 @@ class MainWindow(QWidget):
             GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
         else:
             self.pwrPin = 4  #TODO: Remove this, this is just for development
+
+        self.pwr_button_pressed_signal.connect(self.pwrButtonHandler)
+
+    def pwrButtonPressed(self, pin):
+        self.pwr_button_pressed_signal.emit()
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -696,7 +702,7 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
-    def pwrButtonPressed(self, pin):
+    def pwrButtonHandler(self):
         if self.settings.run_state == 1: #Ventilator is running
             self.warn("You must stop ventilation before powering off", 0)
 
@@ -778,7 +784,7 @@ class MainWindow(QWidget):
                 self.comms_handler.fireAlarm(6)
 
             elif event.key() == QtCore.Qt.Key_P:
-                self.pwrButtonPressed(self.pwrPin)
+                self.pwr_button_pressed_signal.emit()
 
 
 def main() -> None:
