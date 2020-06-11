@@ -543,9 +543,13 @@ class MainWindow(QWidget):
 
 
     def decrementHighPressureAlarmLimit(self) -> None:
-        self.settings.high_pressure_limit -= self.settings.pressure_alarm_limit_increment
-        self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
-        self.passChanges()
+        if self.settings.high_pressure_limit - self.settings.pressure_alarm_limit_increment < \
+                self.settings.low_pressure_limit:
+            return
+        else:
+            self.settings.high_pressure_limit -= self.settings.pressure_alarm_limit_increment
+            self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
+            self.passChanges()
 
     def incrementHighPressureAlarmLimit(self) -> None:
         self.settings.high_pressure_limit += self.settings.pressure_alarm_limit_increment
@@ -553,19 +557,30 @@ class MainWindow(QWidget):
         self.passChanges()
 
     def decrementLowPressureAlarmLimit(self) -> None:
-        self.settings.low_pressure_limit -= self.settings.pressure_alarm_limit_increment
-        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
-        self.passChanges()
+        if self.settings.low_pressure_limit - self.settings.pressure_alarm_limit_increment < 0:
+            return
+        else:
+            self.settings.low_pressure_limit -= self.settings.pressure_alarm_limit_increment
+            self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+            self.passChanges()
 
     def incrementLowPressureAlarmLimit(self) -> None:
-        self.settings.low_pressure_limit += self.settings.pressure_alarm_limit_increment
-        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
-        self.passChanges()
+        if  self.settings.low_pressure_limit + self.settings.pressure_alarm_limit_increment > \
+            self.settings.high_pressure_limit:
+            return
+        else:
+            self.settings.low_pressure_limit += self.settings.pressure_alarm_limit_increment
+            self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+            self.passChanges()
 
     def decrementHighVolumeAlarmLimit(self) -> None:
-        self.settings.high_volume_limit -= self.settings.volume_alarm_limit_increment
-        self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
-        self.passChanges()
+        if self.settings.high_volume_limit - self.settings.volume_alarm_limit_increment < \
+            self.settings.low_volume_limit:
+            return
+        else:
+            self.settings.high_volume_limit -= self.settings.volume_alarm_limit_increment
+            self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
+            self.passChanges()
 
     def incrementHighVolumeAlarmLimit(self) -> None:
         self.settings.high_volume_limit += self.settings.volume_alarm_limit_increment
@@ -573,19 +588,30 @@ class MainWindow(QWidget):
         self.passChanges()
 
     def decrementLowVolumeAlarmLimit(self) -> None:
-        self.settings.low_volume_limit -= self.settings.volume_alarm_limit_increment
-        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
-        self.passChanges()
+        if self.settings.low_volume_limit - self.settings.volume_alarm_limit_increment < 0:
+            return
+        else:
+            self.settings.low_volume_limit -= self.settings.volume_alarm_limit_increment
+            self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+            self.passChanges()
 
     def incrementLowVolumeAlarmLimit(self) -> None:
-        self.settings.low_volume_limit += self.settings.volume_alarm_limit_increment
-        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
-        self.passChanges()
+        if self.settings.low_volume_limit + self.settings.volume_alarm_limit_increment \
+            > self.settings.high_volume_limit:
+            return
+        else:
+            self.settings.low_volume_limit += self.settings.volume_alarm_limit_increment
+            self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+            self.passChanges()
 
     def decrementHighRRAlarmLimit(self) -> None:
-        self.settings.high_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
-        self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
-        self.passChanges()
+        if self.settings.high_resp_rate_limit - self.settings.resp_rate_alarm_limit_increment < \
+                self.settings.low_resp_rate_limit:
+            return
+        else:
+            self.settings.high_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
+            self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
+            self.passChanges()
 
     def incrementHighRRAlarmLimit(self) -> None:
         self.settings.high_resp_rate_limit += self.settings.resp_rate_alarm_limit_increment
@@ -593,14 +619,21 @@ class MainWindow(QWidget):
         self.passChanges()
 
     def decrementLowRRAlarmLimit(self) -> None:
-        self.settings.low_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
-        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
-        self.passChanges()
+        if  self.settings.low_resp_rate_limit - self.settings.resp_rate_alarm_limit_increment < 0:
+            return
+        else:
+            self.settings.low_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
+            self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+            self.passChanges()
 
     def incrementLowRRAlarmLimit(self) -> None:
-        self.settings.low_resp_rate_limit += self.settings.resp_rate_alarm_limit_increment
-        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
-        self.passChanges()
+        if self.settings.low_resp_rate_limit + self.settings.resp_rate_alarm_limit_increment > \
+            self.settings.high_resp_rate_limit:
+            return
+        else:
+            self.settings.low_resp_rate_limit += self.settings.resp_rate_alarm_limit_increment
+            self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+            self.passChanges()
 
     def commitNewPatientID(self) -> None:
         self.logger.debug(f"Old patient ID {self.patient_id}")
