@@ -32,13 +32,14 @@ from display.rectangle import DisplayRect
 from display.ui_settings import (DisplayRectSettings, FancyButtonSettings,
                                  SimpleButtonSettings, TextSetting, UISettings)
 from typing import Callable
-from display.widgets import (
-    initializeHomeScreenWidget, initializeModeWidget,
-    initializeRespiratoryRateWidget, initializeTidalVolumeWidget,
-    initializeIERatioWidget, initializeAlarmWidget, initializeGraphWidget,
-    initializeSettingsWidget, initializeConfirmStopWidget,
-    initializeChangePatientWidget, initializeChangeDatetimeWidget,
-    initializeAlarmLimitWidget, initializeWarningScreen)
+from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
+                             initializeRespiratoryRateWidget,
+                             initializeTidalVolumeWidget,
+                             initializeIERatioWidget, initializeAlarmWidget,
+                             initializeGraphWidget, initializeSettingsWidget,
+                             initializeConfirmStopWidget, initializeChangePatientWidget,
+                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
+                             initializeWarningScreen, initializePwrDownScreen)
 from utils.params import Params
 from utils.settings import Settings
 from utils.Alarm import Alarm, AlarmHandler
@@ -51,6 +52,7 @@ from utils.alarm_limit_type import AlarmLimitType
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
+    pwr_button_pressed_signal = pyqtSignal()
 
     def __init__(self,
                  port: str,
@@ -84,7 +86,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1, 13)}
+        self.page = {str(i): QWidget() for i in range(1,14)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -165,7 +167,13 @@ class MainWindow(QWidget):
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
             GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
+        else:
+            self.pwrPin = 4  #TODO: Remove this, this is just for development
 
+        self.pwr_button_pressed_signal.connect(self.pwrButtonHandler)
+
+    def pwrButtonPressed(self, pin):
+        self.pwr_button_pressed_signal.emit()
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -253,6 +261,7 @@ class MainWindow(QWidget):
         initializeChangeDatetimeWidget(self)
         initializeAlarmLimitWidget(self)
         initializeWarningScreen(self)
+        initializePwrDownScreen(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -665,16 +674,47 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
-    def pwrButtonPressed(self, pin):
+    def pwrButtonHandler(self):
         if self.settings.run_state == 1: #Ventilator is running
             self.warn("You must stop ventilation before powering off", 0)
 
-        elif self.settings.run_state == 0:  #Ventilator is stopped
-            print("Powering off should happen")
-            pass
+        elif self.settings.run_state == 0: #Ventilator is stopped
+            self.beginPwrDown()
 
-    def warn(self, msg, back):
-        self.warning_label.setText(msg)
+    def beginPwrDown(self):
+        self.display(12)
+        self.disableMainButtons()
+
+        self.sec_till_pwrOff = 5
+        self.pwrDownTimer = QTimer()
+
+        self.pwrDownTimer.start(1000)
+        self.pwrDownTimer.timeout.connect(self.pwrTimeout)
+
+    def pwrTimeout(self):
+        self.sec_till_pwrOff-=1
+        self.power_down_label.setText(f"Powering down in {self.sec_till_pwrOff} seconds")
+        self.power_down_label.update()
+
+        if self.sec_till_pwrOff == 0:
+            if not self.dev_mode:
+                os.system("sudo poweroff")
+            else:
+                exit()
+
+    def cancelPwrDown(self):
+        self.display(0)
+        self.pwrDownTimer.stop()
+        self.power_down_label.setText(f"Powering down in 5 seconds")
+        self.power_down_label.update()
+
+
+    def warn(self, main_msg, back, ack_msg = None ):
+        self.warning_label.setText(main_msg)
+        if ack_msg is not None:
+            self.warning_ack_button.updateValue(ack_msg)
+        else:
+            self.warning_ack_button.updateValue("OK")
         self.warning_ack_button.clicked.connect(lambda: self.display(back))
         self.display(11)
 
@@ -716,7 +756,7 @@ class MainWindow(QWidget):
                 self.comms_handler.fireAlarm(6)
 
             elif event.key() == QtCore.Qt.Key_P:
-                self.pwrButtonPressed(self.pwrPin)
+                self.pwr_button_pressed_signal.emit()
 
 
 def main() -> None:
