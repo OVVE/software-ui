@@ -16,7 +16,7 @@ class Settings():
         self.tv: int = 475
         self.ie_ratio_enum: int = 0
 
-        #TODO: Come up with sensible default values for these, currently completely made up
+        #TODO: Adjust these default values
         self.high_pressure_limit: int = 40
         self.low_pressure_limit: int = 0
         self.high_volume_limit: int = 800
