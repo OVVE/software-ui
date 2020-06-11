@@ -17,8 +17,8 @@ class Settings():
         self.ie_ratio_enum: int = 0
 
         #TODO: Come up with sensible default values for these, currently completely made up
-        self.high_pressure_limit: int = 50
-        self.low_pressure_limit: int = 10
+        self.high_pressure_limit: int = 40
+        self.low_pressure_limit: int = 0
         self.high_volume_limit: int = 800
         self.low_volume_limit: int = 0
         self.high_resp_rate_limit: int = 20
