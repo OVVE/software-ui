@@ -707,6 +707,7 @@ class MainWindow(QWidget):
         self.pwrDownTimer.stop()
         self.power_down_label.setText(f"Powering down in 5 seconds")
         self.power_down_label.update()
+        self.enableMainButtons()
 
 
     def warn(self, main_msg, back, ack_msg = None ):
