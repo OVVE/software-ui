@@ -302,7 +302,7 @@ class CommsLink(QThread):
             self.logger.debug(self.sequenceNoTx)
             self.logger.debug(txCrc)
             self.statPacketTxCntOk+=1
-            self.sequenceNoTx+=1
+            self.sequenceNoTx = (self.sequenceNoTx + 1) % 0xFFFF
             return True
 
         except serial.SerialException:
