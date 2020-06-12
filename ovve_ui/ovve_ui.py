@@ -6,6 +6,12 @@ import os
 import sys
 import time
 from timeit import default_timer as timer
+import traceback
+
+try:
+    import RPi.GPIO as GPIO
+except:
+    GPIO = None
 
 import uuid
 from copy import deepcopy
@@ -34,7 +40,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeIERatioWidget, initializeAlarmWidget,
                              initializeGraphWidget, initializeSettingsWidget,
                              initializeConfirmStopWidget, initializeChangePatientWidget,
-                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget)
+                             initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
+                             initializeWarningScreen, initializePwrDownScreen)
 from utils.params import Params
 from utils.settings import Settings
 from utils.Alarm import Alarm, AlarmHandler
@@ -42,9 +49,20 @@ from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 
+# Setup logger at global scope
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+def myExceptHook(exctype, value, tb):
+    logger.error("Uncaught exception", exc_info=(exctype, value, tb))
+
+# Override the system exception hook so that we can log
+# uncaught errors
+sys.excepthook = myExceptHook
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
+    pwr_button_pressed_signal = pyqtSignal()
 
     def __init__(self,
                  port: str,
@@ -64,9 +82,10 @@ class MainWindow(QWidget):
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
         self.new_patient_id_display =1
-        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
-
         self.battery_img = "battery_grey_full"
+
+        self.logger = logging.getLogger()
+        self.setupLogging(self.logger, self.patient_id)
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -78,7 +97,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,12)}
+        self.page = {str(i): QWidget() for i in range(1,14)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -90,47 +109,6 @@ class MainWindow(QWidget):
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
-
-
-
-        # Create all directories in the log path
-        if not os.path.exists(self.logpath):
-            os.makedirs(self.logpath)
-
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
-
-        self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
-
-        # The TimedRotatingFileHandler will write a new file each hour
-        # After two weeks, the oldest logs will start being deleted
-        self.fh = TimedRotatingFileHandler(self.logfileroot,
-                                      when='H',
-                                      interval=1,
-                                      backupCount=336)
-
-        # Set the filehandler to log raw packets, warnings, and higher
-        # Raw packets are logged at custom log level 25, just above INFO
-        self.fh.setLevel(logging.INFO)
-
-        # Log to console with human-readable output
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.WARNING)
-
-        # TODO: Create a custom handler for Ignition
-
-        # create formatter and add it to the handlers
-        self.formatter = logging.Formatter(
-            '%(asctime)s - %(levelname)s - %(message)s')
-        self.fh.setFormatter(self.formatter)
-        ch.setFormatter(self.formatter)
-
-        # add the handlers to the logger
-        self.logger.addHandler(self.fh)
-
-        # Only log to console in dev mode
-        if (self.dev_mode):
-            self.logger.addHandler(ch)
 
         if not is_sim:
             self.comms_handler = CommsLink(port)
@@ -147,6 +125,59 @@ class MainWindow(QWidget):
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
 
+        # If running on the RPi, the GPIO library will be loaded
+        # Detect an active-low interrupt on BCM4
+        if GPIO:
+            self.pwrPin = 4
+            GPIO.setmode(GPIO.BCM)
+            GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
+        else:
+            self.pwrPin = 4  #TODO: Remove this, this is just for development
+
+        self.pwr_button_pressed_signal.connect(self.pwrButtonHandler)
+
+
+    def setupLogging(self, logger, patient_id):
+        logpath = os.path.join("/tmp", "ovve_logs", str(patient_id))
+
+
+        # Create all directories in the log path
+        if not os.path.exists(logpath):
+            os.makedirs(logpath)
+
+        logfileroot = os.path.join(logpath, str(patient_id) + ".log")
+
+        # The TimedRotatingFileHandler will write a new file each hour
+        # After two weeks, the oldest logs will start being deleted
+        fh = TimedRotatingFileHandler(logfileroot,
+                                      when='H',
+                                      interval=1,
+                                      backupCount=336)
+
+        # Set the filehandler to log raw packets, warnings, and higher
+        # Raw packets are logged at custom log level 25, just above INFO
+        fh.setLevel(logging.INFO)
+
+        # Log to console with human-readable output
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.WARNING)
+
+        # TODO: Create a custom handler for Ignition
+
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+
+        # add the handlers to the logger
+        logger.addHandler(fh)
+
+        # Only log to console in dev mode
+        if (self.dev_mode):
+            logger.addHandler(ch)
+
         self.main_timer = QTimer()
         self.main_timer.start(60 * 1000)
         self.main_timer.timeout.connect(self.addMinute)
@@ -155,6 +186,9 @@ class MainWindow(QWidget):
         self.datetime = self.datetime.addSecs(60)
         self.main_datetime_label.setText(self.datetime.toString()[:-8])
         self.main_timer.start(60 * 1000)
+
+    def pwrButtonPressed(self, pin):
+        self.pwr_button_pressed_signal.emit()
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
@@ -240,6 +274,8 @@ class MainWindow(QWidget):
         initializeChangePatientWidget(self)
         initializeChangeDatetimeWidget(self)
         initializeAlarmLimitWidget(self)
+        initializeWarningScreen(self)
+        initializePwrDownScreen(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -531,9 +567,13 @@ class MainWindow(QWidget):
 
 
     def decrementHighPressureAlarmLimit(self) -> None:
-        self.settings.high_pressure_limit -= self.settings.pressure_alarm_limit_increment
-        self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
-        self.passChanges()
+        if self.settings.high_pressure_limit - self.settings.pressure_alarm_limit_increment < \
+                self.settings.low_pressure_limit:
+            return
+        else:
+            self.settings.high_pressure_limit -= self.settings.pressure_alarm_limit_increment
+            self.high_pressure_limit_value_label.setText(str(self.settings.high_pressure_limit))
+            self.passChanges()
 
     def incrementHighPressureAlarmLimit(self) -> None:
         self.settings.high_pressure_limit += self.settings.pressure_alarm_limit_increment
@@ -541,19 +581,30 @@ class MainWindow(QWidget):
         self.passChanges()
 
     def decrementLowPressureAlarmLimit(self) -> None:
-        self.settings.low_pressure_limit -= self.settings.pressure_alarm_limit_increment
-        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
-        self.passChanges()
+        if self.settings.low_pressure_limit - self.settings.pressure_alarm_limit_increment < 0:
+            return
+        else:
+            self.settings.low_pressure_limit -= self.settings.pressure_alarm_limit_increment
+            self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+            self.passChanges()
 
     def incrementLowPressureAlarmLimit(self) -> None:
-        self.settings.low_pressure_limit += self.settings.pressure_alarm_limit_increment
-        self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
-        self.passChanges()
+        if  self.settings.low_pressure_limit + self.settings.pressure_alarm_limit_increment > \
+            self.settings.high_pressure_limit:
+            return
+        else:
+            self.settings.low_pressure_limit += self.settings.pressure_alarm_limit_increment
+            self.low_pressure_limit_value_label.setText(str(self.settings.low_pressure_limit))
+            self.passChanges()
 
     def decrementHighVolumeAlarmLimit(self) -> None:
-        self.settings.high_volume_limit -= self.settings.volume_alarm_limit_increment
-        self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
-        self.passChanges()
+        if self.settings.high_volume_limit - self.settings.volume_alarm_limit_increment < \
+            self.settings.low_volume_limit:
+            return
+        else:
+            self.settings.high_volume_limit -= self.settings.volume_alarm_limit_increment
+            self.high_volume_limit_value_label.setText(str(self.settings.high_volume_limit))
+            self.passChanges()
 
     def incrementHighVolumeAlarmLimit(self) -> None:
         self.settings.high_volume_limit += self.settings.volume_alarm_limit_increment
@@ -561,19 +612,30 @@ class MainWindow(QWidget):
         self.passChanges()
 
     def decrementLowVolumeAlarmLimit(self) -> None:
-        self.settings.low_volume_limit -= self.settings.volume_alarm_limit_increment
-        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
-        self.passChanges()
+        if self.settings.low_volume_limit - self.settings.volume_alarm_limit_increment < 0:
+            return
+        else:
+            self.settings.low_volume_limit -= self.settings.volume_alarm_limit_increment
+            self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+            self.passChanges()
 
     def incrementLowVolumeAlarmLimit(self) -> None:
-        self.settings.low_volume_limit += self.settings.volume_alarm_limit_increment
-        self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
-        self.passChanges()
+        if self.settings.low_volume_limit + self.settings.volume_alarm_limit_increment \
+            > self.settings.high_volume_limit:
+            return
+        else:
+            self.settings.low_volume_limit += self.settings.volume_alarm_limit_increment
+            self.low_volume_limit_value_label.setText(str(self.settings.low_volume_limit))
+            self.passChanges()
 
     def decrementHighRRAlarmLimit(self) -> None:
-        self.settings.high_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
-        self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
-        self.passChanges()
+        if self.settings.high_resp_rate_limit - self.settings.resp_rate_alarm_limit_increment < \
+                self.settings.low_resp_rate_limit:
+            return
+        else:
+            self.settings.high_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
+            self.high_rr_limit_value_label.setText(str(self.settings.high_resp_rate_limit))
+            self.passChanges()
 
     def incrementHighRRAlarmLimit(self) -> None:
         self.settings.high_resp_rate_limit += self.settings.resp_rate_alarm_limit_increment
@@ -581,14 +643,21 @@ class MainWindow(QWidget):
         self.passChanges()
 
     def decrementLowRRAlarmLimit(self) -> None:
-        self.settings.low_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
-        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
-        self.passChanges()
+        if  self.settings.low_resp_rate_limit - self.settings.resp_rate_alarm_limit_increment < 0:
+            return
+        else:
+            self.settings.low_resp_rate_limit -= self.settings.resp_rate_alarm_limit_increment
+            self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+            self.passChanges()
 
     def incrementLowRRAlarmLimit(self) -> None:
-        self.settings.low_resp_rate_limit += self.settings.resp_rate_alarm_limit_increment
-        self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
-        self.passChanges()
+        if self.settings.low_resp_rate_limit + self.settings.resp_rate_alarm_limit_increment > \
+            self.settings.high_resp_rate_limit:
+            return
+        else:
+            self.settings.low_resp_rate_limit += self.settings.resp_rate_alarm_limit_increment
+            self.low_rr_limit_value_label.setText(str(self.settings.low_resp_rate_limit))
+            self.passChanges()
 
     def commitNewPatientID(self) -> None:
         self.logger.debug(f"Old patient ID {self.patient_id}")
@@ -690,6 +759,50 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
+    def pwrButtonHandler(self):
+        if self.settings.run_state == 1: #Ventilator is running
+            self.warn("You must stop ventilation before powering off", 0)
+
+        elif self.settings.run_state == 0: #Ventilator is stopped
+            self.beginPwrDown()
+
+    def beginPwrDown(self):
+        self.display(12)
+        self.disableMainButtons()
+
+        self.sec_till_pwrOff = 5
+        self.pwrDownTimer = QTimer()
+
+        self.pwrDownTimer.start(1000)
+        self.pwrDownTimer.timeout.connect(self.pwrTimeout)
+
+    def pwrTimeout(self):
+        self.sec_till_pwrOff-=1
+        self.power_down_label.setText(f"Powering down in {self.sec_till_pwrOff} seconds")
+        self.power_down_label.update()
+
+        if self.sec_till_pwrOff == 0:
+            if not self.dev_mode:
+                os.system("sudo poweroff")
+            else:
+                exit()
+
+    def cancelPwrDown(self):
+        self.display(0)
+        self.pwrDownTimer.stop()
+        self.power_down_label.setText(f"Powering down in 5 seconds")
+        self.power_down_label.update()
+
+
+    def warn(self, main_msg, back, ack_msg = None ):
+        self.warning_label.setText(main_msg)
+        if ack_msg is not None:
+            self.warning_ack_button.updateValue(ack_msg)
+        else:
+            self.warning_ack_button.updateValue("OK")
+        self.warning_ack_button.clicked.connect(lambda: self.display(back))
+        self.display(11)
+
     def keyPressEvent(self, event):
         if self.dev_mode:
             if event.key() == QtCore.Qt.Key_F:
@@ -726,6 +839,9 @@ class MainWindow(QWidget):
 
             elif event.key() == QtCore.Qt.Key_I:
                 self.comms_handler.fireAlarm(6)
+
+            elif event.key() == QtCore.Qt.Key_P:
+                self.pwr_button_pressed_signal.emit()
 
 
 def main() -> None:
