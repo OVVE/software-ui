@@ -17,6 +17,7 @@ import numpy as np
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtSerialPort, QtWidgets, uic
 from PyQt5.QtCore import *
+from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
@@ -91,6 +92,7 @@ class MainWindow(QWidget):
         self.setPalette(palette)
 
 
+
         # Create all directories in the log path
         if not os.path.exists(self.logpath):
             os.makedirs(self.logpath)
@@ -145,6 +147,14 @@ class MainWindow(QWidget):
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
 
+        self.main_timer = QTimer()
+        self.main_timer.start(60 * 1000)
+        self.main_timer.timeout.connect(self.addMinute)
+
+    def addMinute(self):
+        self.datetime = self.datetime.addSecs(60)
+        self.main_datetime_label.setText(self.datetime.toString()[:-8])
+        self.main_timer.start(60 * 1000)
 
     def get_mode_display(self, mode):
         return self.settings.mode_switcher.get(mode, "invalid")
