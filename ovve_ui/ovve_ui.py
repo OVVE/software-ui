@@ -6,6 +6,7 @@ import os
 import sys
 import time
 from timeit import default_timer as timer
+import traceback
 
 try:
     import RPi.GPIO as GPIO
@@ -47,6 +48,16 @@ from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 
+# Setup logger at global scope
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+def myExceptHook(exctype, value, tb):
+    logger.error("Uncaught exception", exc_info=(exctype, value, tb))
+    
+# Override the system exception hook so that we can log
+# uncaught errors    
+sys.excepthook = myExceptHook
 
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
@@ -70,9 +81,10 @@ class MainWindow(QWidget):
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
         self.new_patient_id_display =1
-        self.logpath = os.path.join("/tmp", "ovve_logs", str(self.patient_id))
-
         self.battery_img = "battery_grey_full"
+        
+        self.logger = logging.getLogger()
+        self.setupLogging(self.logger, self.patient_id)
 
         # you can pass new settings for different object classes here
         self.ui_settings = UISettings()
@@ -96,45 +108,6 @@ class MainWindow(QWidget):
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, Qt.white)
         self.setPalette(palette)
-
-        # Create all directories in the log path
-        if not os.path.exists(self.logpath):
-            os.makedirs(self.logpath)
-
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
-
-        self.logfileroot = os.path.join(self.logpath, str(self.patient_id) + ".log")
-
-        # The TimedRotatingFileHandler will write a new file each hour
-        # After two weeks, the oldest logs will start being deleted
-        self.fh = TimedRotatingFileHandler(self.logfileroot,
-                                      when='H',
-                                      interval=1,
-                                      backupCount=336)
-
-        # Set the filehandler to log raw packets, warnings, and higher
-        # Raw packets are logged at custom log level 25, just above INFO
-        self.fh.setLevel(logging.INFO)
-
-        # Log to console with human-readable output
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.WARNING)
-
-        # TODO: Create a custom handler for Ignition
-
-        # create formatter and add it to the handlers
-        self.formatter = logging.Formatter(
-            '%(asctime)s - %(levelname)s - %(message)s')
-        self.fh.setFormatter(self.formatter)
-        ch.setFormatter(self.formatter)
-
-        # add the handlers to the logger
-        self.logger.addHandler(self.fh)
-
-        # Only log to console in dev mode
-        if (self.dev_mode):
-            self.logger.addHandler(ch)
 
         if not is_sim:
             self.comms_handler = CommsLink(port)
@@ -162,6 +135,46 @@ class MainWindow(QWidget):
             self.pwrPin = 4  #TODO: Remove this, this is just for development
 
         self.pwr_button_pressed_signal.connect(self.pwrButtonHandler)
+
+
+    def setupLogging(self, logger, patient_id):
+        logpath = os.path.join("/tmp", "ovve_logs", str(patient_id))
+
+        # Create all directories in the log path
+        if not os.path.exists(logpath):
+            os.makedirs(logpath)
+
+        logfileroot = os.path.join(logpath, str(patient_id) + ".log")
+
+        # The TimedRotatingFileHandler will write a new file each hour
+        # After two weeks, the oldest logs will start being deleted
+        fh = TimedRotatingFileHandler(logfileroot,
+                                      when='H',
+                                      interval=1,
+                                      backupCount=336)
+
+        # Set the filehandler to log raw packets, warnings, and higher
+        # Raw packets are logged at custom log level 25, just above INFO
+        fh.setLevel(logging.INFO)
+
+        # Log to console with human-readable output
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.WARNING)
+
+        # TODO: Create a custom handler for Ignition
+
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+
+        # add the handlers to the logger
+        logger.addHandler(fh)
+
+        # Only log to console in dev mode
+        if (self.dev_mode):
+            logger.addHandler(ch)
 
     def pwrButtonPressed(self, pin):
         self.pwr_button_pressed_signal.emit()
