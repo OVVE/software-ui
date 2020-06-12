@@ -36,6 +36,30 @@ class Settings():
             3: float(1 / 3)
         }
 
+    @property
+    def high_pressure_limit(self) -> int:
+        return self.alarm_limit_values[AlarmLimitType.HIGH_PRESSURE]
+
+    @property
+    def low_pressure_limit(self) -> int:
+        return self.alarm_limit_values[AlarmLimitType.LOW_PRESSURE]
+
+    @property
+    def high_volume_limit(self) -> int:
+        return self.alarm_limit_values[AlarmLimitType.HIGH_VOLUME]
+
+    @property
+    def low_volume_limit(self) -> int:
+        return self.alarm_limit_values[AlarmLimitType.LOW_VOLUME]
+
+    @property
+    def high_resp_rate_limit(self) -> int:
+        return self.alarm_limit_values[AlarmLimitType.HIGH_RESP_RATE]
+
+    @property
+    def low_resp_rate_limit(self) -> int:
+        return self.alarm_limit_values[AlarmLimitType.LOW_RESP_RATE]
+
     def to_JSON(self) -> str:
         j = {}
         j['run_state'] = self.run_state
