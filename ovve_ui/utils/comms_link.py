@@ -60,7 +60,7 @@ class CommsLink(QThread):
             os.makedirs(self.dirName)
         dateStr=datetime.now().isoformat(timespec='minutes')
         self.binaryLogFile=open(str(self.dirName)+"/["+dateStr+"] binary.log","wb+")
-        self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","wb+")
+        self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","w+")
         
 
     def update_settings(self, settings_dict: dict) -> None:
@@ -201,7 +201,7 @@ class CommsLink(QThread):
 
             
         elif packetType==0x80:
-            self.textLogFile.write(str(byteData))
+            self.textLogFile.write(byteData.decode("UTF-8"))
             self.textLogFile.flush()
 
 
