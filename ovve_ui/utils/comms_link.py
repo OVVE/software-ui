@@ -201,7 +201,7 @@ class CommsLink(QThread):
 
             
         elif packetType==0x80:
-            self.textLogFile.write(str(byteData))
+            self.textLogFile.write(byteData)
             self.textLogFile.flush()
 
 
@@ -228,7 +228,7 @@ class CommsLink(QThread):
                 self.textLogFile.close()
                 dateStr=datetime.now().isoformat(timespec='minutes')
                 self.binaryLogFile=open(str(self.dirName)+"/["+dateStr+"] binary.log","wb+")
-                self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","w+")
+                self.textLogFile=open(str(self.dirName)+"/["+dateStr+"] text.log","wb+")
 
             for byte in byteData:
                 self.handleRxByte(byte)
