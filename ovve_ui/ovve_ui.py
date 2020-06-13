@@ -738,7 +738,7 @@ class MainWindow(QWidget):
     def commitDate(self) -> None:
         self.datetime.setDate(self.new_date)
         if not self.dev_mode:
-            os.system("sudo date -s '@" + str(self.datetime.toSecsSinceEpoch()) + "'")
+            os.system("sudo date -s \'@" + str(self.datetime.toSecsSinceEpoch()) + "\'")
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
