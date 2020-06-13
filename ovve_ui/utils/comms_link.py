@@ -162,10 +162,10 @@ class CommsLink(QThread):
         
         self.cmd_pkt.data['alarm_bits'] = self.ackbits
 
-        self.cmd_pkt.data['high_pressure_limit_set'] = self.settings.high_pressure_limit
-        self.cmd_pkt.data['low_pressure_limit_set'] = self.settings.low_pressure_limit
-        self.cmd_pkt.data['high_volume_limit_set'] = self.settings.high_volume_limit
-        self.cmd_pkt.data['low_volume_limit_set'] = self.settings.low_volume_limit
+        self.cmd_pkt.data['high_pressure_limit_set'] =  Units.cmh2o_to_ecu(self.settings.high_pressure_limit)
+        self.cmd_pkt.data['low_pressure_limit_set'] =  Units.cmh2o_to_ecu(self.settings.low_pressure_limit)
+        self.cmd_pkt.data['high_volume_limit_set'] =  Units.ml_to_ecu(self.settings.high_volume_limit)
+        self.cmd_pkt.data['low_volume_limit_set'] =  Units.ml_to_ecu(self.settings.low_volume_limit)
         self.cmd_pkt.data['high_respiratory_rate_limit_set'] = self.settings.high_resp_rate_limit
         self.cmd_pkt.data['low_respiratory_rate_limit_set'] = self.settings.low_resp_rate_limit
 
@@ -302,7 +302,7 @@ class CommsLink(QThread):
             self.logger.debug(self.sequenceNoTx)
             self.logger.debug(txCrc)
             self.statPacketTxCntOk+=1
-            self.sequenceNoTx+=1
+            self.sequenceNoTx = (self.sequenceNoTx + 1) & 0xFFFF
             return True
 
         except serial.SerialException:
