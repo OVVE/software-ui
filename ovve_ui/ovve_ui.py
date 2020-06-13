@@ -179,13 +179,15 @@ class MainWindow(QWidget):
             logger.addHandler(ch)
 
         self.main_timer = QTimer()
-        self.main_timer.start(60 * 1000)
-        self.main_timer.timeout.connect(self.addMinute)
+        self.main_timer.start(5 * 1000)
+        self.main_timer.timeout.connect(self.updateTimeLabel)
 
-    def addMinute(self):
-        self.datetime = self.datetime.addSecs(60)
+    def updateTimeLabel(self):
+        self.datetime = QDateTime.currentDateTime()
         self.main_datetime_label.setText(self.datetime.toString()[:-8])
-        self.main_timer.start(60 * 1000)
+        if not self.dev_mode:
+            os.system("sudo date -s '@" + str(self.datetime.toSecsSinceEpoch()) + "'")
+        self.main_timer.start(5 * 1000)
 
     def pwrButtonPressed(self, pin):
         self.pwr_button_pressed_signal.emit()
@@ -737,6 +739,8 @@ class MainWindow(QWidget):
 
     def commitDate(self) -> None:
         self.datetime.setDate(self.new_date)
+        if not self.dev_mode:
+            os.system("sudo date -s '@" + str(self.datetime.toSecsSinceEpoch()) + "'")
         self.main_datetime_label.setText(self.datetime.toString()[:-8])
 
     def cancelChange(self) -> None:
