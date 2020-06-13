@@ -201,7 +201,7 @@ class CommsLink(QThread):
 
             
         elif packetType==0x80:
-            self.textLogFile.write(byteData) 
+            self.textLogFile.write(str(byteData))
             self.textLogFile.flush()
 
 
