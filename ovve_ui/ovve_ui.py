@@ -92,6 +92,10 @@ class MainWindow(QWidget):
         self.ptr = 0
 
         self.datetime = QDateTime.currentDateTime()
+        self.time_update_interval = 5
+        self.time_update_timer = QTimer()
+        self.time_update_timer.start(self.time_update_interval * 1000)
+        self.time_update_timer.timeout.connect(self.updateTimeLabel)
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         (layout, stack) = initializeHomeScreenWidget(self)
@@ -178,16 +182,10 @@ class MainWindow(QWidget):
         if (self.dev_mode):
             logger.addHandler(ch)
 
-        self.main_timer = QTimer()
-        self.main_timer.start(5 * 1000)
-        self.main_timer.timeout.connect(self.updateTimeLabel)
-
     def updateTimeLabel(self):
         self.datetime = QDateTime.currentDateTime()
         self.main_datetime_label.setText(self.datetime.toString()[:-8])
-        if not self.dev_mode:
-            os.system("sudo date -s '@" + str(self.datetime.toSecsSinceEpoch()) + "'")
-        self.main_timer.start(5 * 1000)
+        self.time_update_timer.start(self.time_update_interval * 1000)
 
     def pwrButtonPressed(self, pin):
         self.pwr_button_pressed_signal.emit()
@@ -741,7 +739,6 @@ class MainWindow(QWidget):
         self.datetime.setDate(self.new_date)
         if not self.dev_mode:
             os.system("sudo date -s '@" + str(self.datetime.toSecsSinceEpoch()) + "'")
-        self.main_datetime_label.setText(self.datetime.toString()[:-8])
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
