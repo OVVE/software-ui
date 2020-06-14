@@ -742,7 +742,6 @@ class MainWindow(QWidget):
             os.system("sudo date -s \'@" + str(self.datetime.toSecsSinceEpoch()) + "\'")
 
     def incrementTime(self, secs: int) -> None:
-        print("Incrementing by", secs)
         self.new_time = self.new_time.addSecs(secs)
         self.time_hour_label.setText(str(self.new_time.hour()))
         self.time_min_label.setText(str(self.new_time.minute()))
@@ -757,7 +756,6 @@ class MainWindow(QWidget):
 
 
     def commitTime(self) -> None:
-        print("reached")
         self.datetime.setTime(self.new_time)
         self.main_datetime_label.setText(self.datetime.toString()[:-8])
 
