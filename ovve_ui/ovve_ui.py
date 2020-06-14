@@ -737,8 +737,33 @@ class MainWindow(QWidget):
 
     def commitDate(self) -> None:
         self.datetime.setDate(self.new_date)
+        self.main_datetime_label.setText(self.datetime.toString()[:-8])
         if not self.dev_mode:
             os.system("sudo date -s \'@" + str(self.datetime.toSecsSinceEpoch()) + "\'")
+
+    def incrementTime(self, secs: int) -> None:
+        print("Incrementing by", secs)
+        self.new_time = self.new_time.addSecs(secs)
+        self.time_hour_label.setText(str(self.new_time.hour()))
+        self.time_min_label.setText(str(self.new_time.minute()))
+        self.time_sec_label.setText(str(self.new_time.second()))
+
+
+    def cancelTime(self):
+        self.new_time = self.datetime.time()
+        self.time_hour_label.setText(str(self.datetime.time().hour()))
+        self.time_min_label.setText(str(self.datetime.time().minute()))
+        self.time_sec_label.setText(str(self.datetime.time().second()))
+
+
+    def commitTime(self) -> None:
+        print("reached")
+        self.datetime.setTime(self.new_time)
+        self.main_datetime_label.setText(self.datetime.toString()[:-8])
+
+        if not self.dev_mode:
+            os.system("sudo date -s \'@" + str(self.datetime.toSecsSinceEpoch()) + "\'")
+
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)

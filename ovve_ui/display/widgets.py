@@ -966,7 +966,7 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     change_datetime_main_label.setFixedWidth(400)
     change_datetime_main_label.setStyleSheet("QLabel {color: #000000 ;}")
 
-    change_datetime_stack_widget = QStackedWidget()
+    change_datetime_tab_widget = QTabWidget()
 
     date_widget = QWidget()
     date_widget.setFixedHeight(250)
@@ -1130,9 +1130,168 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     date_widget.setLayout(date_v_box)
 
     #TODO: Add time setting
+    time_widget = QWidget()
+    time_widget.setFixedHeight(250)
+    time_widget.setContentsMargins(0, 0, 0, 0)
 
-    for widget in [date_widget]:
-        change_datetime_stack_widget.addWidget(widget)
+    time_v_box = QVBoxLayout()
+    time_h_box_1 = QHBoxLayout()
+    time_v_box_11 = QVBoxLayout()
+    time_v_box_12 = QVBoxLayout()
+    time_v_box_13 = QVBoxLayout()
+    time_h_box_2 = QHBoxLayout()
+    time_v_box_21 = QVBoxLayout()
+    time_v_box_22 = QVBoxLayout()
+
+    time_hour_increment = window.makeSimpleDisplayButton(
+        "+",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    time_hour_increment.setFixedWidth(50)
+    time_hour_increment.clicked.connect(lambda: window.incrementTime(3600))
+
+    time_hour_decrement = window.makeSimpleDisplayButton(
+        "-",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    time_hour_decrement.setFixedWidth(50)
+    time_hour_decrement.clicked.connect(lambda: window.incrementTime(-3600))
+
+    time_min_increment = window.makeSimpleDisplayButton(
+        "+",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    time_min_increment.setFixedWidth(50)
+    time_min_increment.clicked.connect(lambda: window.incrementTime(60))
+
+    time_min_decrement = window.makeSimpleDisplayButton(
+        "-",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    time_min_decrement.setFixedWidth(50)
+    time_min_decrement.clicked.connect(lambda: window.incrementTime(-60))
+
+    time_sec_increment = window.makeSimpleDisplayButton(
+        "+",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    time_sec_increment.clicked.connect(lambda: window.incrementTime(1))
+
+    time_sec_decrement = window.makeSimpleDisplayButton(
+        "-",
+        size=(50, 50),
+        button_settings=SimpleButtonSettings(
+            fillColor="#FFFFFF",
+            borderColor=page_settings.changeButtonBorderColor,
+            valueSetting=page_settings.changeButtonTextSetting,
+            valueColor=page_settings.changeButtonValueColor))
+    time_sec_decrement.clicked.connect(lambda: window.incrementTime(-1))
+
+    window.time_hour_label = QLabel(str(window.datetime.time().hour()))
+    window.time_min_label = QLabel(str(window.datetime.time().minute()))
+    window.time_sec_label = QLabel(str(window.datetime.time().second()))
+    window.date_year_label.setFixedWidth(200)
+
+    time_cancel = window.makeSimpleDisplayButton(
+        "CANCEL",
+        size=(150, 60),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.cancelColor,
+            borderColor=page_settings.cancelColor,
+            valueSetting=page_settings.cancelSetting,
+            valueColor="#FFFFFF"))
+    time_cancel.clicked.connect(window.cancelTime)
+
+    time_apply = window.makeSimpleDisplayButton(
+        "APPLY",
+        size=(150, 60),
+        button_settings=SimpleButtonSettings(
+            fillColor=page_settings.commitColor,
+            borderColor=page_settings.commitColor,
+            valueSetting=page_settings.commitSetting,
+            valueColor="#FFFFFF"))
+    time_apply.clicked.connect(window.commitTime)
+
+    for time_label in [window.time_hour_label,
+                       window.time_min_label,
+                       window.time_sec_label]:
+        time_label.setFont(page_settings.setDatetimeFont)
+        time_label.setAlignment(Qt.AlignCenter)
+
+    time_hour_increment_wrapper = QHBoxLayout()
+    time_hour_increment_wrapper.addWidget(time_hour_increment)
+
+    time_hour_decrement_wrapper = QHBoxLayout()
+    time_hour_decrement_wrapper.addWidget(time_hour_decrement)
+
+    time_min_increment_wrapper = QHBoxLayout()
+    time_min_increment_wrapper.addWidget(time_min_increment)
+
+    time_min_decrement_wrapper = QHBoxLayout()
+    time_min_decrement_wrapper.addWidget(time_min_decrement)
+
+    time_sec_increment_wrapper = QHBoxLayout()
+    time_sec_increment_wrapper.addWidget(time_sec_increment)
+
+    time_sec_decrement_wrapper = QHBoxLayout()
+    time_sec_decrement_wrapper.addWidget(time_sec_decrement)
+
+    for wrapper in [time_hour_increment_wrapper, time_hour_decrement_wrapper,
+                    time_min_increment_wrapper, time_min_decrement_wrapper,
+                    time_sec_increment_wrapper, time_sec_decrement_wrapper]:
+        wrapper.setAlignment(Qt.AlignCenter)
+
+    time_v_box_11.addLayout(time_hour_increment_wrapper)
+    time_v_box_11.addWidget(window.time_hour_label)
+    time_v_box_11.addLayout(time_hour_decrement_wrapper)
+
+    time_v_box_12.addLayout(time_min_increment_wrapper)
+    time_v_box_12.addWidget(window.time_min_label)
+    time_v_box_12.addLayout(time_min_decrement_wrapper)
+
+    time_v_box_13.addLayout(time_sec_increment_wrapper)
+    time_v_box_13.addWidget(window.time_sec_label)
+    time_v_box_13.addLayout(time_sec_decrement_wrapper)
+
+    for v_box in [time_v_box_11, time_v_box_12, time_v_box_13]:
+        v_box.setAlignment(Qt.AlignCenter)
+        time_h_box_1.addLayout(v_box)
+
+    time_v_box_21.addWidget(time_cancel)
+    time_v_box_21.setAlignment(Qt.AlignCenter)
+    time_v_box_22.addWidget(time_apply)
+    time_v_box_22.setAlignment(Qt.AlignCenter)
+
+    time_h_box_2.addLayout(time_v_box_21)
+    time_h_box_2.addLayout(time_v_box_22)
+
+    time_v_box.addLayout(time_h_box_1)
+    time_v_box.addLayout(time_h_box_2)
+
+    time_widget.setLayout(time_v_box)
+
+    change_datetime_tab_widget.addTab(date_widget, "Date")
+    change_datetime_tab_widget.addTab(time_widget, "Time")
 
     datetime_back = window.makeSimpleDisplayButton(
         "Back to Settings",
@@ -1144,7 +1303,7 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     datetime_back.clicked.connect(lambda: window.display(6))
 
 
-    h_box_10mid.addWidget(change_datetime_stack_widget)
+    h_box_10mid.addWidget(change_datetime_tab_widget)
     h_box_10bottom.addWidget(datetime_back)
 
     v_box_10.addLayout(h_box_10top)
