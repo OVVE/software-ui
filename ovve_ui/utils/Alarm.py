@@ -44,7 +44,7 @@ class Alarm():
         AlarmType.LOW_VOLUME: "Volume IN detected exceeding the low volume limit",
         AlarmType.HIGH_RESP_RATE: "Respiratory rate exceeded the high rate limit",
         AlarmType.LOW_RESP_RATE: "Respiratory rate below the low rate limit",
-        AlarmType.LOW_PRESSURE: "Pressure stayed lower than 10cmH2O for more than 15s",
+        AlarmType.CONTINUOUS_PRESSURE: "Pressure difference lower than 10cmH2O for more than 15s",
         AlarmType.UI_COMMS_FAILURE: "Communications are too unreliable to operate",
         AlarmType.UI_HARDWARE_FAILURE: "A hardware failure has been detected",
         AlarmType.SETPOINT_MISMATCH: "One or more setpoints does not match between UI and ECU"
