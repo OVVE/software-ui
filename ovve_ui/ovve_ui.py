@@ -43,7 +43,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeWarningScreen, initializePwrDownScreen)
 from utils.params import Params
 from utils.settings import Settings
-from utils.Alarm import Alarm, AlarmHandler
+from utils.Alarm import Alarm, AlarmHandler, AlarmType
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
@@ -276,8 +276,7 @@ class MainWindow(QWidget):
         self.params = params
         self.logger.info(self.params.to_JSON())
         self.update_ui_alarms()
-        self.setStartStop(params.run_state)
-            
+
         if self.settings.run_state > 0:
             self.updateMainDisplays()
             self.updateGraphs()
@@ -294,6 +293,9 @@ class MainWindow(QWidget):
                 #the alarm that we're showing isn't the highest priority one
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
+
+            if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
+                self.setStartStop(0)
 
 
     def showAlarm(self) -> None:
