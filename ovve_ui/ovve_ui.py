@@ -113,7 +113,7 @@ class MainWindow(QWidget):
         layout.setContentsMargins(10, 10, 10, 10)
         self.setLayout(layout)
         palette = QtGui.QPalette()
-        palette.setColor(QtGui.QPalette.Background, Qt.white)
+        palette.setColor(QtGui.QPalette.Background, QColor("#2C2C2C"))
         self.setPalette(palette)
 
         if not is_sim:

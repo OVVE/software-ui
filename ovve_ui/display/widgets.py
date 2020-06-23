@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QTabWidget, QHBoxLayout, QVBoxLayout,
                              QStackedWidget, QLabel)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
+from PyQt5 import QtGui
 
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
@@ -281,17 +282,22 @@ def initializeGraphWidget(window: MainWindow) -> None:
             window.pressure_graph, window.flow_graph, window.volume_graph
     ]:
         graph.setXRange(0, window.graph_width, padding=0)
-        graph.setBackground("w")
+        graph.setBackground("#232323")
         graph.setMouseEnabled(False, False)
         graph.getPlotItem().hideAxis('bottom')
         v_box.addWidget(graph)
 
+
+
     window.page["1"].setLayout(v_box)
+    window.page["1"].setStyleSheet("background-color: #232323;")
+
 
 
 def initializeModeWidget(window: MainWindow) -> None:
     """ Creates Mode Widget """
     page_settings = window.ui_settings.page_settings
+
     v_box = QVBoxLayout()
     h_box_1 = QHBoxLayout()
     h_box_2 = QHBoxLayout()
@@ -376,6 +382,7 @@ def initializeModeWidget(window: MainWindow) -> None:
     v_box.addLayout(h_box_2)
     v_box.addLayout(h_box_3)
     v_box.addLayout(h_box_4)
+
 
     window.page["2"].setLayout(v_box)
 
