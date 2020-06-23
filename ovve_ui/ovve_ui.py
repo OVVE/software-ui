@@ -274,9 +274,11 @@ class MainWindow(QWidget):
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
-        if self.params.run_state > 0:
-            self.logger.info(self.params.to_JSON())
-            self.update_ui_alarms()
+        self.logger.info(self.params.to_JSON())
+        self.update_ui_alarms()
+        self.setStartStop(params.run_state)
+            
+        if self.settings.run_state > 0:
             self.updateMainDisplays()
             self.updateGraphs()
 
@@ -493,17 +495,23 @@ class MainWindow(QWidget):
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio_enum))
 
-    def changeStartStop(self) -> None:
-        if self.settings.run_state == 0:
-            self.settings.run_state = 1
+    def setStartStop(self, run_state: int):
+        if run_state == 1:
             self.start_stop_button_main.updateValue("STOP")
             self.start_stop_button_main.button_settings = SimpleButtonSettings(
                 fillColor="#ff0000")
-            self.passChanges()
+        else:
+            self.start_stop_button_main.updateValue("START")
+            self.start_stop_button_main.button_settings = SimpleButtonSettings()
+        self.settings.run_state = run_state
+        self.passChanges()
 
-        elif self.settings.run_state == 1:
+    def changeStartStop(self) -> None:
+        if self.settings.run_state == 0:
+            self.setStartStop(1)
+        else:
             self.confirmStop()
-
+        
     def generateNewPatientID(self) -> None:
         self.new_patient_id = uuid.uuid4()
         self.new_patient_id_display += 1
@@ -515,10 +523,7 @@ class MainWindow(QWidget):
         self.display(7)
 
     def stopVentilation(self) -> None:
-        self.settings.run_state = 0
-        self.start_stop_button_main.updateValue("START")
-        self.start_stop_button_main.button_settings = SimpleButtonSettings()
-        self.passChanges()
+        self.setStartStop(0)
         self.display(0)
 
     def commitMode(self) -> None:
