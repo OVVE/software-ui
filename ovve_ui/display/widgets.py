@@ -841,41 +841,37 @@ def initializeConfirmStopWidget(window: MainWindow) -> None:
     h_box_8bottom.setAlignment(Qt.AlignCenter)
 
     confirm_stop_value_label = QLabel(
-        "Caution: this will stop ventilation immediately. "
-        "Proceed?")
+        "<font color='orange'>Caution: </font> <font color='white'> this will stop ventilation immediately. Proceed?")
+
     confirm_stop_value_label.setFont(
-        window.ui_settings.page_settings.mainLabelFont)
+        TextSetting("Arial", 30, True).font)
     confirm_stop_value_label.setWordWrap(True)
     confirm_stop_value_label.setAlignment(Qt.AlignCenter)
     confirm_stop_value_label.setFixedHeight(150)
     confirm_stop_value_label.setFixedWidth(400)
-    confirm_stop_value_label.setStyleSheet("QLabel {color: #000000 ;}")
+    confirm_stop_value_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
-    confirm_stop_cancel_button = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            valueColor="#FFFFFF",
-            fillColor=window.ui_settings.page_settings.cancelColor,
-            borderColor=window.ui_settings.page_settings.cancelColor))
+    cancel_button_path = path.abspath(
+        path.join(path.dirname(__file__), "buttons/cancel.png"))
+
+    confirm_stop_cancel_button = window.makePicButton(
+        cancel_button_path,
+        size=(100, 100),
+    )
     confirm_stop_cancel_button.clicked.connect(lambda: window.display(0))
-    confirm_stop_cancel_button.setFont(
-        window.ui_settings.simple_button_settings.valueFont)
 
-    confirm_stop_confirm_button = window.makeSimpleDisplayButton(
-        "CONFIRM",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.commitSetting,
-            valueColor="#FFFFFF",
-            fillColor=window.ui_settings.page_settings.commitColor,
-            borderColor=window.ui_settings.page_settings.commitColor))
+    confirm_button_path = path.abspath(
+        path.join(path.dirname(__file__), "buttons/apply.png"))
+
+    confirm_stop_confirm_button = window.makePicButton(
+        confirm_button_path,
+        size=(100, 100),
+    )
     confirm_stop_confirm_button.clicked.connect(window.stopVentilation)
     confirm_stop_confirm_button.setFont(
         window.ui_settings.simple_button_settings.valueFont)
 
-    h_box_8bottom.setSpacing(75)
+    h_box_8bottom.setSpacing(100)
 
     h_box_8top.addWidget(confirm_stop_value_label)
     h_box_8bottom.addWidget(confirm_stop_cancel_button)

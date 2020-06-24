@@ -11,7 +11,7 @@ class Settings():
         self.run_state: int = 0
         self.mode: int = 0
 
-        self.mode_switcher: dict = {0: 'NAC', 1: 'AC', 2: 'SIMV'}
+        self.mode_switcher: dict = {0: 'CMV', 1: 'AC', 2: 'SIMV'}
 
         self.resp_rate: int = 20
         self.tv: int = 475
