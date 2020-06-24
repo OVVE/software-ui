@@ -34,7 +34,6 @@ def initializeHomeScreenWidget(
     h_box_3 = QHBoxLayout()
 
     h_box_1left = QHBoxLayout()
-    h_box_1mid = QHBoxLayout()
     h_box_1right = QHBoxLayout()
 
     h_box_1right.setAlignment(Qt.AlignRight)
@@ -49,7 +48,7 @@ def initializeHomeScreenWidget(
         path.join(path.dirname(__file__), "images/lm_logo_dark.png"))
     main_logo = window.makePicButton(
         main_logo_path,
-        size=(215, 35),
+        size=(185, 30),
     )
 
     window.main_patient_label = QLabel(
@@ -71,7 +70,7 @@ def initializeHomeScreenWidget(
 
     main_battery_icon_path = path.abspath(
         path.join(path.dirname(__file__),
-                  f"images/batteries/light_theme/{window.battery_img}"))
+                  f"images/batteries/{window.battery_img}"))
     window.main_battery_icon = window.makePicButton(
         main_battery_icon_path,
         size=(30, 15),
@@ -163,15 +162,22 @@ def initializeHomeScreenWidget(
     )
 
     h_box_1left.addWidget(main_logo)
-    h_box_1mid.addWidget(window.main_patient_label)
-    h_box_1mid.addWidget(window.main_datetime_label)
 
-    h_box_1mid.setSpacing(18)
+    h_box_1right1 = QHBoxLayout()
+    h_box_1right2 = QHBoxLayout()
 
-    h_box_1right.addWidget(window.main_battery_level_label)
-    h_box_1right.addWidget(window.main_battery_icon)
+    h_box_1right1.addWidget(window.main_patient_label)
+    h_box_1right1.addWidget(window.main_datetime_label)
 
-    h_box_1right.setSpacing(0)
+    h_box_1right2.addWidget(window.main_battery_level_label)
+    h_box_1right2.addWidget(window.main_battery_icon)
+
+    h_box_1right.setSpacing(25)
+
+    h_box_1right1.setSpacing(15)
+    h_box_1right2.setSpacing(0)
+    h_box_1right.addLayout(h_box_1right1)
+    h_box_1right.addLayout(h_box_1right2)
 
     for button in [
             window.mode_button_main,
@@ -203,7 +209,6 @@ def initializeHomeScreenWidget(
 
     for h_layout1 in [
             h_box_1left,
-            h_box_1mid,
             h_box_1right,
     ]:
         h_box_1.addLayout(h_layout1)
@@ -223,7 +228,6 @@ def initializeHomeScreenWidget(
     return layout, stack
 
 
-#TODO: Add Units
 def initializeGraphWidget(window: MainWindow) -> None:
     v_box = QVBoxLayout()
     axisStyle = {'color': 'black', 'font-size': '20pt'}
@@ -239,8 +243,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
         window.graph_width,
     ])
     window.pressure_graph = pg.PlotWidget()
-    # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
-    window.pressure_graph.setYRange(-45, 45, padding=0)
+    window.pressure_graph.setYRange(-45, 70, padding=0)
 
     window.pressure_graph_line = window.pressure_graph.plot(
         window.pressure_data, pen=window.new_graph_pen)
@@ -256,7 +259,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
         window.graph_width,
     ])
     window.flow_graph = pg.PlotWidget()
-    window.flow_graph.setYRange(-15, 75,
+    window.flow_graph.setYRange(-10, 90,
                                 padding=0)  #Flow should be presented in L/min.
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
@@ -272,8 +275,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
         window.graph_width,
     ])
     window.volume_graph = pg.PlotWidget()
-    # TODO: Find good values for ranges of volume, just picked a pretty big number for now
-    window.volume_graph.setYRange(-200, 1200, padding=0)
+    window.volume_graph.setYRange(-100, 900, padding=0)
     window.volume_graph_line = window.volume_graph.plot(
         window.volume_data, pen=window.new_graph_pen)
     window.volume_graph_cache_line = window.volume_graph.plot(

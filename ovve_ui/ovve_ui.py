@@ -84,7 +84,7 @@ class MainWindow(QWidget):
         self.patient_id_display = 1
         
         self.new_patient_id_display =1
-        self.battery_img = "battery_grey_full"
+        self.battery_img = "battery_white_full"
         
         self.logger = logging.getLogger()
         self.setupLogging(self.logger, self.patient_id)
@@ -362,20 +362,20 @@ class MainWindow(QWidget):
                 f"{self.params.battery_level}%")
 
             if self.params.battery_level == 0:
-                self.battery_img = "battery_grey_0"
+                self.battery_img = "battery_white_0"
             elif self.params.battery_level <= 25:
-                self.battery_img = "battery_grey_25"
+                self.battery_img = "battery_white_25"
             elif self.params.battery_level <= 50:
-                self.battery_img = "battery_grey_50"
+                self.battery_img = "battery_white_50"
 
             elif self.params.battery_level <= 75:
-                self.battery_img = "battery_grey_75"
+                self.battery_img = "battery_white_75"
 
             elif self.params.battery_level <= 75:
-                self.battery_img = "battery_grey_75"
+                self.battery_img = "battery_white_75"
 
             else:
-                self.battery_img = "battery_grey_full"
+                self.battery_img = "battery_white_full"
 
             self.main_battery_icon.updateValue(
                 os.path.abspath(

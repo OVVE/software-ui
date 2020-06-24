@@ -87,7 +87,7 @@ class DisplayRectSettings:
                  labelColor: str = '#29ABE2',
                  valueColor: str = '#FFFFFF',
                  unitColor: str = '#20c7ff',
-                 default_size: Tuple[int, int] = (140, 95)):
+                 default_size: Tuple[int, int] = (140, 102)):
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
         self.unitFont = unitSetting.font
