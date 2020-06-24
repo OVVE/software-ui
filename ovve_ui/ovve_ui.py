@@ -371,9 +371,6 @@ class MainWindow(QWidget):
             elif self.params.battery_level <= 75:
                 self.battery_img = "battery_white_75"
 
-            elif self.params.battery_level <= 75:
-                self.battery_img = "battery_white_75"
-
             else:
                 self.battery_img = "battery_white_full"
 
@@ -538,7 +535,6 @@ class MainWindow(QWidget):
     def stopVentilation(self) -> None:
         self.settings.run_state = 0
         self.start_stop_button_main.updateValue("START")
-        self.start_stop_button_main.button_settings = SimpleButtonSettings()
         self.passChanges()
         self.display(0)
 

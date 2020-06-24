@@ -322,7 +322,7 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_title_label = QLabel("Set Ventilation Mode")
     mode_title_label.setFont(page_settings.mainLabelFont)
     mode_title_label.setAlignment(Qt.AlignCenter)
-    mode_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    mode_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.mode_page_value_label = QLabel(
         window.get_mode_display(window.local_settings.mode))
