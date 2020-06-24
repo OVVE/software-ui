@@ -848,7 +848,7 @@ def initializeConfirmStopWidget(window: MainWindow) -> None:
     confirm_stop_value_label.setAlignment(Qt.AlignCenter)
     confirm_stop_value_label.setFixedHeight(250)
     confirm_stop_value_label.setFixedWidth(400)
-    confirm_stop_value_label.setText("<font color='red'> CAUTION! </font> <br> <font color='white'> This will immediately stop ventilation. Proceed?")
+    confirm_stop_value_label.setText("<font color='red'> CAUTION! </font> <br> <font color='white'> This will immediately stop ventilation.")
 
     cancel_button_path = path.abspath(
         path.join(path.dirname(__file__), "buttons/cancel.png"))
