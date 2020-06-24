@@ -80,7 +80,7 @@ class DisplayRectSettings:
     def __init__(self,
                  labelSetting: TextSetting = TextSetting("Arial", 16, True),
                  valueSetting: TextSetting = TextSetting(
-                     "Arial Black", 38, True),
+                     "Arial Black", 32, True),
                  unitSetting: TextSetting = TextSetting("Arial", 12, False),
                  fillColor: str = '#2b3c42',
                  borderColor: str = '#20c7ff',
