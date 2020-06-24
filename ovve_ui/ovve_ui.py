@@ -378,7 +378,7 @@ class MainWindow(QWidget):
                 os.path.abspath(
                     os.path.join(
                         os.path.dirname(__file__),
-                        f"display/images/batteries/light_theme/{self.battery_img}"
+                        f"display/images/batteries/{self.battery_img}"
                     )))
 
             #TODO: Get battery level converted to percentage
