@@ -136,9 +136,11 @@ def initializeHomeScreenWidget(
         "TV Exp",
         "---",
         "mL",
-        rect_settings=DisplayRectSettings(fillColor="#C5C5C5",
-                                          labelColor="#A9A9A9",
-                                          unitColor="#A9A9A9"),
+        rect_settings=DisplayRectSettings(fillColor="#2c2c2c",
+                                          labelColor="#4c4e4f",
+                                          unitColor="#4c4e4f",
+                                          borderColor = "#4c4e4f",
+                                          valueColor = "#4c4e4f"),
     )
 
     window.peep_display_main = window.makeDisplayRect(
