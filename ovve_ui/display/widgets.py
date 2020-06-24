@@ -105,7 +105,8 @@ def initializeHomeScreenWidget(
 
     window.start_stop_button_main = window.makeSimpleDisplayButton("START",
                                                                    size=(126,
-                                                                         64))
+                                                                         64),
+                                                                   button_settings = SimpleButtonSettings(fillColor = "#412828", borderColor = "#fd0101", valueColor = "#fd0101"))
     window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
     settings_icon_path = path.abspath(
@@ -221,13 +222,13 @@ def initializeHomeScreenWidget(
 def initializeGraphWidget(window: MainWindow) -> None:
     v_box = QVBoxLayout()
     axisStyle = {'color': 'black', 'font-size': '20pt'}
-    window.new_graph_pen = pg.mkPen(width=2, color="b")
-    window.cache_graph_pen = pg.mkPen(width=2, color="k")
+    window.new_graph_pen = pg.mkPen(width=2, color="#e9840e")
+    window.cache_graph_pen = pg.mkPen(width=2, color="#6a6a6a")
 
     # TODO: Adjust graph width for resp rate
     window.graph_width = 60
     window.graph_ptr = 0
-    label_style = {'color': 'k', 'font-size': '16pt'}
+    label_style = {'color': '#20c7ff', 'font-size': '16pt'}
 
     window.pressure_data = np.empty([
         window.graph_width,
@@ -288,7 +289,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
         v_box.addWidget(graph)
 
     window.page["1"].setLayout(v_box)
-    window.page["1"].setStyleSheet("background-color: #232323;")
+    window.page["1"].setStyleSheet("background-color: #232323; border: 2 solid #20c7ff")
 
 
 

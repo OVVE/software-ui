@@ -519,8 +519,6 @@ class MainWindow(QWidget):
         if self.settings.run_state == 0:
             self.settings.run_state = 1
             self.start_stop_button_main.updateValue("STOP")
-            self.start_stop_button_main.button_settings = SimpleButtonSettings(
-                fillColor="#ff0000")
             self.passChanges()
 
         elif self.settings.run_state == 1:
