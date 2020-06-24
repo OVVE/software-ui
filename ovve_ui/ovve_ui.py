@@ -77,6 +77,7 @@ class MainWindow(QWidget):
         self.dev_mode = dev_mode
         self.last_main_update_time = 0
         self.main_update_interval = 1.0
+        self.last_run_state = None
 
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
@@ -272,14 +273,26 @@ class MainWindow(QWidget):
     def display(self, i) -> None:
         self.stack.setCurrentIndex(i)
 
+    ''' 
+        This is the main callback from comms_link
+    '''  
     def update_ui_params(self, params: Params) -> None:
         self.params = params
         self.logger.info(self.params.to_JSON())
         self.update_ui_alarms()
 
+        # Run state from the controller will override the
+        # current run state.  Only update the run state when
+        # it changes.        
+        if self.last_run_state == None or \
+            (self.last_run_state != self.params.run_state):
+            self.setStartStop(self.params.run_state)
+        self.last_run_state = self.params.run_state
+
         if self.settings.run_state > 0:
             self.updateMainDisplays()
             self.updateGraphs()
+        
 
     def update_ui_alarms(self) -> None:
         if self.alarm_handler.alarms_pending() > 0:
@@ -294,8 +307,8 @@ class MainWindow(QWidget):
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
 
-            if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
-                self.setStartStop(0)
+            #if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
+            #    self.setStartStop(0)
 
 
     def showAlarm(self) -> None:
