@@ -284,14 +284,15 @@ def initializeGraphWidget(window: MainWindow) -> None:
     for graph in [
             window.pressure_graph, window.flow_graph, window.volume_graph
     ]:
+        graph.setStyleSheet("border: 0;")
         graph.setXRange(0, window.graph_width, padding=0)
         graph.setBackground("#232323")
         graph.setMouseEnabled(False, False)
         graph.getPlotItem().hideAxis('bottom')
         v_box.addWidget(graph)
 
+    window.page["1"].setStyleSheet("background-color: #232323; border: 1 solid #20c7ff")
     window.page["1"].setLayout(v_box)
-    window.page["1"].setStyleSheet("background-color: #232323; border: 2 solid #20c7ff")
 
 
 
