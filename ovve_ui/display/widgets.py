@@ -237,7 +237,7 @@ def initializeGraphWidget(window: MainWindow) -> None:
     # TODO: Adjust graph width for resp rate
     window.graph_width = 60
     window.graph_ptr = 0
-    label_style = {'color': '#20c7ff', 'font-size': '16pt'}
+    label_style = {'color': 'k', 'font-size': '9pt'}
 
     window.pressure_data = np.empty([
         window.graph_width,

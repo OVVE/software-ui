@@ -117,7 +117,7 @@ class DisplayRectSettings:
 class PageSettings:
     def __init__(
         self,
-        mainLabelSetting: TextSetting = TextSetting("Arial", 30, True),
+        mainLabelSetting: TextSetting = TextSetting("Arial", 24, True),
         valueSetting: TextSetting = TextSetting("Arial Black", 65, True),
         textValueSetting: TextSetting = TextSetting("Arial Black", 60, True),
         unitSetting: TextSetting = TextSetting("Arial", 30, False),
