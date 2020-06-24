@@ -49,7 +49,7 @@ def initializeHomeScreenWidget(
         path.join(path.dirname(__file__), "images/lm_logo_dark.png"))
     main_logo = window.makePicButton(
         main_logo_path,
-        size=(226, 40),
+        size=(215, 35),
     )
 
     window.main_patient_label = QLabel(
