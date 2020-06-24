@@ -56,18 +56,18 @@ def initializeHomeScreenWidget(
         f"Current Patient: Patient {window.patient_id_display}")
     window.main_patient_label.setFont(
         window.ui_settings.page_settings.topBarFont)
-    window.main_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.main_patient_label.setStyleSheet("QLabel {color: #fc992e ;}")
 
     window.main_datetime_label = QLabel(window.datetime.toString()[:-8])
     window.main_datetime_label.setFont(
         window.ui_settings.page_settings.topBarFont)
-    window.main_datetime_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.main_datetime_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.main_battery_level_label = QLabel(f"{window.params.battery_level}%")
     window.main_battery_level_label.setFont(
         window.ui_settings.page_settings.topBarFont)
     window.main_battery_level_label.setFixedWidth(50)
-    window.main_battery_level_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.main_battery_level_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     main_battery_icon_path = path.abspath(
         path.join(path.dirname(__file__),
