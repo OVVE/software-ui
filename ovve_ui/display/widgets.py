@@ -49,7 +49,7 @@ def initializeHomeScreenWidget(
         path.join(path.dirname(__file__), "images/lm_logo_dark.png"))
     main_logo = window.makePicButton(
         main_logo_path,
-        size=(215, 50),
+        size=(226, 40),
     )
 
     window.main_patient_label = QLabel(
@@ -76,6 +76,8 @@ def initializeHomeScreenWidget(
         main_battery_icon_path,
         size=(30, 15),
     )
+
+    h_box_1.setContentsMargins(0,0,0,0)
 
     window.mode_button_main = window.makeSimpleDisplayButton(
         window.get_mode_display(window.settings.mode), size=(126, 64))
