@@ -703,7 +703,7 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
     window.alarm_display_label.setFixedWidth(400)
 
     alarm_silence_button = window.makeSimpleDisplayButton(
-        f"Silence for {window.settings.silence_time} min.",
+        f"ACKNOWLEDGE",
         button_settings=SimpleButtonSettings(
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
