@@ -287,8 +287,6 @@ def initializeGraphWidget(window: MainWindow) -> None:
         graph.getPlotItem().hideAxis('bottom')
         v_box.addWidget(graph)
 
-
-
     window.page["1"].setLayout(v_box)
     window.page["1"].setStyleSheet("background-color: #232323;")
 

@@ -20,9 +20,9 @@ class FancyButtonSettings:
                  unitSetting: TextSetting = TextSetting("Arial", 8, False),
                  fillColor: str = '#334240',
                  borderColor: str = '#74fff4',
-                 labelColor: str = '#A7A9AA',
-                 valueColor: str = '#000000',
-                 unitColor: str = '#808080',
+                 labelColor: str = '#74fff4',
+                 valueColor: str = '#FFFFFF',
+                 unitColor: str = '#74fff4',
                  default_size: Tuple[int, int] = (126, 64)):
 
         self.labelFont = labelSetting.font
@@ -56,8 +56,8 @@ class SimpleButtonSettings:
                  valueSetting: TextSetting = TextSetting(
                      "Arial Black", 16, False),
                  fillColor: str = '#334240',
-                 borderColor: str = '#C5C5C5',
-                 valueColor: str = '#000000',
+                 borderColor: str = '#74fff4',
+                 valueColor: str = '#FFFFFF',
                  default_size: Tuple[int, int] = (150, 98)):
 
         self.valueFont = valueSetting.font
@@ -85,8 +85,8 @@ class DisplayRectSettings:
                  fillColor: str = '#2b3c42',
                  borderColor: str = '#20c7ff',
                  labelColor: str = '#29ABE2',
-                 valueColor: str = '#000000',
-                 unitColor: str = '#7394A0',
+                 valueColor: str = '#FFFFFF',
+                 unitColor: str = '#20c7ff',
                  default_size: Tuple[int, int] = (140, 95)):
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
