@@ -46,7 +46,7 @@ def initializeHomeScreenWidget(
     v_box_3right = QVBoxLayout()
 
     main_logo_path = path.abspath(
-        path.join(path.dirname(__file__), "images/lm_logo_light.png"))
+        path.join(path.dirname(__file__), "images/lm_logo_dark.png"))
     main_logo = window.makePicButton(
         main_logo_path,
         size=(215, 50),
