@@ -180,6 +180,7 @@ def initializeHomeScreenWidget(
             window.settings_button_main,
     ]:
         h_box_2.addWidget(button)
+    h_box_2.setSpacing(18)
 
     for left_display in [
             window.resp_rate_display_main,
