@@ -113,7 +113,7 @@ def initializeHomeScreenWidget(
     settings_icon_path = path.abspath(
         path.join(path.dirname(__file__), "images/gear.png"))
     window.settings_button_main = window.makePicButton(settings_icon_path,
-                                                       size=(60, 60))
+                                                       size=(50, 50))
     window.settings_button_main.clicked.connect(lambda: window.display(6))
 
     window.resp_rate_display_main = window.makeDisplayRect(
@@ -413,7 +413,7 @@ def initializeRespiratoryRateWidget(window) -> None:
     resp_rate_title_label = QLabel("Set Respiratory Rate")
     resp_rate_title_label.setFont(page_settings.mainLabelFont)
     resp_rate_title_label.setAlignment(Qt.AlignCenter)
-    resp_rate_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    resp_rate_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.resp_rate_page_value_label = QLabel(
         str(window.local_settings.resp_rate))
@@ -528,7 +528,7 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
     tv_title_label = QLabel("Set Tidal Volume")
     tv_title_label.setFont(page_settings.mainLabelFont)
     tv_title_label.setAlignment(Qt.AlignCenter)
-    tv_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    tv_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.tv_page_value_label = QLabel(str(window.local_settings.tv))
     window.tv_page_value_label.setFont(page_settings.valueFont)
@@ -638,7 +638,7 @@ def initializeIERatioWidget(window: MainWindow) -> None:
     ie_ratio_title_label = QLabel("Set I/E Ratio")
     ie_ratio_title_label.setFont(page_settings.mainLabelFont)
     ie_ratio_title_label.setAlignment(Qt.AlignCenter)
-    ie_ratio_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    ie_ratio_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.ie_ratio_page_value_label = QLabel(
         window.get_ie_ratio_display(window.local_settings.ie_ratio_enum))
