@@ -82,7 +82,7 @@ class MainWindow(QWidget):
 
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
-        
+
         self.new_patient_id_display =1
         self.battery_img = "battery_white_full"
         
@@ -240,10 +240,8 @@ class MainWindow(QWidget):
             button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
 
-    def makePicButton(self,
-                      filename: str,
-                      size: Optional[Tuple[int, int]] = None) -> PicButton:
-        return PicButton(filename, size=size)
+    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None) -> PicButton:
+        return PicButton(filename, size = size)
 
     def makeDisplayRect(
             self,

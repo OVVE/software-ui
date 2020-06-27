@@ -79,8 +79,8 @@ def initializeHomeScreenWidget(
     h_box_1.setContentsMargins(0,0,0,0)
 
     window.mode_button_main = window.makeSimpleDisplayButton(
-        window.get_mode_display(window.settings.mode), size=(126, 64))
-    window.mode_button_main.clicked.connect(lambda: window.display(1))
+        window.get_mode_display(window.settings.mode), size = (126,64))
+    # window.mode_button_main.clicked.connect(lambda: window.display(1))
 
     window.resp_rate_button_main = window.makeFancyDisplayButton(
         "Set Resp. Rate",
