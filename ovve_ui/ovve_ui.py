@@ -128,8 +128,10 @@ class MainWindow(QWidget):
         # Detect an active-low interrupt on BCM4
         if GPIO:
             self.pwrPin = 4
+            self.alarmPin = 3
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(self.alarmPin, GPIO.OUT, initial=GPIO.LOW)
             GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
         else:
             self.pwrPin = 4  #TODO: Remove this, this is just for development
