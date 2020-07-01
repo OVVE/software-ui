@@ -768,10 +768,10 @@ class MainWindow(QWidget):
         # Otherwise, just display message to power down
         if self.settings.run_state == 1:  # ventilator is running
             print("Got here 1")
-            self.display(13)
+            self.display(12)
         elif self.settings.run_state == 0: # ventilator is stopped
             print("Got here 2")
-            self.display(14)
+            self.display(13)
 
     def powerDown(self):
         self.stopVentilation()
