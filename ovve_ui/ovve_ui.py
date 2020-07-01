@@ -240,7 +240,25 @@ class MainWindow(QWidget):
             button_settings=self.ui_settings.simple_button_settings
             if button_settings is None else button_settings)
 
-    def makePicButton(self, filename: str, size: Optional[Tuple[int, int]] = None) -> PicButton:
+    def makePicButton(self, name: str,
+                      size: Optional[Tuple[int, int]] = None,
+                      custom_path: Optional[bool] = False) -> PicButton:
+        if not custom_path:
+            if name == "confirm":
+                name = "apply"
+
+            if name in ["apply", "cancel"]:
+                size = (60,60)
+
+            elif name in ["left", "right", "up", "down"]:
+                name += "_arrow"
+                size = (50,50)
+
+            filename = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "display", "buttons", name + ".png"))
+        else:
+            filename = name
+
         return PicButton(filename, size = size)
 
     def makeDisplayRect(
@@ -637,7 +655,7 @@ class MainWindow(QWidget):
         self.date_day_label.setText(str(self.new_date.day()))
         if self.new_date.day() == self.new_date.daysInMonth():
             self.new_date = self.new_date.addMonths(1)
-            self.new_date = self.new_date.setDate(self.new_date.year(),
+            self.new_date.setDate(self.new_date.year(),
                                                   self.new_date.month(),
                                                   self.new_date.daysInMonth())
 
