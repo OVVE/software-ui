@@ -18,11 +18,11 @@ class FancyButtonSettings:
                  labelSetting: TextSetting = TextSetting("Arial", 8, True),
                  valueSetting: TextSetting = TextSetting("Arial", 24, True),
                  unitSetting: TextSetting = TextSetting("Arial", 8, False),
-                 fillColor: str = '#f2fff0',
-                 borderColor: str = '#c5c5c5',
-                 labelColor: str = '#A7A9AA',
-                 valueColor: str = '#000000',
-                 unitColor: str = '#808080',
+                 fillColor: str = '#334240',
+                 borderColor: str = '#74fff4',
+                 labelColor: str = '#74fff4',
+                 valueColor: str = '#FFFFFF',
+                 unitColor: str = '#74fff4',
                  default_size: Tuple[int, int] = (126, 64)):
 
         self.labelFont = labelSetting.font
@@ -55,9 +55,9 @@ class SimpleButtonSettings:
     def __init__(self,
                  valueSetting: TextSetting = TextSetting(
                      "Arial Black", 16, False),
-                 fillColor: str = '#f2fff0',
-                 borderColor: str = '#C5C5C5',
-                 valueColor: str = '#000000',
+                 fillColor: str = '#334240',
+                 borderColor: str = '#74fff4',
+                 valueColor: str = '#FFFFFF',
                  default_size: Tuple[int, int] = (150, 98)):
 
         self.valueFont = valueSetting.font
@@ -80,14 +80,14 @@ class DisplayRectSettings:
     def __init__(self,
                  labelSetting: TextSetting = TextSetting("Arial", 16, True),
                  valueSetting: TextSetting = TextSetting(
-                     "Arial Black", 38, True),
+                     "Arial Black", 32, True),
                  unitSetting: TextSetting = TextSetting("Arial", 12, False),
-                 fillColor: str = '#ECFAFF',
-                 borderColor: str = '#C5C5C5',
+                 fillColor: str = '#2b3c42',
+                 borderColor: str = '#20c7ff',
                  labelColor: str = '#29ABE2',
-                 valueColor: str = '#000000',
-                 unitColor: str = '#7394A0',
-                 default_size: Tuple[int, int] = (140, 95)):
+                 valueColor: str = '#FFFFFF',
+                 unitColor: str = '#20c7ff',
+                 default_size: Tuple[int, int] = (140, 102)):
         self.labelFont = labelSetting.font
         self.valueFont = valueSetting.font
         self.unitFont = unitSetting.font
@@ -117,27 +117,31 @@ class DisplayRectSettings:
 class PageSettings:
     def __init__(
         self,
-        mainLabelSetting: TextSetting = TextSetting("Arial", 30, True),
+        mainLabelSetting: TextSetting = TextSetting("Arial", 24, True),
         valueSetting: TextSetting = TextSetting("Arial Black", 65, True),
         textValueSetting: TextSetting = TextSetting("Arial Black", 60, True),
         unitSetting: TextSetting = TextSetting("Arial", 30, False),
-        valueColor: str = '#000000',
-        unitColor: str = '#C5C5C5',
+        valueColor: str = '#FFFFFF',
+        unitColor: str = '#74fff4',
         changeButtonTextSetting: TextSetting = TextSetting("Arial", 40, True),
+        changeButtonFillColor: str = '#FFFFFF',
         changeButtonValueColor: str = '#C5C5C5',
         changeButtonBorderColor: str = '#C5C5C5',
         valueLabelWidth: int = 210,
         changeButtonSpacing: int = 50,
         cancelSetting: TextSetting = TextSetting("Arial", 20, True),
-        cancelColor: str = "#ff0000",
+        cancelColor: str = "#fd0101",
         commitSetting: TextSetting = TextSetting("Arial", 20, True),
         commitColor: str = "#3cb371",
         commitCancelButtonSpacing: int = 100,
         alarmSilenceButtonColor: str = '#C5C5C5',
         topBarSetting: TextSetting = TextSetting("Arial", 16, True),
         setDatetimeSetting: TextSetting = TextSetting("Arial Black", 36, True),
-        alarmLimitLabelSetting: TextSetting = TextSetting("Arial", 18, False),
-        alarmLimitValueSetting: TextSetting = TextSetting("Arial Black", 24, True),
+        alarmLimitMainLabelSetting: TextSetting = TextSetting(
+            "Arial", 24, True),
+        alarmLimitLabelSetting: TextSetting = TextSetting("Arial", 12, False),
+        alarmLimitValueSetting: TextSetting = TextSetting(
+            "Arial Black", 24, True),
     ):
 
         self.mainLabelFont = mainLabelSetting.font
@@ -147,6 +151,7 @@ class PageSettings:
         self.valueColor = valueColor
         self.unitColor = unitColor
         self.changeButtonTextSetting = changeButtonTextSetting
+        self.changeButtonFillColor = changeButtonFillColor
         self.changeButtonValueColor = changeButtonValueColor
         self.changeButtonBorderColor = changeButtonBorderColor
         self.valueLabelWidth = valueLabelWidth
@@ -159,10 +164,9 @@ class PageSettings:
         self.alarmSilenceButtonColor = alarmSilenceButtonColor
         self.topBarFont = topBarSetting.font
         self.setDatetimeFont = setDatetimeSetting.font
+        self.alarmLimitMainLabelFont = alarmLimitMainLabelSetting.font
         self.alarmLimitLabelFont = alarmLimitLabelSetting.font
         self.alarmLimitValueFont = alarmLimitValueSetting.font
-
-
 
         def getCancelBorderPen(self) -> QPen:
             return QPen(QColor(self.cancelColor))
