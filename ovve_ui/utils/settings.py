@@ -20,7 +20,7 @@ class Settings():
         #TODO: Adjust these default values
         self.alarm_limit_values = {
             AlarmLimitType.HIGH_PRESSURE: 40,
-            AlarmLimitType.LOW_PRESSURE: 0,
+            AlarmLimitType.LOW_PRESSURE: -1,
             AlarmLimitType.HIGH_VOLUME: self.tv * 1.2,
             AlarmLimitType.LOW_VOLUME: self.tv * 0.8,
             AlarmLimitType.HIGH_RESP_RATE: 20,

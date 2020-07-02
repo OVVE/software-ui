@@ -45,7 +45,7 @@ class AlarmLimits:
                 "settable": True,
                 "warning_limit": None,
                 "warning_msg": None,
-                "hard_limit": 0,
+                "hard_limit": None,
                 "low": True,
                 "pair": AlarmLimitType.HIGH_PRESSURE
             },
