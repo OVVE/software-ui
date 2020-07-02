@@ -104,7 +104,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,14)}
+        self.page = {str(i): QWidget() for i in range(1,16)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -135,6 +135,8 @@ class MainWindow(QWidget):
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
+        self.comms_handler.lost_comms_signal.connect(self.lost_comms)
+
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
 
@@ -142,8 +144,10 @@ class MainWindow(QWidget):
         # Detect an active-low interrupt on BCM4
         if GPIO:
             self.pwrPin = 4
+            self.alarmPin = 3
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(self.alarmPin, GPIO.OUT, initial=GPIO.LOW)
             GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
         else:
             self.pwrPin = 4  #TODO: Remove this, this is just for development
@@ -767,7 +771,6 @@ class MainWindow(QWidget):
         self.power_down_label.update()
         self.enableMainButtons()
 
-
     def warn(self, main_msg, back, ack_msg = None ):
         self.warning_label.setText(main_msg)
         if ack_msg is not None:
@@ -776,6 +779,13 @@ class MainWindow(QWidget):
             self.warning_ack_button.updateValue("OK")
         self.warning_ack_button.clicked.connect(lambda: self.display(back))
         self.display(11)
+
+    def lost_comms(self):
+        # Display a dialog for lost comms
+        self.display(15)
+        if GPIO:
+            GPIO.setup(self.alarmPin, GPIO.OUT, initial=GPIO.LOW)
+            GPIO.output(self.alarmPin, GPIO.HIGH)
 
     def keyPressEvent(self, event):
         if self.dev_mode:

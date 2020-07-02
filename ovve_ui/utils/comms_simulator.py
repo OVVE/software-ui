@@ -17,6 +17,7 @@ from copy import deepcopy
 class CommsSimulator(QThread):
     new_params = pyqtSignal(Params)
     new_alarms = pyqtSignal(int)
+    lost_comms_signal = pyqtSignal()
 
     def __init__(self) -> None:
         QThread.__init__(self)
