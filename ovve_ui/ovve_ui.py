@@ -23,6 +23,7 @@ import numpy as np
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtSerialPort, QtWidgets, uic
 from PyQt5.QtCore import *
+from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
@@ -56,9 +57,9 @@ logger.setLevel(logging.DEBUG)
 
 def myExceptHook(exctype, value, tb):
     logger.error("Uncaught exception", exc_info=(exctype, value, tb))
-    
+
 # Override the system exception hook so that we can log
-# uncaught errors    
+# uncaught errors
 sys.excepthook = myExceptHook
 
 class MainWindow(QWidget):
@@ -94,6 +95,10 @@ class MainWindow(QWidget):
         self.ptr = 0
 
         self.datetime = QDateTime.currentDateTime()
+        self.time_update_interval = 5
+        self.time_update_timer = QTimer()
+        self.time_update_timer.start(self.time_update_interval * 1000)
+        self.time_update_timer.timeout.connect(self.updateTimeLabel)
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
         (layout, stack) = initializeHomeScreenWidget(self)
@@ -149,6 +154,7 @@ class MainWindow(QWidget):
     def setupLogging(self, logger, patient_id):
         logpath = os.path.join("/tmp", "ovve_logs", str(patient_id))
 
+
         # Create all directories in the log path
         if not os.path.exists(logpath):
             os.makedirs(logpath)
@@ -184,6 +190,11 @@ class MainWindow(QWidget):
         # Only log to console in dev mode
         if (self.dev_mode):
             logger.addHandler(ch)
+
+    def updateTimeLabel(self):
+        self.datetime = QDateTime.currentDateTime()
+        self.main_datetime_label.setText(self.datetime.toString()[:-8])
+        self.time_update_timer.start(self.time_update_interval * 1000)
 
     def pwrButtonPressed(self, pin):
         self.pwr_button_pressed_signal.emit()
@@ -676,6 +687,30 @@ class MainWindow(QWidget):
     def commitDate(self) -> None:
         self.datetime.setDate(self.new_date)
         self.main_datetime_label.setText(self.datetime.toString()[:-8])
+        if not self.dev_mode:
+            os.system("sudo date -s \'@" + str(self.datetime.toSecsSinceEpoch()) + "\'")
+
+    def incrementTime(self, secs: int) -> None:
+        self.new_time = self.new_time.addSecs(secs)
+        self.time_hour_label.setText(str(self.new_time.hour()))
+        self.time_min_label.setText(str(self.new_time.minute()))
+        self.time_sec_label.setText(str(self.new_time.second()))
+
+
+    def cancelTime(self):
+        self.new_time = self.datetime.time()
+        self.time_hour_label.setText(str(self.datetime.time().hour()))
+        self.time_min_label.setText(str(self.datetime.time().minute()))
+        self.time_sec_label.setText(str(self.datetime.time().second()))
+
+
+    def commitTime(self) -> None:
+        self.datetime.setTime(self.new_time)
+        self.main_datetime_label.setText(self.datetime.toString()[:-8])
+
+        if not self.dev_mode:
+            os.system("sudo date -s \'@" + str(self.datetime.toSecsSinceEpoch()) + "\'")
+
 
     def cancelChange(self) -> None:
         self.local_settings = deepcopy(self.settings)
