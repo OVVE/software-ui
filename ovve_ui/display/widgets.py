@@ -633,7 +633,7 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
         window.ui_settings.page_settings.mainLabelFont)
     window.alarm_display_label.setAlignment(Qt.AlignCenter)
     window.alarm_display_label.setWordWrap(True)
-    window.alarm_display_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.alarm_display_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
     window.alarm_display_label.setFixedWidth(400)
 
     alarm_silence_button = window.makeSimpleDisplayButton(
@@ -673,7 +673,7 @@ def initializeSettingsWidget(window: MainWindow) -> None:
 
     settings_page_label = QLabel("Settings")
     settings_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
-    settings_page_label.setStyleSheet("QLabel {color: #000000 ;}")
+    settings_page_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
@@ -681,43 +681,28 @@ def initializeSettingsWidget(window: MainWindow) -> None:
         f"Current Patient: Patient {window.patient_id_display}")
     window.settings_patient_label.setAlignment(Qt.AlignCenter)
     window.settings_patient_label.setFont(TextSetting("Arial", 20, True).font)
-    window.settings_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.settings_patient_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    window.settings_patient_label.setWordWrap(True)
 
     settings_change_patient_button = window.makeSimpleDisplayButton(
         "Change Patient",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(150, 65))
+        size=(200, 60))
     settings_change_patient_button.clicked.connect(lambda: window.display(8))
 
     settings_change_datetime_button = window.makeSimpleDisplayButton(
         "Change Date/Time",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(150, 65))
+        size=(200, 60))
     settings_change_datetime_button.clicked.connect(lambda: window.display(9))
 
     settings_change_alarm_limits_button = window.makeSimpleDisplayButton(
         "Change Alarm Limits",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(150, 65))
+        size=(200, 60))
     settings_change_alarm_limits_button.clicked.connect(
         lambda: window.display(10))
 
     settings_back_button = window.makeSimpleDisplayButton(
         "Back to Main",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 65))
+        size=(200, 60))
     settings_back_button.clicked.connect(lambda: window.display(0))
 
     h_box_7top.addWidget(settings_page_label)
@@ -798,20 +783,16 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
     change_patient_main_label.setWordWrap(True)
     change_patient_main_label.setAlignment(Qt.AlignCenter)
     change_patient_main_label.setFixedWidth(400)
-    change_patient_main_label.setStyleSheet("QLabel {color: #000000 ;}")
+    change_patient_main_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.patient_page_label = QLabel(
         f"Current Patient: Patient {window.patient_id_display}")
     window.patient_page_label.setAlignment(Qt.AlignCenter)
     window.patient_page_label.setFont(TextSetting("Arial", 20, True).font)
-    window.patient_page_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.patient_page_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.generate_new_patient_id_page_button = window.makeSimpleDisplayButton(
         "Generate New Patient ID",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
         size=(250, 65))
     window.generate_new_patient_id_page_button.clicked.connect(
         window.generateNewPatientID)
@@ -821,33 +802,14 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
     window.generate_new_patient_id_page_button.setSizePolicy(
         generate_new_patient_id_size_policy)
 
-    change_patient_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor=window.ui_settings.page_settings.cancelColor,
-            borderColor=window.ui_settings.page_settings.cancelColor,
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
-
+    change_patient_cancel = window.makePicButton("cancel")
     change_patient_cancel.clicked.connect(window.cancelNewPatientID)
 
-    change_patient_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor=window.ui_settings.page_settings.commitColor,
-            borderColor=window.ui_settings.page_settings.commitColor,
-            valueSetting=window.ui_settings.page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+    change_patient_apply = window.makePicButton("apply")
     change_patient_apply.clicked.connect(window.commitNewPatientID)
 
     change_patient_back = window.makeSimpleDisplayButton(
         "Back to Settings",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
         size=(200, 65))
     change_patient_back.clicked.connect(lambda: window.display(6))
 
@@ -882,7 +844,6 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
 
     change_datetime_main_label = QLabel("Set Date/Time")
     change_datetime_main_label.setFont(page_settings.mainLabelFont)
-    change_datetime_main_label.setWordWrap(True)
     change_datetime_main_label.setAlignment(Qt.AlignCenter)
     change_datetime_main_label.setFixedWidth(400)
     change_datetime_main_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
@@ -891,7 +852,7 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     change_datetime_tab_widget = QTabWidget()
 
     date_widget = QWidget()
-    date_widget.setFixedHeight(300)
+    date_widget.setFixedHeight(280)
     date_widget.setContentsMargins(0, 0, 0, 0)
 
     date_v_box = QVBoxLayout()
@@ -937,6 +898,8 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     window.date_day_label = QLabel(str(window.datetime.date().day()))
     window.date_year_label = QLabel(str(window.datetime.date().year()))
     window.date_year_label.setFixedWidth(200)
+    for label in [ window.date_month_label, window.date_day_label,  window.date_year_label]:
+        label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     date_cancel = window.makePicButton("cancel")
     date_cancel.clicked.connect(window.cancelDate)
@@ -1005,9 +968,8 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
 
     date_widget.setLayout(date_v_box)
 
-    #TODO: Add time setting
     time_widget = QWidget()
-    time_widget.setFixedHeight(250)
+    time_widget.setFixedHeight(280)
     time_widget.setContentsMargins(0, 0, 0, 0)
 
     time_v_box = QVBoxLayout()
@@ -1019,68 +981,26 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     time_v_box_21 = QVBoxLayout()
     time_v_box_22 = QVBoxLayout()
 
-    time_hour_increment = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    time_hour_increment = window.makePicButton("up")
     time_hour_increment.setFixedWidth(50)
     time_hour_increment.clicked.connect(lambda: window.incrementTime(3600))
 
-    time_hour_decrement = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    time_hour_decrement = window.makePicButton("down")
     time_hour_decrement.setFixedWidth(50)
     time_hour_decrement.clicked.connect(lambda: window.incrementTime(-3600))
 
-    time_min_increment = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    time_min_increment = window.makePicButton("up")
     time_min_increment.setFixedWidth(50)
     time_min_increment.clicked.connect(lambda: window.incrementTime(60))
 
-    time_min_decrement = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    time_min_decrement = window.makePicButton("down")
     time_min_decrement.setFixedWidth(50)
     time_min_decrement.clicked.connect(lambda: window.incrementTime(-60))
 
-    time_sec_increment = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    time_sec_increment = window.makePicButton("up")
     time_sec_increment.clicked.connect(lambda: window.incrementTime(1))
 
-    time_sec_decrement = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    time_sec_decrement = window.makePicButton("down")
     time_sec_decrement.clicked.connect(lambda: window.incrementTime(-1))
 
     window.time_hour_label = QLabel(str(window.datetime.time().hour()))
@@ -1088,24 +1008,13 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     window.time_sec_label = QLabel(str(window.datetime.time().second()))
     window.date_year_label.setFixedWidth(200)
 
-    time_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 60),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.cancelColor,
-            borderColor=page_settings.cancelColor,
-            valueSetting=page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
+    for label in [ window.time_hour_label, window.time_min_label,  window.time_sec_label]:
+        label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+
+    time_cancel = window.makePicButton("cancel")
     time_cancel.clicked.connect(window.cancelTime)
 
-    time_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size=(150, 60),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+    time_apply = window.makePicButton("apply")
     time_apply.clicked.connect(window.commitTime)
 
     for time_label in [window.time_hour_label,
@@ -1166,24 +1075,19 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
 
     time_widget.setLayout(time_v_box)
 
+    date_widget.setAutoFillBackground(True)
+    time_widget.setAutoFillBackground(True)
+
     change_datetime_tab_widget.addTab(date_widget, "Date")
     change_datetime_tab_widget.addTab(time_widget, "Time")
 
-    datetime_back = window.makeSimpleDisplayButton(
-        "Back to Settings",
-        button_settings=SimpleButtonSettings(
-            valueSetting=page_settings.cancelSetting,
-            fillColor=page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 50))
-    datetime_back.clicked.connect(lambda: window.display(6))
+    palette = QtGui.QPalette()
+    palette.setColor(QtGui.QPalette.Background, QColor("#2C2C2C"))
+    change_datetime_tab_widget.setPalette(palette)
 
-
-    h_box_10mid.addWidget(change_datetime_tab_widget)
-    h_box_10bottom.addWidget(datetime_back)
+    h_box_10top.addWidget(change_datetime_tab_widget)
 
     v_box_10.addLayout(h_box_10top)
-    v_box_10.addLayout(h_box_10bottom)
     v_box_10.setContentsMargins(10,10,10,10)
 
     window.page["10"].setLayout(v_box_10)
@@ -1199,7 +1103,6 @@ def initializeAlarmLimitWidget(window: MainWindow) -> None:
 
     h_box_11_top.addWidget(alarm_limits_tabbed)
     v_box_11.addLayout(h_box_11_top)
-    v_box_11.setSpacing(10)
     v_box_11.setContentsMargins(0, 0, 0, 0)
 
     window.page["11"].setLayout(v_box_11)
@@ -1237,7 +1140,7 @@ def initializeWarningScreen(window: MainWindow) -> None:
     window.warning_label.setAlignment(Qt.AlignCenter)
     window.warning_label.setFixedHeight(150)
     window.warning_label.setFixedWidth(400)
-    window.warning_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.warning_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.warning_ack_button = window.makeSimpleDisplayButton(
         "OK",
@@ -1267,7 +1170,7 @@ def initializePwrDownScreen(window: MainWindow) -> None:
     window.power_down_label.setAlignment(Qt.AlignCenter)
     window.power_down_label.setFixedHeight(150)
     window.power_down_label.setFixedWidth(400)
-    window.power_down_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.power_down_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.pwr_down_cancel_button = window.makeSimpleDisplayButton(
         "Cancel",

@@ -48,7 +48,7 @@ class AlarmLimitSelectorPair(QWidget):
 
     def styleMainLabel(self):
         self.main_label.setFont(self.page_settings.alarmLimitMainLabelFont)
-        self.main_label.setStyleSheet("QLabel {color: #000000 ;}")
+        self.main_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
         self.main_label.setAlignment(Qt.AlignCenter)
         self.main_label.setWordWrap(True)
         self.main_label.setFixedHeight(150)
@@ -77,8 +77,7 @@ class AlarmLimitSelector(QWidget):
         self.main_label = QLabel(self.properties["name"])
         self.styleMainLabel()
 
-        self.dec_button = self.window.makeSimpleDisplayButton(
-            "-", size=(50, 50), button_settings=button_settings)
+        self.dec_button = self.window.makePicButton("down")
 
         self.value_label = QLabel(
             str(
@@ -86,9 +85,7 @@ class AlarmLimitSelector(QWidget):
                     self.alarmLimitType])))
         self.styleValueLabel()
 
-        self.inc_button = self.window.makeSimpleDisplayButton(
-            "+", size=(50, 50), button_settings=button_settings)
-
+        self.inc_button = self.window.makePicButton("up")
         for widget in [
                 self.inc_button, self.value_label, self.dec_button,
                 self.main_label
@@ -103,13 +100,13 @@ class AlarmLimitSelector(QWidget):
         self.connectOrHideButtons()
 
     def styleMainLabel(self):
-        self.main_label.setStyleSheet("QLabel {color: #000000 ;}")
+        self.main_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
         self.main_label.setFont(self.page_settings.alarmLimitLabelFont)
         self.main_label.setAlignment(Qt.AlignLeft)
         self.main_label.setFixedWidth(300)
 
     def styleValueLabel(self):
-        self.value_label.setStyleSheet("QLabel {color: #000000 ;}")
+        self.value_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
         self.value_label.setFont(self.page_settings.alarmLimitValueFont)
         self.value_label.setAlignment(Qt.AlignCenter)
         # self.value_label.setFixedWidth(100)
