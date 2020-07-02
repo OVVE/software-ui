@@ -761,22 +761,24 @@ class MainWindow(QWidget):
     def closeEvent(self, *args, **kwargs) -> None:
         self.comms_handler.terminate()
 
-    def pwrButtonHandler(self):
-        print("Got power button press " + str(self.settings.run_state))
-        
+    def pwrButtonHandler(self):        
         # If ventilating, display message to stop ventilation and power down
         # Otherwise, just display message to power down
         if self.settings.run_state == 1:  # ventilator is running
-            print("Got here 1")
             self.display(12)
         elif self.settings.run_state == 0: # ventilator is stopped
-            print("Got here 2")
             self.display(13)
 
     def powerDown(self):
         self.stopVentilation()
-        
-        #TODO: set bit in comms to tell MCU to shut down
+
+        # Send message to MCU to shut down        
+        self.settings.should_shut_down = 1
+        self.passChanges()
+
+        # Sleep for some time to make sure comms thread has time
+        # to seed the message before shutdown
+        time.sleep(1)
 
         if not self.dev_mode:
             os.system("sudo poweroff")
