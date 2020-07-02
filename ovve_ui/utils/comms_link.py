@@ -26,6 +26,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 class CommsLink(QThread):
     new_params = pyqtSignal(Params)
     new_alarms = pyqtSignal(int)
+    lost_comms_signal = pyqtSignal()
 
     def __init__(self, port: str) -> None:
         QThread.__init__(self)
@@ -316,6 +317,13 @@ class CommsLink(QThread):
             self.logger.debug('Serial Init Successful')
         else:
             self.logger.error('Serial Initialization failed')
-            # When the alarm infrastructure is done this would trigger an alarm
+            # Signal the UI to display and sound an alarm
+            self.lost_comms_signal.emit()
             return
-        self.process_SerialData()
+        
+        # Process serial data forever.  If we lose the connection,
+        # emit the the lost comms signal
+        try:
+            self.process_SerialData()
+        except:
+            self.lost_comms_signal.emit()
