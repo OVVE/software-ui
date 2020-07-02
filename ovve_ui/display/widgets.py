@@ -1157,37 +1157,94 @@ def initializeWarningScreen(window: MainWindow) -> None:
     v_box_12.addLayout(h_box_12_2)
     window.page["12"].setLayout(v_box_12)
 
-def initializePwrDownScreen(window: MainWindow) -> None:
+
+
+def initializeStopVentilationAndPowerDownScreen(window: MainWindow) -> None:
     v_box_13 = QVBoxLayout()
-    h_box_13_1 = QHBoxLayout()
-    h_box_13_2 = QHBoxLayout()
-    h_box_13_2.setAlignment(Qt.AlignCenter)
+    h_box_13top = QHBoxLayout()
+    h_box_13bottom = QHBoxLayout()
 
-    window.power_down_label = QLabel("Powering down in 5 seconds")
-    window.power_down_label.setFont(
+    h_box_13top.setAlignment(Qt.AlignCenter)
+    h_box_13bottom.setAlignment(Qt.AlignCenter)
+
+    confirm_stop_and_power_down_value_label = QLabel(
+        "Stop ventilation and power down the device?")
+    confirm_stop_and_power_down_value_label.setFont(
         window.ui_settings.page_settings.mainLabelFont)
-    window.power_down_label.setWordWrap(True)
-    window.power_down_label.setAlignment(Qt.AlignCenter)
-    window.power_down_label.setFixedHeight(150)
-    window.power_down_label.setFixedWidth(400)
-    window.power_down_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    confirm_stop_and_power_down_value_label.setWordWrap(True)
+    confirm_stop_and_power_down_value_label.setAlignment(Qt.AlignCenter)
+    confirm_stop_and_power_down_value_label.setFixedHeight(150)
+    confirm_stop_and_power_down_value_label.setFixedWidth(400)
+    confirm_stop_and_power_down_value_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
-    window.pwr_down_cancel_button = window.makeSimpleDisplayButton(
-        "Cancel",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 65))
-    window.pwr_down_cancel_button.clicked.connect(window.cancelPwrDown)
+    confirm_stop_and_power_down_cancel_button = window.makePicButton(
+        "cancel",
+        size=(60, 60),
+    )
+    confirm_stop_and_power_down_cancel_button.clicked.connect(lambda: window.display(0))
 
-    h_box_13_1.addWidget(window.power_down_label)
-    h_box_13_2.addWidget(window.pwr_down_cancel_button)
-    v_box_13.addLayout(h_box_13_1)
-    v_box_13.addLayout(h_box_13_2)
+    confirm_stop_and_power_down_confirm_button = window.makePicButton(
+        "confirm",
+        size=(60, 60),
+    )
+    confirm_stop_and_power_down_confirm_button.clicked.connect(window.powerDown)
+
+    confirm_stop_and_power_down_confirm_button.setFont(
+        window.ui_settings.simple_button_settings.valueFont)
+
+    h_box_13bottom.setSpacing(100)
+
+    h_box_13top.addWidget(confirm_stop_and_power_down_value_label)
+    h_box_13bottom.addWidget(confirm_stop_and_power_down_cancel_button)
+    h_box_13bottom.addWidget(confirm_stop_and_power_down_confirm_button)
+    v_box_13.addLayout(h_box_13top)
+    v_box_13.addLayout(h_box_13bottom)
+
     window.page["13"].setLayout(v_box_13)
 
-  
+def initializePowerDownScreen(window: MainWindow) -> None:
+    v_box_14 = QVBoxLayout()
+    h_box_14top = QHBoxLayout()
+    h_box_14bottom = QHBoxLayout()
+
+    h_box_14top.setAlignment(Qt.AlignCenter)
+    h_box_14bottom.setAlignment(Qt.AlignCenter)
+
+    confirm_power_down_value_label = QLabel(
+        "Power down the device?")
+    confirm_power_down_value_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+    confirm_power_down_value_label.setWordWrap(True)
+    confirm_power_down_value_label.setAlignment(Qt.AlignCenter)
+    confirm_power_down_value_label.setFixedHeight(150)
+    confirm_power_down_value_label.setFixedWidth(400)
+    confirm_power_down_value_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+
+    confirm_power_down_cancel_button = window.makePicButton(
+        "cancel",
+        size=(60, 60),
+    )
+    confirm_power_down_cancel_button.clicked.connect(lambda: window.display(0))
+
+    confirm_power_down_confirm_button = window.makePicButton(
+        "confirm",
+        size=(60, 60),
+    )
+    confirm_power_down_confirm_button.clicked.connect(window.powerDown)
+
+    confirm_power_down_confirm_button.setFont(
+        window.ui_settings.simple_button_settings.valueFont)
+
+    h_box_14bottom.setSpacing(100)
+
+    h_box_14top.addWidget(confirm_power_down_value_label)
+    h_box_14bottom.addWidget(confirm_power_down_cancel_button)
+    h_box_14bottom.addWidget(confirm_power_down_confirm_button)
+    v_box_14.addLayout(h_box_14top)
+    v_box_14.addLayout(h_box_14bottom)
+
+    window.page["14"].setLayout(v_box_14)
+
 def initializeLostCommsScreen(window: MainWindow) -> None:
     v_box_15 = QVBoxLayout()
     h_box_15top = QHBoxLayout()
@@ -1216,8 +1273,7 @@ def initializeLostCommsScreen(window: MainWindow) -> None:
         "confirm",
         size=(60, 60),
     )
-    # Hook this up once power down code is merged in
-    #comms_lost_confirm_button.clicked.connect(window.powerDown)
+    comms_lost_confirm_button.clicked.connect(window.powerDown)
 
     comms_lost_confirm_button.setFont(
         window.ui_settings.simple_button_settings.valueFont)
@@ -1231,4 +1287,8 @@ def initializeLostCommsScreen(window: MainWindow) -> None:
     v_box_15.addLayout(h_box_15bottom)
 
     window.page["15"].setLayout(v_box_15)
+
+
+  
+
 
