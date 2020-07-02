@@ -81,6 +81,10 @@ class CommsSimulator(QThread):
                 params.battery_level = random.randint(0, 100)
                 self.new_params.emit(params)
 
+                # if (self.seqnum == 9):
+                #     print("Emitting lost comms signal")
+                #     self.lost_comms_signal.emit()
+
                 if (self.seqnum % 300 == 299):
                     alarmindex = random.randrange(len(list(AlarmType)))
                     alarmtype = list(AlarmType)[alarmindex]

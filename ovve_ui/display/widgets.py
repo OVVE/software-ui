@@ -1187,50 +1187,6 @@ def initializePwrDownScreen(window: MainWindow) -> None:
     v_box_13.addLayout(h_box_13_2)
     window.page["13"].setLayout(v_box_13)
 
-
-def initializePowerDownScreen(window: MainWindow) -> None:
-    v_box_14 = QVBoxLayout()
-    h_box_14top = QHBoxLayout()
-    h_box_14bottom = QHBoxLayout()
-
-    h_box_14top.setAlignment(Qt.AlignCenter)
-    h_box_14bottom.setAlignment(Qt.AlignCenter)
-
-    confirm_power_down_value_label = QLabel(
-        "Power down the device?")
-    confirm_power_down_value_label.setFont(
-        window.ui_settings.page_settings.mainLabelFont)
-    confirm_power_down_value_label.setWordWrap(True)
-    confirm_power_down_value_label.setAlignment(Qt.AlignCenter)
-    confirm_power_down_value_label.setFixedHeight(150)
-    confirm_power_down_value_label.setFixedWidth(400)
-    confirm_power_down_value_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
-
-    confirm_power_down_cancel_button = window.makePicButton(
-        "cancel",
-        size=(60, 60),
-    )
-    confirm_power_down_cancel_button.clicked.connect(lambda: window.display(0))
-
-    confirm_power_down_confirm_button = window.makePicButton(
-        "confirm",
-        size=(60, 60),
-    )
-    confirm_power_down_confirm_button.clicked.connect(window.powerDown)
-
-    confirm_power_down_confirm_button.setFont(
-        window.ui_settings.simple_button_settings.valueFont)
-
-    h_box_14bottom.setSpacing(100)
-
-    h_box_14top.addWidget(confirm_power_down_value_label)
-    h_box_14bottom.addWidget(confirm_power_down_cancel_button)
-    h_box_14bottom.addWidget(confirm_power_down_confirm_button)
-    v_box_14.addLayout(h_box_14top)
-    v_box_14.addLayout(h_box_14bottom)
-
-    window.page["14"].setLayout(v_box_14)
-
   
 def initializeLostCommsScreen(window: MainWindow) -> None:
     v_box_15 = QVBoxLayout()
@@ -1260,7 +1216,8 @@ def initializeLostCommsScreen(window: MainWindow) -> None:
         "confirm",
         size=(60, 60),
     )
-    comms_lost_confirm_button.clicked.connect(window.powerDown)
+    # Hook this up once power down code is merged in
+    #comms_lost_confirm_button.clicked.connect(window.powerDown)
 
     comms_lost_confirm_button.setFont(
         window.ui_settings.simple_button_settings.valueFont)
@@ -1269,7 +1226,7 @@ def initializeLostCommsScreen(window: MainWindow) -> None:
 
     h_box_15top.addWidget(comms_lost_value_label)
     h_box_15bottom.addWidget(comms_lost_cancel_button)
-    h_box_15bottom.addWidget(confirm_power_down_confirm_button)
+    h_box_15bottom.addWidget(comms_lost_confirm_button)
     v_box_15.addLayout(h_box_15top)
     v_box_15.addLayout(h_box_15bottom)
 

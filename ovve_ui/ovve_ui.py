@@ -41,7 +41,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeGraphWidget, initializeSettingsWidget,
                              initializeConfirmStopWidget, initializeChangePatientWidget,
                              initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
-                             initializeWarningScreen, initializePwrDownScreen)
+                             initializeWarningScreen, initializePwrDownScreen, initializeLostCommsScreen)
 from utils.params import Params
 from utils.settings import Settings
 from utils.Alarm import Alarm, AlarmHandler
@@ -306,6 +306,7 @@ class MainWindow(QWidget):
         initializeAlarmLimitWidget(self)
         initializeWarningScreen(self)
         initializePwrDownScreen(self)
+        initializeLostCommsScreen(self)
 
         for i in self.page:
             self.stack.addWidget(self.page[i])
@@ -782,9 +783,8 @@ class MainWindow(QWidget):
 
     def lost_comms(self):
         # Display a dialog for lost comms
-        self.display(15)
+        self.display(14)
         if GPIO:
-            GPIO.setup(self.alarmPin, GPIO.OUT, initial=GPIO.LOW)
             GPIO.output(self.alarmPin, GPIO.HIGH)
 
     def keyPressEvent(self, event):
