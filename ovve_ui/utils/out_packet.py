@@ -6,6 +6,7 @@ class OutPacket():
     def __init__(self) -> None:
         self.crc = CRC()
         self.data = {
+            'should_shut_down': 0,
             'mode_value': 0,                             # byte 3      - rpi unsigned char
             'command': 0,
             'reserved': 0,
@@ -45,9 +46,10 @@ class OutPacket():
 
         return cmd_byteData
         
-    def pack_command(self, run_state, upgrade_fw) -> int:
+    def pack_command(self, run_state, upgrade_fw, should_shut_down) -> int:
         return (((run_state == 1) << 0) |
-                ((upgrade_fw == 1) << 4))
+                ((upgrade_fw == 1) << 4) |
+                ((should_shut_down == 1) << 5))
 
 
     def ie_fraction_to_fixed(self, ie_fraction: float) -> int:
