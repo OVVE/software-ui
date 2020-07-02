@@ -107,7 +107,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,15)}
+        self.page = {str(i): QWidget() for i in range(1,16)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -774,7 +774,7 @@ class MainWindow(QWidget):
 
     def lost_comms(self):
         # Display a dialog for lost comms
-        #self.display(15)
+        self.display(15)
         if GPIO:
             GPIO.output(self.alarmPin, GPIO.HIGH)
 
