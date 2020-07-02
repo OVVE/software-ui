@@ -5,13 +5,14 @@ import json
 from typing import List
 from copy import deepcopy
 
+
 class Ranges():
     def __init__(self) -> None:
         self._ranges: dict = {
-            "min_resp_rate": 5, #Unit: bpm
+            "min_resp_rate": 5,  #Unit: bpm
             "max_resp_rate": 35,
             "resp_rate_increment": 1,
-            "min_tv": 150, #Unit: mL
+            "min_tv": 150,  #Unit: mL
             "max_tv": 800,
             "tv_increment": 25
         }

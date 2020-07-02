@@ -7,13 +7,19 @@ from os import path
 import numpy as np
 import pyqtgraph as pg
 
-from PyQt5.QtWidgets import (QWidget, QTabWidget, QHBoxLayout, QVBoxLayout, QStackedWidget,
-                             QLabel)
+from PyQt5.QtWidgets import (QWidget, QTabWidget, QHBoxLayout, QVBoxLayout,
+                             QStackedWidget, QLabel)
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+from PyQt5 import QtGui
 
 from display.ui_settings import (SimpleButtonSettings, FancyButtonSettings,
                                  DisplayRectSettings, PageSettings,
                                  TextSetting)
+from display.selectors import AlarmLimitSelector, AlarmLimitSelectorPair
+
+from utils.alarm_limits import AlarmLimits
+from utils.alarm_limit_type import AlarmLimitType, AlarmLimitPair
 
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')
@@ -28,7 +34,6 @@ def initializeHomeScreenWidget(
     h_box_3 = QHBoxLayout()
 
     h_box_1left = QHBoxLayout()
-    h_box_1mid= QHBoxLayout()
     h_box_1right = QHBoxLayout()
 
     h_box_1right.setAlignment(Qt.AlignRight)
@@ -39,33 +44,42 @@ def initializeHomeScreenWidget(
     v_box_3mid = QVBoxLayout()
     v_box_3right = QVBoxLayout()
 
-    main_logo_path = path.abspath(path.join(path.dirname(__file__), "images/lm_logo_light.png"))
+    main_logo_path = path.abspath(
+        path.join(path.dirname(__file__), "images/lm_logo_dark.png"))
     main_logo = window.makePicButton(
         main_logo_path,
-        size = (215, 50),
+        size=(185, 30),
+        custom_path = True
     )
+    main_logo.clicked.connect(lambda: window.display(0))
 
-    window.main_patient_label = QLabel(f"Current Patient: Patient {window.patient_id_display}")
-    window.main_patient_label.setFont(window.ui_settings.page_settings.topBarFont)
-    window.main_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
-
+    window.main_patient_label = QLabel(
+        f"Current Patient: Patient {window.patient_id_display}")
+    window.main_patient_label.setFont(
+        window.ui_settings.page_settings.topBarFont)
+    window.main_patient_label.setStyleSheet("QLabel {color: #fc992e ;}")
 
     window.main_datetime_label = QLabel(window.datetime.toString()[:-8])
-    window.main_datetime_label.setFont(window.ui_settings.page_settings.topBarFont)
-    window.main_datetime_label.setStyleSheet("QLabel {color: #000000 ;}")
-
+    window.main_datetime_label.setFont(
+        window.ui_settings.page_settings.topBarFont)
+    window.main_datetime_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.main_battery_level_label = QLabel(f"{window.params.battery_level}%")
-    window.main_battery_level_label.setFont(window.ui_settings.page_settings.topBarFont)
+    window.main_battery_level_label.setFont(
+        window.ui_settings.page_settings.topBarFont)
     window.main_battery_level_label.setFixedWidth(50)
-    window.main_battery_level_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.main_battery_level_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
-    main_battery_icon_path = path.abspath(path.join(path.dirname(__file__),
-                                            f"images/batteries/light_theme/{window.battery_img}"))
+    main_battery_icon_path = path.abspath(
+        path.join(path.dirname(__file__),
+                  f"images/batteries/{window.battery_img}"))
     window.main_battery_icon = window.makePicButton(
         main_battery_icon_path,
-        size = (30, 15),
+        size=(30, 15),
+        custom_path = True
     )
+
+    h_box_1.setContentsMargins(0,0,0,0)
 
     window.mode_button_main = window.makeSimpleDisplayButton(
         window.get_mode_display(window.settings.mode), size = (126,64))
@@ -93,14 +107,18 @@ def initializeHomeScreenWidget(
     )
     window.ie_button_main.clicked.connect(lambda: window.display(4))
 
-    window.start_stop_button_main = window.makeSimpleDisplayButton("START", size = (126,64))
+    window.start_stop_button_main = window.makeSimpleDisplayButton("START",
+                                                                   size=(126,
+                                                                         64),
+                                                                   button_settings = SimpleButtonSettings(fillColor = "#412828", borderColor = "#fd0101", valueColor = "#fd0101"))
     window.start_stop_button_main.clicked.connect(window.changeStartStop)
 
-    settings_icon_path = path.abspath(path.join(path.dirname(__file__), "images/gear.png"))
-    window.settings_button_main = window.makePicButton(
-        settings_icon_path, size=(60, 60))
+    settings_icon_path = path.abspath(
+        path.join(path.dirname(__file__), "images/gear.png"))
+    window.settings_button_main = window.makePicButton(settings_icon_path,
+                                                       size=(50, 50),
+                                                       custom_path = True)
     window.settings_button_main.clicked.connect(lambda: window.display(6))
-
 
     window.resp_rate_display_main = window.makeDisplayRect(
         "Resp. Rate",
@@ -123,9 +141,11 @@ def initializeHomeScreenWidget(
         "TV Exp",
         "---",
         "mL",
-        rect_settings=DisplayRectSettings(fillColor="#C5C5C5",
-                                          labelColor="#A9A9A9",
-                                          unitColor="#A9A9A9"),
+        rect_settings=DisplayRectSettings(fillColor="#2c2c2c",
+                                          labelColor="#4c4e4f",
+                                          unitColor="#4c4e4f",
+                                          borderColor = "#4c4e4f",
+                                          valueColor = "#4c4e4f"),
     )
 
     window.peep_display_main = window.makeDisplayRect(
@@ -146,79 +166,88 @@ def initializeHomeScreenWidget(
     )
 
     h_box_1left.addWidget(main_logo)
-    h_box_1mid.addWidget(window.main_patient_label)
-    h_box_1mid.addWidget(window.main_datetime_label)
 
-    h_box_1mid.setSpacing(18)
+    h_box_1right1 = QHBoxLayout()
+    h_box_1right2 = QHBoxLayout()
 
-    h_box_1right.addWidget(window.main_battery_level_label)
-    h_box_1right.addWidget(window.main_battery_icon)
+    h_box_1right1.addWidget(window.main_patient_label)
+    h_box_1right1.addWidget(window.main_datetime_label)
 
-    h_box_1right.setSpacing(0)
+    h_box_1right2.addWidget(window.main_battery_level_label)
+    h_box_1right2.addWidget(window.main_battery_icon)
 
+    h_box_1right.setSpacing(25)
 
-    for button in [window.mode_button_main,
-                   window.resp_rate_button_main,
-                   window.tv_button_main,
-                   window.ie_button_main,
-                   window.start_stop_button_main,
-                   window.settings_button_main,
-                   ]:
+    h_box_1right1.setSpacing(15)
+    h_box_1right2.setSpacing(0)
+    h_box_1right.addLayout(h_box_1right1)
+    h_box_1right.addLayout(h_box_1right2)
+
+    for button in [
+            window.mode_button_main,
+            window.resp_rate_button_main,
+            window.tv_button_main,
+            window.ie_button_main,
+            window.start_stop_button_main,
+            window.settings_button_main,
+    ]:
         h_box_2.addWidget(button)
+    h_box_2.setSpacing(18)
 
-    for left_display in [window.resp_rate_display_main,
-                    window.tv_insp_display_main,
-                    window.tv_exp_display_main,
-                    ]:
+    for left_display in [
+            window.resp_rate_display_main,
+            window.tv_insp_display_main,
+            window.tv_exp_display_main,
+    ]:
         v_box_3left.addWidget(left_display)
 
     stack = QStackedWidget()
     v_box_3mid.addWidget(stack)
 
-    for right_display in [window.peep_display_main,
-                    window.ppeak_display_main,
-                    window.pplat_display_main,
-                    ]:
+    for right_display in [
+            window.peep_display_main,
+            window.ppeak_display_main,
+            window.pplat_display_main,
+    ]:
         v_box_3right.addWidget(right_display)
 
-    for h_layout1 in [h_box_1left,
-                      h_box_1mid,
-                     h_box_1right,
-                     ]:
+    for h_layout1 in [
+            h_box_1left,
+            h_box_1right,
+    ]:
         h_box_1.addLayout(h_layout1)
 
-    for v_layout3 in [v_box_3left,
-                     v_box_3mid,
-                     v_box_3right,
-                     ]:
+    for v_layout3 in [
+            v_box_3left,
+            v_box_3mid,
+            v_box_3right,
+    ]:
         h_box_3.addLayout(v_layout3)
 
     h_box_3.setSpacing(18)
 
-    for h_layout in [h_box_1,
-                     h_box_2,
-                     h_box_3]:
+    for h_layout in [h_box_1, h_box_2, h_box_3]:
         layout.addLayout(h_layout)
 
     return layout, stack
 
 
-#TODO: Add Units
 def initializeGraphWidget(window: MainWindow) -> None:
     v_box = QVBoxLayout()
     axisStyle = {'color': 'black', 'font-size': '20pt'}
-    window.new_graph_pen = pg.mkPen(width=2, color="b")
-    window.cache_graph_pen = pg.mkPen(width=2, color="k")
+    window.new_graph_pen = pg.mkPen(width=2, color="#e9840e")
+    window.cache_graph_pen = pg.mkPen(width=2, color="#6a6a6a")
 
     # TODO: Adjust graph width for resp rate
     window.graph_width = 60
     window.graph_ptr = 0
-    label_style = {'color': 'k', 'font-size': '16pt'}
+    label_style = {'color': '#20c7ff', 'font-size': '9pt'}
 
-    window.pressure_data = np.empty([window.graph_width, ])
+    window.pressure_data = np.empty([
+        window.graph_width,
+    ])
     window.pressure_graph = pg.PlotWidget()
-    # TODO: Find good values for ranges of pressure, 40 cmH2O is the max before overpressure value pops
-    window.pressure_graph.setYRange(-45, 45, padding=0)
+    window.pressure_graph.setYRange(-45, 70, padding=0)
 
     window.pressure_graph_line = window.pressure_graph.plot(
         window.pressure_data, pen=window.new_graph_pen)
@@ -230,9 +259,12 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.pressure_graph_left_axis = window.pressure_graph.getAxis("left")
     window.pressure_graph_left_axis.setLabel("Press. (cmH2O)", **label_style)
 
-    window.flow_data = np.empty([window.graph_width,])
+    window.flow_data = np.empty([
+        window.graph_width,
+    ])
     window.flow_graph = pg.PlotWidget()
-    window.flow_graph.setYRange(-15, 75, padding=0) #Flow should be presented in L/min.
+    window.flow_graph.setYRange(-10, 90,
+                                padding=0)  #Flow should be presented in L/min.
     window.flow_graph_line = window.flow_graph.plot(window.flow_data,
                                                     pen=window.new_graph_pen)
     window.flow_graph_cache_line = window.flow_graph.plot(
@@ -243,10 +275,11 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.flow_graph_left_axis = window.flow_graph.getAxis("left")
     window.flow_graph_left_axis.setLabel("Flow (L/min.)", **label_style)
 
-    window.volume_data = np.empty([window.graph_width,])
+    window.volume_data = np.empty([
+        window.graph_width,
+    ])
     window.volume_graph = pg.PlotWidget()
-    # TODO: Find good values for ranges of volume, just picked a pretty big number for now
-    window.volume_graph.setYRange(-200, 1200, padding=0)
+    window.volume_graph.setYRange(-100, 900, padding=0)
     window.volume_graph_line = window.volume_graph.plot(
         window.volume_data, pen=window.new_graph_pen)
     window.volume_graph_cache_line = window.volume_graph.plot(
@@ -257,19 +290,25 @@ def initializeGraphWidget(window: MainWindow) -> None:
     window.volume_graph_left_axis = window.volume_graph.getAxis("left")
     window.volume_graph_left_axis.setLabel("Volume (mL)", **label_style)
 
-    for graph in [window.pressure_graph, window.flow_graph, window.volume_graph]:
+    for graph in [
+            window.pressure_graph, window.flow_graph, window.volume_graph
+    ]:
+        graph.setStyleSheet("border: 0;")
         graph.setXRange(0, window.graph_width, padding=0)
-        graph.setBackground("w")
+        graph.setBackground("#232323")
         graph.setMouseEnabled(False, False)
         graph.getPlotItem().hideAxis('bottom')
         v_box.addWidget(graph)
 
+    window.page["1"].setStyleSheet("background-color: #232323; border: 1 solid #20c7ff")
     window.page["1"].setLayout(v_box)
+
 
 
 def initializeModeWidget(window: MainWindow) -> None:
     """ Creates Mode Widget """
     page_settings = window.ui_settings.page_settings
+
     v_box = QVBoxLayout()
     h_box_1 = QHBoxLayout()
     h_box_2 = QHBoxLayout()
@@ -287,7 +326,7 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_title_label = QLabel("Set Ventilation Mode")
     mode_title_label.setFont(page_settings.mainLabelFont)
     mode_title_label.setAlignment(Qt.AlignCenter)
-    mode_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    mode_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.mode_page_value_label = QLabel(
         window.get_mode_display(window.local_settings.mode))
@@ -301,30 +340,15 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_unit_label.setFont(page_settings.unitFont)
     mode_unit_label.setAlignment(Qt.AlignCenter)
 
-    mode_decrement_button = window.makeSimpleDisplayButton(
-        "\u2190",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-
-    mode_increment_button = window.makeSimpleDisplayButton(
-        "\u2192",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    mode_decrement_button = window.makePicButton("left")
+    mode_increment_button = window.makePicButton("right")
 
 
     mode_cancel = window.makeSimpleDisplayButton(
         "CANCEL",
         size=(150, 90),
         button_settings=SimpleButtonSettings(
-            fillColor= page_settings.cancelColor,
+            fillColor=page_settings.cancelColor,
             borderColor=page_settings.cancelColor,
             valueSetting=page_settings.cancelSetting,
             valueColor="#FFFFFF"))
@@ -343,7 +367,6 @@ def initializeModeWidget(window: MainWindow) -> None:
     mode_cancel.clicked.connect(window.cancelChange)
     mode_apply.clicked.connect(window.commitMode)
 
-
     h_box_1.addWidget(mode_title_label)
     h_box_2.addWidget(mode_decrement_button)
     h_box_2.addWidget(window.mode_page_value_label)
@@ -356,6 +379,7 @@ def initializeModeWidget(window: MainWindow) -> None:
     v_box.addLayout(h_box_2)
     v_box.addLayout(h_box_3)
     v_box.addLayout(h_box_4)
+
 
     window.page["2"].setLayout(v_box)
 
@@ -379,7 +403,7 @@ def initializeRespiratoryRateWidget(window) -> None:
     resp_rate_title_label = QLabel("Set Respiratory Rate")
     resp_rate_title_label.setFont(page_settings.mainLabelFont)
     resp_rate_title_label.setAlignment(Qt.AlignCenter)
-    resp_rate_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    resp_rate_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.resp_rate_page_value_label = QLabel(
         str(window.local_settings.resp_rate))
@@ -395,33 +419,13 @@ def initializeRespiratoryRateWidget(window) -> None:
                                        page_settings.unitColor + ";}")
     resp_rate_unit_label.setAlignment(Qt.AlignCenter)
 
-    window.resp_rate_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    window.resp_rate_decrement_button = window.makePicButton("left")
 
-    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy(
-    )
+    resp_rate_decrement_size_policy = window.resp_rate_decrement_button.sizePolicy()
     resp_rate_decrement_size_policy.setRetainSizeWhenHidden(True)
-    window.resp_rate_decrement_button.setSizePolicy(
-        resp_rate_decrement_size_policy)
+    window.resp_rate_decrement_button.setSizePolicy(resp_rate_decrement_size_policy)
 
-    if window.local_settings.resp_rate - window.ranges._ranges["resp_rate_increment"] \
-            < window.ranges._ranges["min_resp_rate"]:
-        window.resp_rate_decrement_button.hide()
-
-    window.resp_rate_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    window.resp_rate_increment_button = window.makePicButton("right")
 
     resp_rate_increment_size_policy = window.resp_rate_increment_button.sizePolicy(
     )
@@ -429,27 +433,18 @@ def initializeRespiratoryRateWidget(window) -> None:
     window.resp_rate_increment_button.setSizePolicy(
         resp_rate_increment_size_policy)
 
+
+    if window.local_settings.resp_rate - window.ranges._ranges["resp_rate_increment"] \
+            < window.ranges._ranges["min_resp_rate"]:
+        window.resp_rate_decrement_button.hide()
+
     if window.local_settings.resp_rate + window.ranges._ranges["resp_rate_increment"] \
             > window.ranges._ranges["max_resp_rate"]:
         window.resp_rate_increment_button.hide()
 
-    resp_rate_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.cancelColor,
-            borderColor=page_settings.cancelColor,
-            valueSetting=page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
+    resp_rate_cancel = window.makePicButton("cancel")
 
-    resp_rate_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+    resp_rate_apply = window.makePicButton("apply")
 
     window.resp_rate_decrement_button.clicked.connect(window.decrementRespRate)
     window.resp_rate_increment_button.clicked.connect(window.incrementRespRate)
@@ -494,7 +489,7 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
     tv_title_label = QLabel("Set Tidal Volume")
     tv_title_label.setFont(page_settings.mainLabelFont)
     tv_title_label.setAlignment(Qt.AlignCenter)
-    tv_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    tv_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.tv_page_value_label = QLabel(str(window.local_settings.tv))
     window.tv_page_value_label.setFont(page_settings.valueFont)
@@ -509,14 +504,7 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
                                 ";}")
     tv_unit_label.setAlignment(Qt.AlignCenter)
 
-    window.tv_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    window.tv_decrement_button = window.makePicButton("left")
 
     tv_decrement_size_policy = window.tv_decrement_button.sizePolicy()
     tv_decrement_size_policy.setRetainSizeWhenHidden(True)
@@ -526,14 +514,7 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
             < window.ranges._ranges["min_tv"]:
         window.tv_decrement_button.hide()
 
-    window.tv_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    window.tv_increment_button = window.makePicButton("right")
 
     tv_increment_size_policy = window.tv_increment_button.sizePolicy()
     tv_increment_size_policy.setRetainSizeWhenHidden(True)
@@ -543,26 +524,8 @@ def initializeTidalVolumeWidget(window: MainWindow) -> None:
             > window.ranges._ranges["max_tv"]:
         window.tv_increment_button.hide()
 
-
-    tv_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.cancelColor,
-            borderColor=page_settings.cancelColor,
-            valueSetting=page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
-
-
-    tv_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size = (150,90),
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF",
-            ))
+    tv_cancel = window.makePicButton("cancel")
+    tv_apply = window.makePicButton("apply")
 
     window.tv_decrement_button.clicked.connect(window.decrementTidalVol)
     window.tv_increment_button.clicked.connect(window.incrementTidalVol)
@@ -606,7 +569,7 @@ def initializeIERatioWidget(window: MainWindow) -> None:
     ie_ratio_title_label = QLabel("Set I/E Ratio")
     ie_ratio_title_label.setFont(page_settings.mainLabelFont)
     ie_ratio_title_label.setAlignment(Qt.AlignCenter)
-    ie_ratio_title_label.setStyleSheet("QLabel {color: #000000 ;}")
+    ie_ratio_title_label.setStyleSheet("QLabel {color: #74fff4 ;}")
 
     window.ie_ratio_page_value_label = QLabel(
         window.get_ie_ratio_display(window.local_settings.ie_ratio_enum))
@@ -622,42 +585,13 @@ def initializeIERatioWidget(window: MainWindow) -> None:
     ie_unit_label.setFont(page_settings.unitFont)
     ie_unit_label.setAlignment(Qt.AlignCenter)
 
-    ie_ratio_decrement_button = window.makeSimpleDisplayButton(
-        "\u2190",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    ie_ratio_decrement_button = window.makePicButton("left")
 
-    ie_ratio_increment_button = window.makeSimpleDisplayButton(
-        "\u2192",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    ie_ratio_increment_button = window.makePicButton("right")
 
 
-    ie_ratio_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor= page_settings.cancelColor,
-            borderColor=page_settings.cancelColor,
-            valueSetting=page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
-
-    ie_ratio_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+    ie_ratio_cancel = window.makePicButton("cancel")
+    ie_ratio_apply = window.makePicButton("apply")
 
     ie_ratio_decrement_button.clicked.connect(window.decrementIERatio)
     ie_ratio_increment_button.clicked.connect(window.incrementIERatio)
@@ -699,11 +633,11 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
         window.ui_settings.page_settings.mainLabelFont)
     window.alarm_display_label.setAlignment(Qt.AlignCenter)
     window.alarm_display_label.setWordWrap(True)
-    window.alarm_display_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.alarm_display_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
     window.alarm_display_label.setFixedWidth(400)
 
     alarm_silence_button = window.makeSimpleDisplayButton(
-        f"ACKNOWLEDGE",
+        f"Silence for {window.settings.silence_time} min.",
         button_settings=SimpleButtonSettings(
             valueSetting=window.ui_settings.page_settings.cancelSetting,
             fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
@@ -739,7 +673,7 @@ def initializeSettingsWidget(window: MainWindow) -> None:
 
     settings_page_label = QLabel("Settings")
     settings_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
-    settings_page_label.setStyleSheet("QLabel {color: #000000 ;}")
+    settings_page_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     settings_page_label.setAlignment(Qt.AlignCenter)
 
@@ -747,43 +681,28 @@ def initializeSettingsWidget(window: MainWindow) -> None:
         f"Current Patient: Patient {window.patient_id_display}")
     window.settings_patient_label.setAlignment(Qt.AlignCenter)
     window.settings_patient_label.setFont(TextSetting("Arial", 20, True).font)
-    window.settings_patient_label.setStyleSheet("QLabel {color: #000000 ;}")
-
+    window.settings_patient_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    window.settings_patient_label.setWordWrap(True)
 
     settings_change_patient_button = window.makeSimpleDisplayButton(
         "Change Patient",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(150, 65))
+        size=(200, 60))
     settings_change_patient_button.clicked.connect(lambda: window.display(8))
 
     settings_change_datetime_button = window.makeSimpleDisplayButton(
         "Change Date/Time",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(150, 65))
+        size=(200, 60))
     settings_change_datetime_button.clicked.connect(lambda: window.display(9))
 
     settings_change_alarm_limits_button = window.makeSimpleDisplayButton(
         "Change Alarm Limits",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(150, 65))
-    settings_change_alarm_limits_button.clicked.connect(lambda: window.display(10))
+        size=(200, 60))
+    settings_change_alarm_limits_button.clicked.connect(
+        lambda: window.display(10))
 
     settings_back_button = window.makeSimpleDisplayButton(
         "Back to Main",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 65))
+        size=(200, 60))
     settings_back_button.clicked.connect(lambda: window.display(0))
 
     h_box_7top.addWidget(settings_page_label)
@@ -795,7 +714,7 @@ def initializeSettingsWidget(window: MainWindow) -> None:
     h_box_7mid1.addLayout(h_box_7mid1_v1)
     h_box_7mid1.addLayout(h_box_7mid1_v2)
 
-    for h_box in [h_box_7top, h_box_7mid1,h_box_7mid2, h_box_7bottom]:
+    for h_box in [h_box_7top, h_box_7mid1, h_box_7mid2, h_box_7bottom]:
         v_box_7.addLayout(h_box)
 
     window.page["7"].setLayout(v_box_7)
@@ -809,42 +728,31 @@ def initializeConfirmStopWidget(window: MainWindow) -> None:
     h_box_8top.setAlignment(Qt.AlignCenter)
     h_box_8bottom.setAlignment(Qt.AlignCenter)
 
-    confirm_stop_value_label = QLabel(
-        "Caution: this will stop ventilation immediately. "
-        "Proceed?")
+    confirm_stop_value_label = QLabel()
+
     confirm_stop_value_label.setFont(
-        window.ui_settings.page_settings.mainLabelFont)
+        TextSetting("Arial", 30, True).font)
     confirm_stop_value_label.setWordWrap(True)
     confirm_stop_value_label.setAlignment(Qt.AlignCenter)
-    confirm_stop_value_label.setFixedHeight(150)
+    confirm_stop_value_label.setFixedHeight(250)
     confirm_stop_value_label.setFixedWidth(400)
-    confirm_stop_value_label.setStyleSheet("QLabel {color: #000000 ;}")
+    confirm_stop_value_label.setText("<font color='red'> CAUTION! </font> <br> <font color='white'> This will immediately stop ventilation.")
 
-    confirm_stop_cancel_button = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size = (150,90),
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            valueColor="#FFFFFF",
-            fillColor=window.ui_settings.page_settings.cancelColor,
-            borderColor=window.ui_settings.page_settings.cancelColor))
+    confirm_stop_cancel_button = window.makePicButton(
+        "cancel",
+        size=(60, 60),
+    )
     confirm_stop_cancel_button.clicked.connect(lambda: window.display(0))
-    confirm_stop_cancel_button.setFont(
-        window.ui_settings.simple_button_settings.valueFont)
 
-    confirm_stop_confirm_button = window.makeSimpleDisplayButton(
-        "CONFIRM",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.commitSetting,
-            valueColor="#FFFFFF",
-            fillColor=window.ui_settings.page_settings.commitColor,
-            borderColor=window.ui_settings.page_settings.commitColor))
+    confirm_stop_confirm_button = window.makePicButton(
+        "confirm",
+        size=(60, 60),
+    )
     confirm_stop_confirm_button.clicked.connect(window.stopVentilation)
     confirm_stop_confirm_button.setFont(
         window.ui_settings.simple_button_settings.valueFont)
 
-    h_box_8bottom.setSpacing(75)
+    h_box_8bottom.setSpacing(100)
 
     h_box_8top.addWidget(confirm_stop_value_label)
     h_box_8bottom.addWidget(confirm_stop_cancel_button)
@@ -875,21 +783,16 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
     change_patient_main_label.setWordWrap(True)
     change_patient_main_label.setAlignment(Qt.AlignCenter)
     change_patient_main_label.setFixedWidth(400)
-    change_patient_main_label.setStyleSheet("QLabel {color: #000000 ;}")
-
+    change_patient_main_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.patient_page_label = QLabel(
         f"Current Patient: Patient {window.patient_id_display}")
     window.patient_page_label.setAlignment(Qt.AlignCenter)
     window.patient_page_label.setFont(TextSetting("Arial", 20, True).font)
-    window.patient_page_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.patient_page_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.generate_new_patient_id_page_button = window.makeSimpleDisplayButton(
         "Generate New Patient ID",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
         size=(250, 65))
     window.generate_new_patient_id_page_button.clicked.connect(
         window.generateNewPatientID)
@@ -899,33 +802,14 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
     window.generate_new_patient_id_page_button.setSizePolicy(
         generate_new_patient_id_size_policy)
 
-    change_patient_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor= window.ui_settings.page_settings.cancelColor,
-            borderColor=window.ui_settings.page_settings.cancelColor,
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
-
+    change_patient_cancel = window.makePicButton("cancel")
     change_patient_cancel.clicked.connect(window.cancelNewPatientID)
 
-    change_patient_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size=(150, 90),
-        button_settings=SimpleButtonSettings(
-            fillColor= window.ui_settings.page_settings.commitColor,
-            borderColor=window.ui_settings.page_settings.commitColor,
-            valueSetting=window.ui_settings.page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+    change_patient_apply = window.makePicButton("apply")
     change_patient_apply.clicked.connect(window.commitNewPatientID)
 
     change_patient_back = window.makeSimpleDisplayButton(
         "Back to Settings",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
         size=(200, 65))
     change_patient_back.clicked.connect(lambda: window.display(6))
 
@@ -945,6 +829,7 @@ def initializeChangePatientWidget(window: MainWindow) -> None:
 
     window.page["9"].setLayout(v_box_9)
 
+
 def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     page_settings = window.ui_settings.page_settings
     window.new_date = window.datetime.date()
@@ -952,25 +837,23 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
 
     v_box_10 = QVBoxLayout()
     h_box_10top = QVBoxLayout()
-    h_box_10mid = QVBoxLayout()
     h_box_10bottom = QVBoxLayout()
 
     h_box_10top.setAlignment(Qt.AlignCenter)
-    h_box_10mid.setAlignment(Qt.AlignCenter)
     h_box_10bottom.setAlignment(Qt.AlignCenter)
 
     change_datetime_main_label = QLabel("Set Date/Time")
     change_datetime_main_label.setFont(page_settings.mainLabelFont)
-    change_datetime_main_label.setWordWrap(True)
     change_datetime_main_label.setAlignment(Qt.AlignCenter)
     change_datetime_main_label.setFixedWidth(400)
-    change_datetime_main_label.setStyleSheet("QLabel {color: #000000 ;}")
+    change_datetime_main_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    h_box_10top.addWidget(change_datetime_main_label)
 
-    change_datetime_stack_widget = QStackedWidget()
+    change_datetime_tab_widget = QTabWidget()
 
     date_widget = QWidget()
-    date_widget.setFixedHeight(250)
-    date_widget.setContentsMargins(0,0,0,0)
+    date_widget.setFixedHeight(280)
+    date_widget.setContentsMargins(0, 0, 0, 0)
 
     date_v_box = QVBoxLayout()
     date_h_box_1 = QHBoxLayout()
@@ -978,102 +861,56 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     date_v_box_12 = QVBoxLayout()
     date_v_box_13 = QVBoxLayout()
     date_h_box_2 = QHBoxLayout()
-    date_v_box_21 = QVBoxLayout()
-    date_v_box_22 = QVBoxLayout()
+    date_h_box_21 = QHBoxLayout()
+    date_h_box_22 = QHBoxLayout()
 
-    date_month_increment = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    date_month_increment = window.makePicButton("up")
     date_month_increment.setFixedWidth(50)
+    date_month_increment.setFixedHeight(50)
+
     date_month_increment.clicked.connect(window.incrementMonth)
 
-    date_month_decrement = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    date_month_decrement = window.makePicButton("down")
     date_month_decrement.setFixedWidth(50)
+    date_month_decrement.setFixedHeight(50)
     date_month_decrement.clicked.connect(window.decrementMonth)
 
-    date_day_increment = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    date_day_increment = window.makePicButton("up")
     date_day_increment.setFixedWidth(50)
+    date_day_increment.setFixedHeight(50)
     date_day_increment.clicked.connect(window.incrementDay)
 
-    date_day_decrement = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    date_day_decrement = window.makePicButton("down")
     date_day_decrement.setFixedWidth(50)
+    date_day_decrement.setFixedHeight(50)
     date_day_decrement.clicked.connect(window.decrementDay)
 
-    date_year_increment = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    date_year_increment = window.makePicButton("up")
+    date_year_increment.setFixedHeight(50)
     date_year_increment.clicked.connect(window.incrementYear)
 
-    date_year_decrement = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
+    date_year_decrement = window.makePicButton("down")
+    date_year_decrement.setFixedHeight(50)
+
     date_year_decrement.clicked.connect(window.decrementYear)
 
     window.date_month_label = QLabel(str(window.datetime.date().month()))
     window.date_day_label = QLabel(str(window.datetime.date().day()))
     window.date_year_label = QLabel(str(window.datetime.date().year()))
     window.date_year_label.setFixedWidth(200)
+    for label in [ window.date_month_label, window.date_day_label,  window.date_year_label]:
+        label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
-
-    date_cancel = window.makeSimpleDisplayButton(
-        "CANCEL",
-        size=(150, 60),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.cancelColor,
-            borderColor=page_settings.cancelColor,
-            valueSetting=page_settings.cancelSetting,
-            valueColor="#FFFFFF"))
+    date_cancel = window.makePicButton("cancel")
     date_cancel.clicked.connect(window.cancelDate)
 
-    date_apply = window.makeSimpleDisplayButton(
-        "APPLY",
-        size=(150, 60),
-        button_settings=SimpleButtonSettings(
-            fillColor=page_settings.commitColor,
-            borderColor=page_settings.commitColor,
-            valueSetting=page_settings.commitSetting,
-            valueColor="#FFFFFF"))
+    date_apply = window.makePicButton("apply")
     date_apply.clicked.connect(window.commitDate)
 
-    for date_label in [window.date_month_label,
-                           window.date_day_label,
-                           window.date_year_label]:
+    for date_label in [
+            window.date_month_label, window.date_day_label,
+            window.date_year_label
+    ]:
         date_label.setFont(page_settings.setDatetimeFont)
         date_label.setAlignment(Qt.AlignCenter)
 
@@ -1095,9 +932,11 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
     date_year_decrement_wrapper = QHBoxLayout()
     date_year_decrement_wrapper.addWidget(date_year_decrement)
 
-    for wrapper in [date_month_increment_wrapper, date_month_decrement_wrapper,
-                    date_day_increment_wrapper, date_day_decrement_wrapper,
-                    date_year_increment_wrapper, date_year_decrement_wrapper]:
+    for wrapper in [
+            date_month_increment_wrapper, date_month_decrement_wrapper,
+            date_day_increment_wrapper, date_day_decrement_wrapper,
+            date_year_increment_wrapper, date_year_decrement_wrapper
+    ]:
         wrapper.setAlignment(Qt.AlignCenter)
 
     date_v_box_11.addLayout(date_month_increment_wrapper)
@@ -1116,299 +955,177 @@ def initializeChangeDatetimeWidget(window: MainWindow) -> None:
         v_box.setAlignment(Qt.AlignCenter)
         date_h_box_1.addLayout(v_box)
 
-    date_v_box_21.addWidget(date_cancel)
-    date_v_box_21.setAlignment(Qt.AlignCenter)
-    date_v_box_22.addWidget(date_apply)
-    date_v_box_22.setAlignment(Qt.AlignCenter)
+    date_h_box_21.addWidget(date_cancel)
+    date_h_box_21.setAlignment(Qt.AlignCenter)
+    date_h_box_22.addWidget(date_apply)
+    date_h_box_22.setAlignment(Qt.AlignCenter)
 
-    date_h_box_2.addLayout(date_v_box_21)
-    date_h_box_2.addLayout(date_v_box_22)
+    date_h_box_2.addLayout(date_h_box_21)
+    date_h_box_2.addLayout(date_h_box_22)
 
     date_v_box.addLayout(date_h_box_1)
     date_v_box.addLayout(date_h_box_2)
 
     date_widget.setLayout(date_v_box)
 
-    #TODO: Add time setting
+    time_widget = QWidget()
+    time_widget.setFixedHeight(280)
+    time_widget.setContentsMargins(0, 0, 0, 0)
 
-    for widget in [date_widget]:
-        change_datetime_stack_widget.addWidget(widget)
+    time_v_box = QVBoxLayout()
+    time_h_box_1 = QHBoxLayout()
+    time_v_box_11 = QVBoxLayout()
+    time_v_box_12 = QVBoxLayout()
+    time_v_box_13 = QVBoxLayout()
+    time_h_box_2 = QHBoxLayout()
+    time_v_box_21 = QVBoxLayout()
+    time_v_box_22 = QVBoxLayout()
 
-    datetime_back = window.makeSimpleDisplayButton(
-        "Back to Settings",
-        button_settings=SimpleButtonSettings(
-            valueSetting=page_settings.cancelSetting,
-            fillColor=page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 50))
-    datetime_back.clicked.connect(lambda: window.display(6))
+    time_hour_increment = window.makePicButton("up")
+    time_hour_increment.setFixedWidth(50)
+    time_hour_increment.clicked.connect(lambda: window.incrementTime(3600))
 
+    time_hour_decrement = window.makePicButton("down")
+    time_hour_decrement.setFixedWidth(50)
+    time_hour_decrement.clicked.connect(lambda: window.incrementTime(-3600))
 
-    h_box_10mid.addWidget(change_datetime_stack_widget)
-    h_box_10bottom.addWidget(datetime_back)
+    time_min_increment = window.makePicButton("up")
+    time_min_increment.setFixedWidth(50)
+    time_min_increment.clicked.connect(lambda: window.incrementTime(60))
+
+    time_min_decrement = window.makePicButton("down")
+    time_min_decrement.setFixedWidth(50)
+    time_min_decrement.clicked.connect(lambda: window.incrementTime(-60))
+
+    time_sec_increment = window.makePicButton("up")
+    time_sec_increment.clicked.connect(lambda: window.incrementTime(1))
+
+    time_sec_decrement = window.makePicButton("down")
+    time_sec_decrement.clicked.connect(lambda: window.incrementTime(-1))
+
+    window.time_hour_label = QLabel(str(window.datetime.time().hour()))
+    window.time_min_label = QLabel(str(window.datetime.time().minute()))
+    window.time_sec_label = QLabel(str(window.datetime.time().second()))
+    window.date_year_label.setFixedWidth(200)
+
+    for label in [ window.time_hour_label, window.time_min_label,  window.time_sec_label]:
+        label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+
+    time_cancel = window.makePicButton("cancel")
+    time_cancel.clicked.connect(window.cancelTime)
+
+    time_apply = window.makePicButton("apply")
+    time_apply.clicked.connect(window.commitTime)
+
+    for time_label in [window.time_hour_label,
+                       window.time_min_label,
+                       window.time_sec_label]:
+        time_label.setFont(page_settings.setDatetimeFont)
+        time_label.setAlignment(Qt.AlignCenter)
+
+    time_hour_increment_wrapper = QHBoxLayout()
+    time_hour_increment_wrapper.addWidget(time_hour_increment)
+
+    time_hour_decrement_wrapper = QHBoxLayout()
+    time_hour_decrement_wrapper.addWidget(time_hour_decrement)
+
+    time_min_increment_wrapper = QHBoxLayout()
+    time_min_increment_wrapper.addWidget(time_min_increment)
+
+    time_min_decrement_wrapper = QHBoxLayout()
+    time_min_decrement_wrapper.addWidget(time_min_decrement)
+
+    time_sec_increment_wrapper = QHBoxLayout()
+    time_sec_increment_wrapper.addWidget(time_sec_increment)
+
+    time_sec_decrement_wrapper = QHBoxLayout()
+    time_sec_decrement_wrapper.addWidget(time_sec_decrement)
+
+    for wrapper in [time_hour_increment_wrapper, time_hour_decrement_wrapper,
+                    time_min_increment_wrapper, time_min_decrement_wrapper,
+                    time_sec_increment_wrapper, time_sec_decrement_wrapper]:
+        wrapper.setAlignment(Qt.AlignCenter)
+
+    time_v_box_11.addLayout(time_hour_increment_wrapper)
+    time_v_box_11.addWidget(window.time_hour_label)
+    time_v_box_11.addLayout(time_hour_decrement_wrapper)
+
+    time_v_box_12.addLayout(time_min_increment_wrapper)
+    time_v_box_12.addWidget(window.time_min_label)
+    time_v_box_12.addLayout(time_min_decrement_wrapper)
+
+    time_v_box_13.addLayout(time_sec_increment_wrapper)
+    time_v_box_13.addWidget(window.time_sec_label)
+    time_v_box_13.addLayout(time_sec_decrement_wrapper)
+
+    for v_box in [time_v_box_11, time_v_box_12, time_v_box_13]:
+        v_box.setAlignment(Qt.AlignCenter)
+        time_h_box_1.addLayout(v_box)
+
+    time_v_box_21.addWidget(time_cancel)
+    time_v_box_21.setAlignment(Qt.AlignCenter)
+    time_v_box_22.addWidget(time_apply)
+    time_v_box_22.setAlignment(Qt.AlignCenter)
+
+    time_h_box_2.addLayout(time_v_box_21)
+    time_h_box_2.addLayout(time_v_box_22)
+
+    time_v_box.addLayout(time_h_box_1)
+    time_v_box.addLayout(time_h_box_2)
+
+    time_widget.setLayout(time_v_box)
+
+    date_widget.setAutoFillBackground(True)
+    time_widget.setAutoFillBackground(True)
+
+    change_datetime_tab_widget.addTab(date_widget, "Date")
+    change_datetime_tab_widget.addTab(time_widget, "Time")
+
+    palette = QtGui.QPalette()
+    palette.setColor(QtGui.QPalette.Background, QColor("#2C2C2C"))
+    change_datetime_tab_widget.setPalette(palette)
+
+    h_box_10top.addWidget(change_datetime_tab_widget)
 
     v_box_10.addLayout(h_box_10top)
-    v_box_10.addLayout(h_box_10mid)
-    v_box_10.addLayout(h_box_10bottom)
+    v_box_10.setContentsMargins(10,10,10,10)
 
     window.page["10"].setLayout(v_box_10)
 
+
 def initializeAlarmLimitWidget(window: MainWindow) -> None:
-    page_settings = window.ui_settings.page_settings
 
-    v_box_11 = QVBoxLayout() #main layout
+    v_box_11 = QVBoxLayout()  #main layout
+    h_box_11_top = QHBoxLayout()
 
-    h_box_11_1 = QHBoxLayout() #high press.
-    h_box_11_1_1 = QHBoxLayout() #high press. label wrapper
-    h_box_11_1_2 = QHBoxLayout() #high press. buttons wrapper
+    alarm_limits_tabbed = QTabWidget()
+    makeandAddAllAlarmSelectors(window, alarm_limits_tabbed)
 
-    h_box_11_2 = QHBoxLayout() #low press.
-    h_box_11_2_1 = QHBoxLayout() #low press. label wrapper
-    h_box_11_2_2 = QHBoxLayout() #low press. buttons wrapper
-
-
-    h_box_11_3 = QHBoxLayout() #high vol.
-    h_box_11_3_1 = QHBoxLayout() #high vol. label wrapper
-    h_box_11_3_2 = QHBoxLayout() #high vol. buttons wrapper
-
-
-
-    h_box_11_4 = QHBoxLayout() #low vol.
-    h_box_11_4_1 = QHBoxLayout() #low vol. label wrapper
-    h_box_11_4_2 = QHBoxLayout() #low vol. buttons wrapper
-
-
-    h_box_11_5 = QHBoxLayout() #high RR
-    h_box_11_5_1 = QHBoxLayout() #high RR label wrapper
-    h_box_11_5_2 = QHBoxLayout() #high RR buttons wrapper
-
-
-    h_box_11_6 = QHBoxLayout() #low RR
-    h_box_11_6_1 = QHBoxLayout() #low RR label wrapper
-    h_box_11_6_2 = QHBoxLayout() #low RR buttons wrapper
-
-    h_box_11_7 = QHBoxLayout() #back button
-
-
-    high_pressure_limit_label = QLabel("Upper Pressure Alarm")
-    window.high_pressure_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_pressure_decrement_button.clicked.connect(window.decrementHighPressureAlarmLimit)
-
-    window.high_pressure_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_pressure_increment_button.clicked.connect(window.incrementHighPressureAlarmLimit)
-
-    window.high_pressure_limit_value_label = QLabel(str(window.settings.high_pressure_limit))
-
-    h_box_11_1_1.addWidget(high_pressure_limit_label)
-    h_box_11_1_2.addWidget(window.high_pressure_decrement_button)
-    h_box_11_1_2.addWidget(window.high_pressure_limit_value_label)
-    h_box_11_1_2.addWidget(window.high_pressure_increment_button)
-
-    h_box_11_1.addLayout(h_box_11_1_1)
-    h_box_11_1.addLayout(h_box_11_1_2)
-
-
-    low_pressure_limit_label = QLabel("Lower Pressure Alarm")
-
-    window.low_pressure_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_pressure_decrement_button.clicked.connect(window.decrementLowPressureAlarmLimit)
-
-    window.low_pressure_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_pressure_increment_button.clicked.connect(window.incrementLowPressureAlarmLimit)
-
-    window.low_pressure_limit_value_label = QLabel(str(window.settings.low_pressure_limit))
-
-    h_box_11_2_1.addWidget(low_pressure_limit_label)
-    h_box_11_2_2.addWidget(window.low_pressure_decrement_button)
-    h_box_11_2_2.addWidget(window.low_pressure_limit_value_label)
-    h_box_11_2_2.addWidget(window.low_pressure_increment_button)
-
-    h_box_11_2.addLayout(h_box_11_2_1)
-    h_box_11_2.addLayout(h_box_11_2_2)
-
-    high_volume_limit_label = QLabel("Upper Volume Alarm")
-    window.high_volume_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_volume_decrement_button.clicked.connect(window.decrementHighVolumeAlarmLimit)
-
-    window.high_volume_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_volume_increment_button.clicked.connect(window.incrementHighVolumeAlarmLimit)
-
-    window.high_volume_limit_value_label = QLabel(str(window.settings.high_volume_limit))
-
-    h_box_11_3_1.addWidget(high_volume_limit_label)
-    h_box_11_3_2.addWidget(window.high_volume_decrement_button)
-    h_box_11_3_2.addWidget(window.high_volume_limit_value_label)
-    h_box_11_3_2.addWidget(window.high_volume_increment_button)
-
-    h_box_11_3.addLayout(h_box_11_3_1)
-    h_box_11_3.addLayout(h_box_11_3_2)
-
-    low_volume_limit_label = QLabel("Lower Volume Alarm")
-    window.low_volume_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_volume_decrement_button.clicked.connect(window.decrementLowVolumeAlarmLimit)
-
-    window.low_volume_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_volume_increment_button.clicked.connect(window.incrementLowVolumeAlarmLimit)
-
-    window.low_volume_limit_value_label = QLabel(str(window.settings.low_volume_limit))
-
-    h_box_11_4_1.addWidget(low_volume_limit_label)
-    h_box_11_4_2.addWidget(window.low_volume_decrement_button)
-    h_box_11_4_2.addWidget(window.low_volume_limit_value_label)
-    h_box_11_4_2.addWidget(window.low_volume_increment_button)
-
-    h_box_11_4.addLayout(h_box_11_4_1)
-    h_box_11_4.addLayout(h_box_11_4_2)
-
-    high_rr_limit_label = QLabel("Upper Resp. Rate Alarm")
-    window.high_rr_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_rr_decrement_button.clicked.connect(window.decrementHighRRAlarmLimit)
-
-    window.high_rr_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.high_rr_increment_button.clicked.connect(window.incrementHighRRAlarmLimit)
-
-    window.high_rr_limit_value_label = QLabel(str(window.settings.high_resp_rate_limit))
-
-    h_box_11_5_1.addWidget(high_rr_limit_label)
-    h_box_11_5_2.addWidget(window.high_rr_decrement_button)
-    h_box_11_5_2.addWidget(window.high_rr_limit_value_label)
-    h_box_11_5_2.addWidget(window.high_rr_increment_button)
-
-    h_box_11_5.addLayout(h_box_11_5_1)
-    h_box_11_5.addLayout(h_box_11_5_2)
-
-    low_rr_limit_label = QLabel("Lower Resp. Rate Alarm")
-    window.low_rr_decrement_button = window.makeSimpleDisplayButton(
-        "-",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_rr_decrement_button.clicked.connect(window.decrementLowRRAlarmLimit)
-
-    window.low_rr_increment_button = window.makeSimpleDisplayButton(
-        "+",
-        size=(50, 50),
-        button_settings=SimpleButtonSettings(
-            fillColor="#FFFFFF",
-            borderColor=page_settings.changeButtonBorderColor,
-            valueSetting=page_settings.changeButtonTextSetting,
-            valueColor=page_settings.changeButtonValueColor))
-    window.low_rr_increment_button.clicked.connect(window.incrementLowRRAlarmLimit)
-
-    window.low_rr_limit_value_label = QLabel(str(window.settings.low_resp_rate_limit))
-
-    h_box_11_6_1.addWidget(low_rr_limit_label)
-    h_box_11_6_2.addWidget(window.low_rr_decrement_button)
-    h_box_11_6_2.addWidget(window.low_rr_limit_value_label)
-    h_box_11_6_2.addWidget(window.low_rr_increment_button)
-
-    h_box_11_6.addLayout(h_box_11_6_1)
-    h_box_11_6.addLayout(h_box_11_6_2)
-
-    for label in [high_pressure_limit_label, low_pressure_limit_label,
-                  high_volume_limit_label,low_volume_limit_label,
-                  high_rr_limit_label,low_rr_limit_label]:
-        label.setStyleSheet("QLabel {color: #000000 ;}")
-        label.setFont(page_settings.alarmLimitLabelFont)
-        label.setAlignment(Qt.AlignCenter)
-
-    for value_label in [window.high_pressure_limit_value_label, window.low_pressure_limit_value_label,
-                        window.high_volume_limit_value_label, window.low_volume_limit_value_label,
-                        window.high_rr_limit_value_label, window.low_rr_limit_value_label]:
-        value_label.setStyleSheet("QLabel {color: #000000 ;}")
-        value_label.setFont(page_settings.alarmLimitValueFont)
-        value_label.setAlignment(Qt.AlignCenter)
-
-    alarm_limits_back = window.makeSimpleDisplayButton(
-        "Back to Settings",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 65))
-    alarm_limits_back.clicked.connect(lambda: window.display(6))
-    h_box_11_7.addWidget(alarm_limits_back)
-
-    for h_box in [h_box_11_1, h_box_11_2, h_box_11_3,
-                  h_box_11_4, h_box_11_5, h_box_11_6,
-                  h_box_11_7]:
-        h_box.setAlignment(Qt.AlignCenter)
-        v_box_11.addLayout(h_box)
+    h_box_11_top.addWidget(alarm_limits_tabbed)
+    v_box_11.addLayout(h_box_11_top)
+    v_box_11.setContentsMargins(0, 0, 0, 0)
 
     window.page["11"].setLayout(v_box_11)
+
+
+def makeandAddAllAlarmSelectors(window, tab_widget):
+    window.alarmLimitSelectors = {}
+    window.alarmLimitSelectorPairs = {}
+    for limit_type in AlarmLimitType:
+        selector = AlarmLimitSelector(window, limit_type)
+        window.alarmLimitSelectors[limit_type] = selector
+
+    for limit_type in AlarmLimitType:
+        window.alarmLimitSelectors[limit_type].setPairSelector()
+
+    count = 0
+    for pair_type in AlarmLimitPair:
+        pair = AlarmLimitSelectorPair(window, pair_type)
+        window.alarmLimitSelectorPairs[pair_type] = pair
+        tab_widget.addTab(pair, pair.tab_str)
+        tab_widget.tabBar().setTabTextColor(count, QColor(0,0,0))
+        count+=1
+
 
 def initializeWarningScreen(window: MainWindow) -> None:
     v_box_12 = QVBoxLayout()
@@ -1423,7 +1140,7 @@ def initializeWarningScreen(window: MainWindow) -> None:
     window.warning_label.setAlignment(Qt.AlignCenter)
     window.warning_label.setFixedHeight(150)
     window.warning_label.setFixedWidth(400)
-    window.warning_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.warning_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.warning_ack_button = window.makeSimpleDisplayButton(
         "OK",
@@ -1453,7 +1170,7 @@ def initializePwrDownScreen(window: MainWindow) -> None:
     window.power_down_label.setAlignment(Qt.AlignCenter)
     window.power_down_label.setFixedHeight(150)
     window.power_down_label.setFixedWidth(400)
-    window.power_down_label.setStyleSheet("QLabel {color: #000000 ;}")
+    window.power_down_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     window.pwr_down_cancel_button = window.makeSimpleDisplayButton(
         "Cancel",
