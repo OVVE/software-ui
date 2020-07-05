@@ -64,7 +64,6 @@ class CommsLink(QThread):
         
 
     def update_settings(self, settings_dict: dict) -> None:
-        print("Setting being updated")
         self.settings_lock.acquire()
         self.settings.from_dict(settings_dict)
         self.settings_lock.release()
