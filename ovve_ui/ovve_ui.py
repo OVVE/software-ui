@@ -43,7 +43,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
                              initializeWarningScreen, 
                              initializeStopVentilationAndPowerDownScreen, 
-                             initializePowerDownScreen)
+                             initializePowerDownScreen, initializeLostCommsScreen)
 
 from utils.params import Params
 from utils.settings import Settings
@@ -107,7 +107,7 @@ class MainWindow(QWidget):
         (layout, stack) = initializeHomeScreenWidget(self)
 
         self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,15)}
+        self.page = {str(i): QWidget() for i in range(1,16)}
 
         self.shown_alarm = None
         self.prev_index = None
@@ -138,6 +138,8 @@ class MainWindow(QWidget):
 
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
+        self.comms_handler.lost_comms_signal.connect(self.lost_comms)
+
         self.new_settings_signal.connect(self.comms_handler.update_settings)
         self.comms_handler.start()
 
@@ -145,8 +147,10 @@ class MainWindow(QWidget):
         # Detect an active-low interrupt on BCM4
         if GPIO:
             self.pwrPin = 4
+            self.alarmPin = 3
             GPIO.setmode(GPIO.BCM)
             GPIO.setup(self.pwrPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            GPIO.setup(self.alarmPin, GPIO.OUT, initial=GPIO.LOW)
             GPIO.add_event_detect(self.pwrPin, GPIO.FALLING, callback=self.pwrButtonPressed, bouncetime = 200)
         else:
             self.pwrPin = 4  #TODO: Remove this, this is just for development
@@ -304,6 +308,7 @@ class MainWindow(QWidget):
         initializeChangeDatetimeWidget(self)
         initializeAlarmLimitWidget(self)
         initializeWarningScreen(self)
+        initializeLostCommsScreen(self)
         initializeStopVentilationAndPowerDownScreen(self)
         initializePowerDownScreen(self)
 
@@ -752,7 +757,7 @@ class MainWindow(QWidget):
         self.passChanges()
 
         # Sleep for some time to make sure comms thread has time
-        # to seed the message before shutdown
+        # to send the message before shutdown
         time.sleep(1)
 
         if not self.dev_mode:
@@ -760,7 +765,12 @@ class MainWindow(QWidget):
         else:
             exit()
 
-    
+    def lost_comms(self):
+        # Display a dialog for lost comms
+        self.display(14)
+        if GPIO:
+            GPIO.output(self.alarmPin, GPIO.HIGH)
+
     def keyPressEvent(self, event):
         if self.dev_mode:
             if event.key() == QtCore.Qt.Key_F:

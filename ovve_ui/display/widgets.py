@@ -1202,7 +1202,6 @@ def initializeStopVentilationAndPowerDownScreen(window: MainWindow) -> None:
 
     window.page["13"].setLayout(v_box_13)
 
-
 def initializePowerDownScreen(window: MainWindow) -> None:
     v_box_14 = QVBoxLayout()
     h_box_14top = QHBoxLayout()
@@ -1245,6 +1244,50 @@ def initializePowerDownScreen(window: MainWindow) -> None:
     v_box_14.addLayout(h_box_14bottom)
 
     window.page["14"].setLayout(v_box_14)
+
+def initializeLostCommsScreen(window: MainWindow) -> None:
+    v_box_15 = QVBoxLayout()
+    h_box_15top = QHBoxLayout()
+    h_box_15bottom = QHBoxLayout()
+
+    h_box_15top.setAlignment(Qt.AlignCenter)
+    h_box_15bottom.setAlignment(Qt.AlignCenter)
+
+    comms_lost_value_label = QLabel(
+        "Communications with controller lost!  Click OK to power down.")
+    comms_lost_value_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+    comms_lost_value_label.setWordWrap(True)
+    comms_lost_value_label.setAlignment(Qt.AlignCenter)
+    comms_lost_value_label.setFixedHeight(150)
+    comms_lost_value_label.setFixedWidth(400)
+    comms_lost_value_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+
+    comms_lost_cancel_button = window.makePicButton(
+        "cancel",
+        size=(60, 60),
+    )
+    comms_lost_cancel_button.clicked.connect(lambda: window.display(0))
+
+    comms_lost_confirm_button = window.makePicButton(
+        "confirm",
+        size=(60, 60),
+    )
+    comms_lost_confirm_button.clicked.connect(window.powerDown)
+
+    comms_lost_confirm_button.setFont(
+        window.ui_settings.simple_button_settings.valueFont)
+
+    h_box_15bottom.setSpacing(100)
+
+    h_box_15top.addWidget(comms_lost_value_label)
+    h_box_15bottom.addWidget(comms_lost_cancel_button)
+    h_box_15bottom.addWidget(comms_lost_confirm_button)
+    v_box_15.addLayout(h_box_15top)
+    v_box_15.addLayout(h_box_15bottom)
+
+    window.page["15"].setLayout(v_box_15)
+
 
   
 

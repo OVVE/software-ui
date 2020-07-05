@@ -17,6 +17,7 @@ from copy import deepcopy
 class CommsSimulator(QThread):
     new_params = pyqtSignal(Params)
     new_alarms = pyqtSignal(int)
+    lost_comms_signal = pyqtSignal()
 
     def __init__(self) -> None:
         QThread.__init__(self)
@@ -79,6 +80,10 @@ class CommsSimulator(QThread):
                 params.control_state = 0
                 params.battery_level = random.randint(0, 100)
                 self.new_params.emit(params)
+
+                # if (self.seqnum == 9):
+                #     print("Emitting lost comms signal")
+                #     self.lost_comms_signal.emit()
 
                 if (self.seqnum % 300 == 299):
                     alarmindex = random.randrange(len(list(AlarmType)))
