@@ -771,6 +771,7 @@ class MainWindow(QWidget):
         if GPIO:
             GPIO.output(self.alarmPin, GPIO.HIGH)
 
+    
     def keyPressEvent(self, event):
         if self.dev_mode:
             if event.key() == QtCore.Qt.Key_F:
