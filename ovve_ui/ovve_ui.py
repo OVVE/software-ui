@@ -343,7 +343,7 @@ class MainWindow(QWidget):
                 )
                 self.showAlarm()
 
-            if (self.show_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
+            if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
                 self.setStartStop(0)
 
 
