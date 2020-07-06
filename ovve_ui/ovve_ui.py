@@ -331,8 +331,7 @@ class MainWindow(QWidget):
             if self.shown_alarm is None:  #There is no alarm currently shown, so show something if it comes
                 self.logger.debug("Pending : " +
                                   str(self.alarm_handler.alarms_pending()))
-                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm(
-                )
+                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
 
             elif not self.shown_alarm.isSamePrior(
@@ -343,6 +342,11 @@ class MainWindow(QWidget):
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm(
                 )
                 self.showAlarm()
+
+            if (self.show_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
+                self.setStartStop(0)
+
+
 
     def showAlarm(self) -> None:
         self.prev_index = self.stack.currentIndex()
