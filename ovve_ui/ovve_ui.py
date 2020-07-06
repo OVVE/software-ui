@@ -47,7 +47,7 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
 
 from utils.params import Params
 from utils.settings import Settings
-from utils.Alarm import Alarm, AlarmHandler
+from utils.Alarm import Alarm, AlarmHandler, AlarmType
 from utils.comms_simulator import CommsSimulator
 from utils.comms_link import CommsLink
 from utils.ranges import Ranges
