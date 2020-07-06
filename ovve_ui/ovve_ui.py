@@ -552,13 +552,18 @@ class MainWindow(QWidget):
         self.ie_ratio_page_value_label.setText(
             self.get_ie_ratio_display(self.local_settings.ie_ratio_enum))
 
+    def setStartStop(self, run_state: int):
+        if run_state == 1:
+            self.start_stop_button_main.updateValue("STOP")
+        else:
+            self.start_stop_button_main.updateValue("START") 
+        self.settings.run_state = run_state
+        self.passChanges()
+
     def changeStartStop(self) -> None:
         if self.settings.run_state == 0:
-            self.settings.run_state = 1
-            self.start_stop_button_main.updateValue("STOP")
-            self.passChanges()
-
-        elif self.settings.run_state == 1:
+            self.setStartStop(1)
+        else:
             self.confirmStop()
 
     def generateNewPatientID(self) -> None:
