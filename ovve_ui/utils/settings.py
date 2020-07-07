@@ -8,6 +8,7 @@ from utils.alarm_limit_type import AlarmLimitType
 
 class Settings():
     def __init__(self) -> None:
+        self.should_shut_down = 0
         self.run_state: int = 0
         self.mode: int = 0
 
@@ -62,6 +63,7 @@ class Settings():
 
     def to_JSON(self) -> str:
         j = {}
+        j['should_shut_down'] = self.should_shut_down
         j['run_state'] = self.run_state
         j['mode'] = self.mode
         j['tv'] = self.tv
@@ -83,6 +85,7 @@ class Settings():
 
     #TODO: add error handling for bad dict keys
     def from_dict(self, settings_dict: dict) -> None:
+        self.should_shut_down = settings_dict['should_shut_down']
         self.run_state = settings_dict['run_state']
         self.mode = settings_dict['mode']
         self.tv = settings_dict['tv']
