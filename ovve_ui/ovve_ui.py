@@ -334,14 +334,14 @@ class MainWindow(QWidget):
                 self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
                 self.showAlarm()
 
-            elif not self.shown_alarm.isSamePrior(
-                    self.alarm_handler.get_highest_priority_alarm()):
-                self.logger.debug("Pending2 : " +
-                                  str(self.alarm_handler.alarms_pending()))
-                #the alarm that we're showing isn't the highest priority one
-                self.shown_alarm = self.alarm_handler.get_highest_priority_alarm(
-                )
-                self.showAlarm()
+            # elif not self.shown_alarm.isSamePrior(
+            #         self.alarm_handler.get_highest_priority_alarm()):
+            #     self.logger.debug("Pending2 : " +
+            #                       str(self.alarm_handler.alarms_pending()))
+            #     #the alarm that we're showing isn't the highest priority one
+            #     self.shown_alarm = self.alarm_handler.get_highest_priority_alarm(
+            #     )
+            #     self.showAlarm()
 
             if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
                 self.setStartStop(0)
