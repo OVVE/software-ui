@@ -177,7 +177,7 @@ class MainWindow(QWidget):
 
         # Set the filehandler to log raw packets, warnings, and higher
         # Raw packets are logged at custom log level 25, just above INFO
-        fh.setLevel(logging.INFO)
+        fh.setLevel(logging.DEBUG)
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
