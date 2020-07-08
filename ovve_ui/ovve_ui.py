@@ -329,27 +329,11 @@ class MainWindow(QWidget):
     def update_ui_alarms(self) -> None:
         if self.alarm_handler.alarms_pending() > 0:
             self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
-            if (self.alarm_handler.alarms_pending() > 0):
-                pending_alarm = self.alarm_handler.get_highest_priority_alarm()
-                if (self.shown_alarm is None or self.shown_alarm != pending_alarm):
-                    self.shown_alarm = pending_alarm
-                    self.showAlarm()
-            
-            # if self.shown_alarm is None:  #There is no alarm currently shown, so show something if it comes
-            #     self.logger.debug("Pending : " +
-            #                       str(self.alarm_handler.alarms_pending()))
-            #     self.shown_alarm = self.alarm_handler.get_highest_priority_alarm()
-            #     self.showAlarm()
-
-            # elif not self.shown_alarm.isSamePrior(
-            #         self.alarm_handler.get_highest_priority_alarm()):
-            #     self.logger.debug("Pending2 : " +
-            #                       str(self.alarm_handler.alarms_pending()))
-            #     #the alarm that we're showing isn't the highest priority one
-            #     self.shown_alarm = self.alarm_handler.get_highest_priority_alarm(
-            #     )
-            #     self.showAlarm()
-
+            pending_alarm = self.alarm_handler.get_highest_priority_alarm()
+            if self.shown_alarm is None:
+                self.shown_alarm = pending_alarm                    
+                self.showAlarm()
+        
             if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
                 self.setStartStop(0)
 
