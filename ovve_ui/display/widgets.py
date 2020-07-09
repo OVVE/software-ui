@@ -1135,11 +1135,9 @@ def makeandAddAllAlarmSelectors(window, tab_widget):
         height: 40px;
         width: 80px;
         }
-        QTabWidget::pane {
-        background-color: #2C2C2C;
-        }
+
         QTabWidget {
-        background-color: #FF0000;
+        background-color: #2C2C2C;
         }
     
     ''')
