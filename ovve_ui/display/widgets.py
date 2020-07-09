@@ -1123,8 +1123,23 @@ def makeandAddAllAlarmSelectors(window, tab_widget):
         pair = AlarmLimitSelectorPair(window, pair_type)
         window.alarmLimitSelectorPairs[pair_type] = pair
         tab_widget.addTab(pair, pair.tab_str)
-        tab_widget.tabBar().setTabTextColor(count, QColor(0,0,0))
+        tab_widget.tabBar().setTabTextColor(count, QColor(255,255,255))
         count+=1
+
+    tab_widget.setStyleSheet('''
+        QTabBar::tab {
+        background-color: #2C2C2C; 
+        border: 1px solid rgb(255,255,255); 
+        margin-left: 10px;
+        margin-right: 10px;
+        height: 40px;
+        width: 80px;
+        }
+        QTabWidget::pane {
+        background-color: #2C2C2C;
+        }
+    
+    ''')
 
 
 def initializeWarningScreen(window: MainWindow) -> None:
