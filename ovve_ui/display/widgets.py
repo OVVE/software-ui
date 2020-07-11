@@ -1158,13 +1158,7 @@ def initializeWarningScreen(window: MainWindow) -> None:
     window.warning_label.setFixedWidth(400)
     window.warning_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
-    window.warning_ack_button = window.makeSimpleDisplayButton(
-        "OK",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 65))
+    window.warning_ack_button =  window.makeSimpleDisplayButton("OK", size = (200,80))
     window.warning_ack_button.clicked.connect(lambda: window.display(0))
 
     h_box_12_1.addWidget(window.warning_label)

@@ -771,6 +771,15 @@ class MainWindow(QWidget):
         if GPIO:
             GPIO.output(self.alarmPin, GPIO.HIGH)
 
+    def warn(self, main_msg, back, ack_msg=None):
+        self.warning_label.setText(main_msg)
+        if ack_msg is not None:
+            self.warning_ack_button.updateValue(ack_msg)
+        else:
+            self.warning_ack_button.updateValue("OK")
+        self.warning_ack_button.clicked.connect(lambda: self.display(back))
+        self.display(11)
+
     
     def keyPressEvent(self, event):
         if self.dev_mode:
