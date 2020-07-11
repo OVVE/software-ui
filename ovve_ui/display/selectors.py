@@ -71,6 +71,7 @@ class AlarmLimitSelector(QWidget):
         self.alarmLimitType = alarmLimitType
         self.properties = window.alarm_limits[self.alarmLimitType]
         self.pair_selector = None
+        self.warn_on_limit_value = True
 
         self.layout = QVBoxLayout()
 
@@ -131,7 +132,6 @@ class AlarmLimitSelector(QWidget):
             self.dec_button.hide()
 
     def incrementValue(self):
-        # TODO: check warning limit
         if self.properties["settable"]:
             self.window.settings.alarm_limit_values[
                 self.alarmLimitType] += self.properties["increment"]
@@ -139,7 +139,9 @@ class AlarmLimitSelector(QWidget):
                 if self.window.settings.alarm_limit_values[
                         self.
                         alarmLimitType] > self.properties["warning_limit"]:
-                    self.window.warn(self.properties["warning_msg"], 10)
+                    if self.warn_on_limit_value:
+                        self.window.warn(self.properties["warning_msg"], 10)
+                        self.warn_on_limit_value = False
             self.updateValue()
             self.checkIfHideShowButtons()
 
@@ -150,9 +152,12 @@ class AlarmLimitSelector(QWidget):
                 self.alarmLimitType] -= self.properties["increment"]
             if self.properties["warning_limit"] is not None:
                 if self.window.settings.alarm_limit_values[
-                        self.
-                        alarmLimitType] > self.properties["warning_limit"]:
-                    self.window.warn(self.properties["warning_msg"], 10)
+                        self.alarmLimitType] > self.properties["warning_limit"]:
+                    if self.warn_on_limit_value:
+                        self.window.warn(self.properties["warning_msg"], 10)
+                        self.warn_on_limit_value = False
+                else:
+                   self.warn_on_limit_value = True
             self.updateValue()
             self.checkIfHideShowButtons()
 

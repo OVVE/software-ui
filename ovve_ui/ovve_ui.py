@@ -115,7 +115,6 @@ class MainWindow(QWidget):
         lim = AlarmLimits()
         self.alarm_limits = lim.alarm_limits
         self.alarm_limit_pairs = lim.alarm_limit_pairs
-
         self.initializeAndAddStackWidgets()
 
         layout.setContentsMargins(10, 10, 10, 10)
@@ -779,7 +778,6 @@ class MainWindow(QWidget):
             self.warning_ack_button.updateValue("OK")
         self.warning_ack_button.clicked.connect(lambda: self.display(back))
         self.display(11)
-
     
     def keyPressEvent(self, event):
         if self.dev_mode:
