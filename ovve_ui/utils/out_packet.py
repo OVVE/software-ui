@@ -46,8 +46,9 @@ class OutPacket():
 
         return cmd_byteData
         
-    def pack_command(self, run_state, upgrade_fw, should_shut_down) -> int:
+    def pack_command(self, run_state, upgrade_fw, should_shut_down, enable_calibration) -> int:
         return (((run_state == 1) << 0) |
+                ((enable_calibration == 1) << 1) |
                 ((upgrade_fw == 1) << 4) |
                 ((should_shut_down == 1) << 5))
 

@@ -46,6 +46,7 @@ class CommsLink(QThread):
         self.lastSeq=-1
         self.alarmbits = 0
         self.ackbits = 0
+        self.enable_calibration = False
         #statistics
         self.statSeqError=0
         self.statPacketRxCntOk=0
@@ -70,6 +71,13 @@ class CommsLink(QThread):
         self.settings_lock.release()
         self.logger.debug("Got updated settings from UI")
         self.logger.debug(self.settings.to_JSON())
+
+
+    def ready_to_calibrate(self):
+        self.enable_calibration = True
+
+    def ready_to_ventilate(self):
+        self.enable_calibration = False
 
     def set_alarm_ackbits(self, ackbits: int) -> None:
         self.logger.debug("Commslink got ackbits :" + str(ackbits))

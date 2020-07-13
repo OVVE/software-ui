@@ -53,6 +53,7 @@ from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType
+from utils.control_state import ControlState
 
 # Setup logger at global scope
 logger = logging.getLogger()
@@ -68,6 +69,8 @@ sys.excepthook = myExceptHook
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
     pwr_button_pressed_signal = pyqtSignal()
+    ready_to_calibrate_signal = pyqtSignal()
+    ready_to_ventilate_signal = pyqtSignal()
 
     def __init__(self,
                  port: str,
@@ -140,6 +143,8 @@ class MainWindow(QWidget):
         self.comms_handler.lost_comms_signal.connect(self.lost_comms)
 
         self.new_settings_signal.connect(self.comms_handler.update_settings)
+        self.ready_to_calibrate_signal.connect(self.comms_handler.ready_to_calibrate)
+        self.ready_to_ventilate_signal.connect(self.comms_handler.ready_to_ventilate)
         self.comms_handler.start()
 
         # If running on the RPi, the GPIO library will be loaded
@@ -180,7 +185,7 @@ class MainWindow(QWidget):
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
-        ch.setLevel(logging.WARNING)
+        ch.setLevel(logging.DEBUG)
 
         # TODO: Create a custom handler for Ignition
 
@@ -319,11 +324,25 @@ class MainWindow(QWidget):
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
-        if self.params.run_state > 0:
-            self.logger.info(self.params.to_JSON())
-            self.update_ui_alarms()
-            self.updateMainDisplays()
-            self.updateGraphs()
+        if (self.params.control_state == ControlState.UNCALIBRATED):
+            logger.DEBUG("Control state is UNCALIBRATED")
+            # Display 1a and 1b dialogs and signal controller
+            # That we're ready to calibrate
+            # ready_to_calibrate_signal.emit()
+        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION):
+            logger.DEBUG("Control state is SENSOR_CALIBRATION")
+        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE):
+            logger.DEBUG("Control state is SENSOR_CALIBRATION_DONE")
+            # Perform any other setup required before starting ventilation
+            # ready_to_ventilate_signal.emit()
+        elif (self.params.control_state == ControlState.HALT):
+            logger.DEBUG("Control state is HALT")
+        else:   # Controller is idle or ventilating 
+            if self.params.run_state > 0:
+                self.logger.info(self.params.to_JSON())
+                self.update_ui_alarms()
+                self.updateMainDisplays()
+                self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
         if self.alarm_handler.alarms_pending() > 0:
@@ -818,6 +837,12 @@ class MainWindow(QWidget):
 
             elif event.key() == QtCore.Qt.Key_P:
                 self.pwr_button_pressed_signal.emit()
+
+            elif event.key() == QtCore.Qt.Key_C:
+                self.ready_to_calibrate_signal.emit()
+            
+            elif event.key() == QtCore.Qt.Key_V:
+                self.ready_to_ventilate_signal.emit()
 
 
 def main() -> None:
