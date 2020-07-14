@@ -319,10 +319,10 @@ class MainWindow(QWidget):
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
+        self.logger.info(self.params.to_JSON())
+        self.update_ui_alarms()
+        self.updateMainDisplays()
         if self.params.run_state > 0:
-            self.logger.info(self.params.to_JSON())
-            self.update_ui_alarms()
-            self.updateMainDisplays()
             self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
