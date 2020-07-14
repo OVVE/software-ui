@@ -1,5 +1,6 @@
 from utils.params import Params
 from utils.units import Units
+from utils.Alarm import AlarmType
 
 class InPacket():
 
@@ -94,6 +95,8 @@ class InPacket():
         params.high_resp_rate_limit_set = self.data['high_respiratory_rate_limit_set']
         params.low_resp_rate_limit_set = self.data['low_respiratory_rate_limit_set']
         params.alarm_bits = self.data['alarm_bits']
+        if self.check_setpoint_mismatch():
+            params.alarm_bits |= 1 << AlarmType.SETPOINT_MISMATCH
         return params
 
     def ie_fixed_to_fraction(self, n: int) -> float:
@@ -111,3 +114,10 @@ class InPacket():
             return 0
         else:
             return i / e
+
+    def check_setpoint_mismatch(self) -> bool:
+        if (params.resp_rate_meas != params.resp_rate_set or
+            params.tv_meas != params.tv_set or
+            params.ie_ratio_meas != params.ie_ratio_set):
+            return True
+        return False
