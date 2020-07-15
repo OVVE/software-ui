@@ -45,7 +45,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeWarningScreen, 
                              initializeStopVentilationAndPowerDownScreen, 
                              initializePowerDownScreen, initializeLostCommsScreen,
-                             initializeCalibWidget, initializeSetupWidget)
+                             initializeCalibWidget, initializeReadyWidget,
+                             initializeSetupWidget)
 
 from utils.params import Params
 from utils.settings import Settings
@@ -112,7 +113,7 @@ class MainWindow(QWidget):
 
         initializeHomeScreenWidget(self)
 
-        self.page = {str(i): QWidget() for i in range(1, 17)}
+        self.page = {str(i): QWidget() for i in range(1, 18)}
         lim = AlarmLimits()
         self.alarm_limits = lim.alarm_limits
         self.alarm_limit_pairs = lim.alarm_limit_pairs
@@ -189,6 +190,7 @@ class MainWindow(QWidget):
         initializeStopVentilationAndPowerDownScreen(self)
         initializePowerDownScreen(self)
         initializeCalibWidget(self)
+        initializeReadyWidget(self)
 
         initializeSetupWidget(self)
 
@@ -347,13 +349,12 @@ class MainWindow(QWidget):
 
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION):
             self.main_stack.setCurrentIndex(0)
-            self.display(16)
+            self.display(15)
             self.logger.debug("Control state is SENSOR_CALIBRATION")
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE):
+            self.display(16)
             self.logger.debug("Control state is SENSOR_CALIBRATION_DONE")
-            self.enableStartButton()
             # Perform any other setup required before starting ventilation
-            ready_to_ventilate_signal.emit()
         elif (self.params.control_state == ControlState.HALT):
             self.logger.debug("Control state is HALT")
         else:   # Controller is idle or ventilating 
@@ -396,6 +397,8 @@ class MainWindow(QWidget):
     def enableStartButton(self):
         self.start_stop_button_main.button_settings = SimpleButtonSettings(
             fillColor="#412828", borderColor="#fd0101", valueColor="#fd0101")
+        self.start_stop_button_main.update()
+
 
         self.start_stop_button_main.setEnabled(True)
 

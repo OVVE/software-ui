@@ -1305,12 +1305,49 @@ def initializeLostCommsScreen(window: MainWindow) -> None:
 
 def initializeCalibWidget(window: MainWindow) -> None:
     v_box_16 = QVBoxLayout()
+    h_box_16_1 = QHBoxLayout()
     calib_label = QLabel("Calibration in progress. Please wait")
+    calib_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
     calib_label.setFont(
         window.ui_settings.page_settings.mainLabelFont)
     window.disableStartButton()
+    window.disableMainButtons()
+
+    h_box_16_1.addWidget(calib_label)
+    v_box_16.addLayout(h_box_16_1)
 
     window.page["16"].setLayout(v_box_16)
+
+def initializeReadyWidget(window: MainWindow) -> None:
+    def beginVentilation():
+        window.display(0)
+        window.ready_to_ventilate_signal.emit()
+        window.enableStartButton()
+        window.enableMainButtons()
+
+    v_box_17 = QVBoxLayout()
+    h_box_17_1 = QHBoxLayout()
+    h_box_17_2 = QHBoxLayout()
+
+    ready_label = QLabel("Calibration completed. Please check initial settings, connect to patient, and start ventilation.")
+    ready_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    ready_label.setFixedWidth(400)
+    ready_label.setWordWrap(True)
+    ready_label.setAlignment(Qt.AlignCenter)
+    ready_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+
+    ready_confirm = window.makePicButton("confirm")
+    ready_confirm.clicked.connect(beginVentilation)
+
+    h_box_17_1.addWidget(ready_label)
+    h_box_17_2.addWidget(ready_confirm)
+
+    for h_box in [h_box_17_1, h_box_17_2]:
+        h_box.setAlignment(Qt.AlignCenter)
+        v_box_17.addLayout(h_box)
+
+    window.page["17"].setLayout(v_box_17)
 
 def initializeSetupWidget(window: MainWindow) -> None:
     window.setup_stack = QStackedWidget()
