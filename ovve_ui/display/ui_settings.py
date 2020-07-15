@@ -139,7 +139,7 @@ class PageSettings:
         setDatetimeSetting: TextSetting = TextSetting("Arial Black", 36, True),
         alarmLimitMainLabelSetting: TextSetting = TextSetting(
             "Arial", 24, True),
-        alarmLimitLabelSetting: TextSetting = TextSetting("Arial", 12, False),
+        alarmLimitLabelSetting: TextSetting = TextSetting("Arial", 8, False),
         alarmLimitValueSetting: TextSetting = TextSetting(
             "Arial Black", 24, True),
     ):
