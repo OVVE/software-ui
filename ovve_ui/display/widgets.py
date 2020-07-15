@@ -625,6 +625,8 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
     h_box_6bottom.setAlignment(Qt.AlignCenter)
 
     alarm_page_label = QLabel("Alarm")
+    alarm_page_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+
     alarm_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
     alarm_page_label.setAlignment(Qt.AlignCenter)
 
@@ -638,10 +640,6 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
 
     alarm_silence_button = window.makeSimpleDisplayButton(
         f"Silence for {window.settings.silence_time} min.",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
         size=(200, 65))
     alarm_silence_button.clicked.connect(lambda: window.silenceAlarm())
 
