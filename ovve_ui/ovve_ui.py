@@ -27,7 +27,8 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget, QTabWidget, QMessageBox, QDialog)
+                             QStackedLayout, QWidget, QTabWidget, QMessageBox,
+                             QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton, PicButton
 from display.rectangle import DisplayRect
@@ -43,7 +44,8 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
                              initializeWarningScreen, 
                              initializeStopVentilationAndPowerDownScreen, 
-                             initializePowerDownScreen, initializeLostCommsScreen)
+                             initializePowerDownScreen, initializeLostCommsScreen,
+                             initializeCalibWidget, initializeSetupWidget)
 
 from utils.params import Params
 from utils.settings import Settings
@@ -107,20 +109,23 @@ class MainWindow(QWidget):
         self.time_update_timer.timeout.connect(self.updateTimeLabel)
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
-        (layout, stack) = initializeHomeScreenWidget(self)
 
-        self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,16)}
+        initializeHomeScreenWidget(self)
 
-        self.shown_alarm = None
-        self.prev_index = None
-
+        self.page = {str(i): QWidget() for i in range(1, 17)}
         lim = AlarmLimits()
         self.alarm_limits = lim.alarm_limits
         self.alarm_limit_pairs = lim.alarm_limit_pairs
-        self.initializeAndAddStackWidgets()
 
-        layout.setContentsMargins(10, 10, 10, 10)
+        self.initializeWidgets()
+        self.addStackWidgets()
+
+        self.main_stack = QStackedWidget()
+        self.main_stack.addWidget(self.home_screen_widget)
+        self.main_stack.addWidget(self.setup_stack)
+
+        layout = self.main_stack.layout()
+
         self.setLayout(layout)
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, QColor("#2C2C2C"))
@@ -130,6 +135,12 @@ class MainWindow(QWidget):
             self.comms_handler = CommsLink(port)
         else:
             self.comms_handler = CommsSimulator()
+
+
+        self.shown_alarm = None
+        self.prev_index = None
+
+
 
         self.alarm_handler = AlarmHandler()
         self.comms_handler.new_alarms.connect(
@@ -161,6 +172,32 @@ class MainWindow(QWidget):
 
         self.pwr_button_pressed_signal.connect(self.pwrButtonHandler)
 
+    def initializeWidgets(self) -> None:
+        initializeGraphWidget(self)
+        initializeModeWidget(self)
+        initializeRespiratoryRateWidget(self)
+        initializeTidalVolumeWidget(self)
+        initializeIERatioWidget(self)
+        initializeAlarmWidget(self)
+        initializeSettingsWidget(self)
+        initializeConfirmStopWidget(self)
+        initializeChangePatientWidget(self)
+        initializeChangeDatetimeWidget(self)
+        initializeAlarmLimitWidget(self)
+        initializeWarningScreen(self)
+        initializeLostCommsScreen(self)
+        initializeStopVentilationAndPowerDownScreen(self)
+        initializePowerDownScreen(self)
+        initializeCalibWidget(self)
+
+        initializeSetupWidget(self)
+
+    def addStackWidgets(self):
+        for i in self.page:
+            self.stack.addWidget(self.page[i])
+
+    def display(self, i) -> None:
+        self.stack.setCurrentIndex(i)
 
     def setupLogging(self, logger, patient_id):
         logpath = os.path.join("/tmp", "ovve_logs", str(patient_id))
@@ -299,44 +336,26 @@ class MainWindow(QWidget):
                            rect_settings=self.ui_settings.display_rect_settings
                            if rect_settings is None else rect_settings)
 
-    def initializeAndAddStackWidgets(self) -> None:
-        initializeGraphWidget(self)
-        initializeModeWidget(self)
-        initializeRespiratoryRateWidget(self)
-        initializeTidalVolumeWidget(self)
-        initializeIERatioWidget(self)
-        initializeAlarmWidget(self)
-        initializeSettingsWidget(self)
-        initializeConfirmStopWidget(self)
-        initializeChangePatientWidget(self)
-        initializeChangeDatetimeWidget(self)
-        initializeAlarmLimitWidget(self)
-        initializeWarningScreen(self)
-        initializeLostCommsScreen(self)
-        initializeStopVentilationAndPowerDownScreen(self)
-        initializePowerDownScreen(self)
-
-        for i in self.page:
-            self.stack.addWidget(self.page[i])
-
-    def display(self, i) -> None:
-        self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
         if (self.params.control_state == ControlState.UNCALIBRATED):
-            logger.DEBUG("Control state is UNCALIBRATED")
+            self.logger.debug("Control state is UNCALIBRATED")
+            self.main_stack.setCurrentIndex(1)
             # Display 1a and 1b dialogs and signal controller
             # That we're ready to calibrate
-            # ready_to_calibrate_signal.emit()
+
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION):
-            logger.DEBUG("Control state is SENSOR_CALIBRATION")
+            self.main_stack.setCurrentIndex(0)
+            self.display(16)
+            self.logger.debug("Control state is SENSOR_CALIBRATION")
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE):
-            logger.DEBUG("Control state is SENSOR_CALIBRATION_DONE")
+            self.logger.debug("Control state is SENSOR_CALIBRATION_DONE")
+            self.enableStartButton()
             # Perform any other setup required before starting ventilation
-            # ready_to_ventilate_signal.emit()
+            ready_to_ventilate_signal.emit()
         elif (self.params.control_state == ControlState.HALT):
-            logger.DEBUG("Control state is HALT")
+            self.logger.debug("Control state is HALT")
         else:   # Controller is idle or ventilating 
             if self.params.run_state > 0:
                 self.logger.info(self.params.to_JSON())
@@ -373,6 +392,21 @@ class MainWindow(QWidget):
         self.prev_index = None
         self.enableMainButtons()
         self.update_ui_alarms()
+
+    def enableStartButton(self):
+        self.start_stop_button_main.button_settings = SimpleButtonSettings(
+            fillColor="#412828", borderColor="#fd0101", valueColor="#fd0101")
+
+        self.start_stop_button_main.setEnabled(True)
+
+    def disableStartButton(self):
+        self.start_stop_button_main.button_settings = SimpleButtonSettings(
+            fillColor="#808080", borderColor="#A9A9A9",
+            valueColor="#A9A9A9")
+
+        self.start_stop_button_main.update()
+        self.start_stop_button_main.setEnabled(False)
+
 
     def enableMainButtons(self) -> None:
         self.mode_button_main.setEnabled(True)

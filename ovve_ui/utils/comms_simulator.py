@@ -67,14 +67,21 @@ class CommsSimulator(QThread):
                 self.logger.debug("CommsSim: ControlState UNCALIBRATED")
                 if self.enable_calibration:
                     self.control_state = ControlState.SENSOR_CALIBRATION
+                params.control_state = self.control_state
+                self.new_params.emit(params)
             elif self.control_state == ControlState.SENSOR_CALIBRATION:
                 self.logger.debug("CommsSim: ControlState SENSOR_CALIBRATION")
                 self.control_state = ControlState.SENSOR_CALIBRATION_DONE
+                params.control_state = self.control_state
+                self.new_params.emit(params)
             elif self.control_state == ControlState.SENSOR_CALIBRATION_DONE:
                 self.logger.debug("CommsSim: ControlState SENSOR_CALIBRATION_DONE")
                 if not self.enable_calibration:
                     self.logger.debug("CommsSim: ControlState IDLE")
                     self.control_state = ControlState.IDLE
+                params.control_state = self.control_state
+                self.new_params.emit(params)
+
             else:            
                 self.settings_lock.acquire()
                 if self.settings.run_state > 0:

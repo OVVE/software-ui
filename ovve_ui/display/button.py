@@ -104,6 +104,13 @@ class SimpleDisplayButton(QAbstractButton):
 
         self.setLayout(self.layout)
 
+    def update(self):
+        self.value_label.setFont(self.button_settings.valueFont)
+        self.value_label.setStyleSheet("QLabel {color: " +
+                                       self.button_settings.valueColor + ";}")
+        self.value_label.update()
+        super().update()
+
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
 
