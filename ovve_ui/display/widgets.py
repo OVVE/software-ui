@@ -67,7 +67,7 @@ def initializeHomeScreenWidget(
     window.main_battery_level_label = QLabel(f"{window.params.battery_level}%")
     window.main_battery_level_label.setFont(
         window.ui_settings.page_settings.topBarFont)
-    window.main_battery_level_label.setFixedWidth(50)
+    window.main_battery_level_label.setFixedWidth(60)
     window.main_battery_level_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     main_battery_icon_path = path.abspath(
