@@ -341,6 +341,10 @@ class MainWindow(QWidget):
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
+        self.logger.info(self.params.to_JSON())
+        self.update_ui_alarms()
+        self.updateMainDisplays()
+
         if (self.params.control_state == ControlState.UNCALIBRATED):
             self.logger.debug("Control state is UNCALIBRATED")
             self.main_stack.setCurrentIndex(1)
@@ -359,9 +363,6 @@ class MainWindow(QWidget):
             self.logger.debug("Control state is HALT")
         else:   # Controller is idle or ventilating 
             if self.params.run_state > 0:
-                self.logger.info(self.params.to_JSON())
-                self.update_ui_alarms()
-                self.updateMainDisplays()
                 self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
