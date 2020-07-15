@@ -72,7 +72,6 @@ class CommsLink(QThread):
         self.logger.debug("Got updated settings from UI")
         self.logger.debug(self.settings.to_JSON())
 
-
     def ready_to_calibrate(self):
         self.enable_calibration = True
 
@@ -157,7 +156,8 @@ class CommsLink(QThread):
         self.settings_lock.acquire()
 
         self.cmd_pkt.data['mode_value'] = self.settings.mode
-        self.cmd_pkt.data['command'] = self.cmd_pkt.pack_command(self.settings.run_state, 0, self.settings.should_shut_down)
+        self.cmd_pkt.data['command'] = self.cmd_pkt.pack_command(self.settings.run_state, 0, 
+            self.settings.should_shut_down, self.enable_calibration)
         self.cmd_pkt.data['respiratory_rate_set'] = self.settings.resp_rate
         self.cmd_pkt.data['tidal_volume_set'] = Units.ml_to_ecu(
             self.settings.tv)
@@ -326,12 +326,14 @@ class CommsLink(QThread):
         else:
             self.logger.error('Serial Initialization failed')
             # Signal the UI to display and sound an alarm
-            self.lost_comms_signal.emit()
+            #self.lost_comms_signal.emit()
             return
         
         # Process serial data forever.  If we lose the connection,
         # emit the the lost comms signal
-        try:
-            self.process_SerialData()
-        except:
-            self.lost_comms_signal.emit()
+        #try:
+        #    self.process_SerialData()
+        #except:
+        #    self.lost_comms_signal.emit()
+        self.process_SerialData()
+        
