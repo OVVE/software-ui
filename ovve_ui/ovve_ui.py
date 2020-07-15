@@ -341,7 +341,10 @@ class MainWindow(QWidget):
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
-        self.logger.info(self.params.to_JSON())
+        try:
+            self.logger.info(self.params.to_JSON())
+        except:
+            pass
         self.update_ui_alarms()
         self.updateMainDisplays()
 
