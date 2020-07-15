@@ -686,22 +686,34 @@ def initializeSettingsWidget(window: MainWindow) -> None:
 
     settings_change_patient_button = window.makeSimpleDisplayButton(
         "Change Patient",
+        button_settings = SimpleButtonSettings(
+            valueSetting = TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_change_patient_button.clicked.connect(lambda: window.display(8))
 
     settings_change_datetime_button = window.makeSimpleDisplayButton(
         "Change Date/Time",
+        button_settings=SimpleButtonSettings(
+            valueSetting=TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_change_datetime_button.clicked.connect(lambda: window.display(9))
 
     settings_change_alarm_limits_button = window.makeSimpleDisplayButton(
         "Change Alarm Limits",
+        button_settings=SimpleButtonSettings(
+            valueSetting=TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_change_alarm_limits_button.clicked.connect(
         lambda: window.display(10))
 
     settings_back_button = window.makeSimpleDisplayButton(
         "Back to Main",
+        button_settings=SimpleButtonSettings(
+            valueSetting=TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_back_button.clicked.connect(lambda: window.display(0))
 
