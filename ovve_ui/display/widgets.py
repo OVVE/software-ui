@@ -640,7 +640,7 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
 
     alarm_silence_button = window.makeSimpleDisplayButton(
         f"Silence for {window.settings.silence_time} min.",
-        size=(200, 65))
+        size=(250, 80))
     alarm_silence_button.clicked.connect(lambda: window.silenceAlarm())
 
     h_box_6top.addWidget(alarm_page_label)
