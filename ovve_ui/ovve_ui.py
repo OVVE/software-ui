@@ -89,6 +89,7 @@ class MainWindow(QWidget):
         self.dev_mode = dev_mode
         self.last_main_update_time = 0
         self.main_update_interval = 1.0
+        self.calibration_complete = False
 
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
@@ -361,6 +362,7 @@ class MainWindow(QWidget):
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE):
             self.display(16)
             self.logger.debug("Control state is SENSOR_CALIBRATION_DONE")
+            self.calibration_complete = True
             # Perform any other setup required before starting ventilation
         elif (self.params.control_state == ControlState.HALT):
             self.logger.debug("Control state is HALT")
@@ -370,9 +372,7 @@ class MainWindow(QWidget):
 
     def update_ui_alarms(self) -> None:
         if ((self.alarm_handler.alarms_pending() > 0) and 
-            (self.params.control_state != ControlState.UNCALIBRATED) and 
-            (self.params.control_state != ControlState.SENSOR_CALIBRATION) and 
-            (self.params.control_state != ControlState.SENSOR_CALIBRATION_DONE)):
+            self.calibration_complete):
         
             self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
             pending_alarm = self.alarm_handler.get_highest_priority_alarm()
