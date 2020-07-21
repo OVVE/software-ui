@@ -329,11 +329,8 @@ class CommsLink(QThread):
             #self.lost_comms_signal.emit()
             return
         
-        # Process serial data forever.  If we lose the connection,
-        # emit the the lost comms signal
-        #try:
-        #    self.process_SerialData()
-        #except:
-        #    self.lost_comms_signal.emit()
-        self.process_SerialData()
+        try:
+            self.process_SerialData()
+        except:
+            self.logger.debug("Received serial exception")
         
