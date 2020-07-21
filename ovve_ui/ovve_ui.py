@@ -349,6 +349,7 @@ class MainWindow(QWidget):
         self.update_ui_alarms()
         self.updateMainDisplays()
 
+        self.logger.debug("Control state: " + str(self.params.control_state))
         if (self.params.control_state == ControlState.UNCALIBRATED):
             self.logger.debug("Control state is UNCALIBRATED")
             self.main_stack.setCurrentIndex(1)
@@ -698,7 +699,7 @@ class MainWindow(QWidget):
                                            when='H',
                                            interval=1,
                                            backupCount=336)
-        self.fh.setLevel(logging.INFO)
+        self.fh.setLevel(logging.DEBUG)
         self.fh.setFormatter(self.formatter)
         self.logger.addHandler(self.fh)
 
