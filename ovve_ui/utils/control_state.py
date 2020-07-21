@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
-class ControlState(Enum):
+class ControlState(IntEnum):
     UNCALIBRATED = 0x00
     IDLE = 0x01
     BEGIN_INHALATION = 0x02
@@ -13,4 +13,3 @@ class ControlState(Enum):
     HALT = 0x09
     SENSOR_CALIBRATION = 0x0a
     SENSOR_CALIBRATION_DONE = 0x0b
-    
