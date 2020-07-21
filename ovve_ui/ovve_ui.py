@@ -369,7 +369,11 @@ class MainWindow(QWidget):
                 self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
-        if self.alarm_handler.alarms_pending() > 0:
+        if ((self.alarm_handler.alarms_pending() > 0) and 
+            (self.params.control_state != ControlState.UNCALIBRATED) and 
+            (self.params.control_state != ControlState.CALIBRATED) and 
+            (self.params.control_state != ControlState.SENSOR_CALIBRATION_DONE)):
+        
             self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
             pending_alarm = self.alarm_handler.get_highest_priority_alarm()
             if self.shown_alarm is None:
@@ -378,8 +382,6 @@ class MainWindow(QWidget):
         
             if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
                 self.setStartStop(0)
-
-
 
     def showAlarm(self) -> None:
         self.prev_index = self.stack.currentIndex()
