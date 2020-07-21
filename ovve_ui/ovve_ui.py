@@ -371,7 +371,7 @@ class MainWindow(QWidget):
     def update_ui_alarms(self) -> None:
         if ((self.alarm_handler.alarms_pending() > 0) and 
             (self.params.control_state != ControlState.UNCALIBRATED) and 
-            (self.params.control_state != ControlState.CALIBRATED) and 
+            (self.params.control_state != ControlState.SENSOR_CALIBRATION) and 
             (self.params.control_state != ControlState.SENSOR_CALIBRATION_DONE)):
         
             self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
