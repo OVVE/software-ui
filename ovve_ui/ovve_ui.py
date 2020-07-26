@@ -53,6 +53,7 @@ from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType
+from utils.IgnitionHandler import IgnitionHandler
 
 # Setup logger at global scope
 logger = logging.getLogger()
@@ -84,7 +85,8 @@ class MainWindow(QWidget):
         self.last_main_update_time = 0
         self.main_update_interval = 1.0
 
-        self.patient_id = uuid.uuid4()
+        #self.patient_id = uuid.uuid4()
+        self.patient_id = 'ff77d047-ed23-4fb7-8784-0556ccd9fa85'
         self.patient_id_display = 1
 
         self.new_patient_id_display =1
@@ -183,6 +185,11 @@ class MainWindow(QWidget):
         ch.setLevel(logging.WARNING)
 
         # TODO: Create a custom handler for Ignition
+        ih = IgnitionHandler(self.patient_id, "DATA")
+        ih.setLevel(logging.INFO)
+
+        ih_alarm = IgnitionHandler(self.patient_id, "ALARM")
+        ih_alarm.setLevel(logging.CRITICAL)
 
         # create formatter and add it to the handlers
         formatter = logging.Formatter(
@@ -192,6 +199,8 @@ class MainWindow(QWidget):
 
         # add the handlers to the logger
         logger.addHandler(fh)
+        logger.addHandler(ih)
+        logger.addHandler(ih_alarm)
 
         # Only log to console in dev mode
         if (self.dev_mode):
@@ -327,10 +336,17 @@ class MainWindow(QWidget):
 
     def update_ui_alarms(self) -> None:
         if self.alarm_handler.alarms_pending() > 0:
+
             self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
             pending_alarm = self.alarm_handler.get_highest_priority_alarm()
             if self.shown_alarm is None:
-                self.shown_alarm = pending_alarm                    
+                self.shown_alarm = pending_alarm
+
+                #Ignition JSON Payload
+                payload = {"alarm": self.shown_alarm.get_message()}
+                payloadJSON = json.dumps(payload)
+                self.logger.critical(payloadJSON)                    
+
                 self.showAlarm()
         
             if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):

@@ -85,7 +85,8 @@ class CommsSimulator(QThread):
                 #     print("Emitting lost comms signal")
                 #     self.lost_comms_signal.emit()
 
-                if (self.seqnum % 300 == 299):
+                #if (self.seqnum % 300 == 299):
+                if (self.seqnum % 10 == 0):
                     alarmindex = random.randrange(len(list(AlarmType)))
                     alarmtype = list(AlarmType)[alarmindex]
                     self.alarmbits |= 1 << alarmtype.value
@@ -102,4 +103,5 @@ class CommsSimulator(QThread):
                 self.seqnum += 1
 
             self.settings_lock.release()
-            self.msleep(100)
+            #self.msleep(100)
+            self.msleep(2000)
