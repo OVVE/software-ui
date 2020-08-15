@@ -68,6 +68,7 @@ class InPacket():
     def to_params(self,sequenceNo) -> Params:
         params = Params()
         params.run_state = self.data['run_state']
+        params.control_state = self.data['control_state']
         params.seq_num = sequenceNo
         params.packet_version = 4
         params.mode = self.data['mode_value']
