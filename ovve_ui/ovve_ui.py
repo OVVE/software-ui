@@ -352,22 +352,24 @@ class MainWindow(QWidget):
         self.logger.debug("Control state: " + str(self.params.control_state))
         if (self.params.control_state == ControlState.UNCALIBRATED):
             self.logger.debug("Control state is UNCALIBRATED")
+            self.calibration_complete = False
             self.main_stack.setCurrentIndex(1)
-            # Display 1a and 1b dialogs and signal controller
-            # That we're ready to calibrate
-
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION):
-            self.main_stack.setCurrentIndex(0)
-            self.display(15)
             self.logger.debug("Control state is SENSOR_CALIBRATION")
+            self.calibration_complete = False
+            self.main_stack.setCurrentIndex(0)
+            if not self.shown_alarm is None:
+                self.display(15)
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE):
-            self.display(16)
             self.logger.debug("Control state is SENSOR_CALIBRATION_DONE")
-            self.calibration_complete = True
-            # Perform any other setup required before starting ventilation
+            self.calibration_complete = False
+            if not self.shown_alarm is None:
+                self.display(16)
         elif (self.params.control_state == ControlState.HALT):
             self.logger.debug("Control state is HALT")
-        else:   # Controller is idle or ventilating 
+            self.calibration_complete = False
+        else:   # Controller is idle or ventilating
+            self.calibration_complete = True 
             if self.params.run_state > 0:
                 self.updateGraphs()
 
