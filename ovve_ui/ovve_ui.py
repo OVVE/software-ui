@@ -373,6 +373,7 @@ class MainWindow(QWidget):
                 self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
+        print(str(self.ui_calibration_state))
         if ((self.alarm_handler.alarms_pending() > 0) and 
             self.ui_calibration_state == UICalibrationState.CALIBRATION_DONE):
         
@@ -384,6 +385,7 @@ class MainWindow(QWidget):
         
             if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
                 self.setStartStop(0)
+                
 
     def showAlarm(self) -> None:
         self.prev_index = self.stack.currentIndex()
@@ -406,9 +408,8 @@ class MainWindow(QWidget):
         self.start_stop_button_main.button_settings = SimpleButtonSettings(
             fillColor="#412828", borderColor="#fd0101", valueColor="#fd0101")
         self.start_stop_button_main.update()
-
-
         self.start_stop_button_main.setEnabled(True)
+        self.ui_calibration_state = UICalibrationState.CALIBRATION_DONE
 
     def disableStartButton(self):
         self.start_stop_button_main.button_settings = SimpleButtonSettings(
