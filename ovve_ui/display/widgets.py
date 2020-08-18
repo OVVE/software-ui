@@ -20,6 +20,7 @@ from display.selectors import AlarmLimitSelector, AlarmLimitSelectorPair
 
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType, AlarmLimitPair
+from utils.ui_calibration_state import UICalibrationState
 
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')
@@ -1324,6 +1325,7 @@ def initializeReadyWidget(window: MainWindow) -> None:
         window.ready_to_ventilate_signal.emit()
         window.enableStartButton()
         window.enableMainButtons()
+        window.setUICalibrationState(UICalibrationState.CALIBRATION_DONE)
 
     v_box_17 = QVBoxLayout()
     h_box_17_1 = QHBoxLayout()

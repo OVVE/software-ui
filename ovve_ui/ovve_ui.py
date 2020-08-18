@@ -353,18 +353,20 @@ class MainWindow(QWidget):
         self.logger.debug("Control state: " + str(self.params.control_state))
         if (self.params.control_state == ControlState.UNCALIBRATED):
             self.logger.debug("Control state is UNCALIBRATED")
-            self.ui_calibration_state = UICalibrationState.UNCALIBRATED
+            self.setUICalibrationState(UICalibrationState.UNCALIBRATED)
             self.main_stack.setCurrentIndex(1)
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION and
               self.ui_calibration_state == UICalibrationState.UNCALIBRATED):
             self.logger.debug("Control state is SENSOR_CALIBRATION")
-            self.ui_calibration_state = UICalibrationState.SENSOR_CALIBRATION
+            self.setUICalibrationState(UICalibrationState.SENSOR_CALIBRATION)
             self.main_stack.setCurrentIndex(0)
             self.display(15)
         elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE and
               self.ui_calibration_state == UICalibrationState.SENSOR_CALIBRATION):
             self.logger.debug("Control state is SENSOR_CALIBRATION_DONE")
-            self.ui_calibration_state = UICalibrationState.CALIBRATION_PENDING
+            self.setUICalibrationState(UICalibrationState.CALIBRATION_PENDING)
+            # Note, the UI calibration state will be set to CALIBRATION_DONE
+            # When the user acknowledges the startup message raised by this dialog
             self.display(16)
         elif (self.params.control_state == ControlState.HALT):
             self.logger.debug("Control state is HALT")
@@ -404,12 +406,14 @@ class MainWindow(QWidget):
         self.enableMainButtons()
         self.update_ui_alarms()
 
+    def setUICalibrationState(self, uiCalibrationState):
+        self.ui_calibration_state = uiCalibrationState
+
     def enableStartButton(self):
         self.start_stop_button_main.button_settings = SimpleButtonSettings(
             fillColor="#412828", borderColor="#fd0101", valueColor="#fd0101")
         self.start_stop_button_main.update()
         self.start_stop_button_main.setEnabled(True)
-        self.ui_calibration_state = UICalibrationState.CALIBRATION_DONE
 
     def disableStartButton(self):
         self.start_stop_button_main.button_settings = SimpleButtonSettings(
