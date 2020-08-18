@@ -369,7 +369,6 @@ class MainWindow(QWidget):
         elif (self.params.control_state == ControlState.HALT):
             self.logger.debug("Control state is HALT")
         else:   # Controller is idle or ventilating
-            self.ui_calibration_state = UICalibrationState.CALIBRATION_DONE
             if self.params.run_state > 0:
                 self.updateGraphs()
 
