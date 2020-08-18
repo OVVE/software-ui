@@ -1324,6 +1324,7 @@ def initializeReadyWidget(window: MainWindow) -> None:
         window.ready_to_ventilate_signal.emit()
         window.enableStartButton()
         window.enableMainButtons()
+        window.ui_calibration_state = UICalibrationState.CALIBRATION_DONE
 
     v_box_17 = QVBoxLayout()
     h_box_17_1 = QHBoxLayout()
