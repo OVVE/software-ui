@@ -59,7 +59,7 @@ class CommsSimulator(QThread):
 
     def run(self) -> None:
         params = Params()
-       
+        alarmindex = 0
         while not self.done:
             
             # Simulate controller state changes for calibration
@@ -86,6 +86,7 @@ class CommsSimulator(QThread):
                 self.settings_lock.acquire()
                 if self.settings.run_state > 0:
                     params.run_state = self.settings.run_state
+                    params.control_state = self.control_state
                     params.seq_num = self.seqnum
                     params.packet_version = self.packet_version
                     params.mode = self.settings.mode
@@ -109,7 +110,6 @@ class CommsSimulator(QThread):
                     params.tv_insp = random.uniform(475, 575)
                     params.tv_exp = random.uniform(475, 575)
                     params.tv_rate = random.uniform(475, 575)
-                    params.control_state = 0
                     params.battery_level = random.randint(0, 100)
                     self.new_params.emit(params)
 
@@ -117,17 +117,18 @@ class CommsSimulator(QThread):
                     #     print("Emitting lost comms signal")
                     #     self.lost_comms_signal.emit()
 
-                    if (self.seqnum % 300 == 299):
-                        alarmindex = random.randrange(len(list(AlarmType)))
+                    if (self.seqnum % 100 == 99):
+                        #alarmindex = random.randrange(len(list(AlarmType)))
+                        alarmindex += 1
                         alarmtype = list(AlarmType)[alarmindex]
                         self.alarmbits |= 1 << alarmtype.value
-                        if random.randint(0,3) == 0:
-                            alarmindex2 = random.randrange(len(list(AlarmType)))
-                            alarmtype2 = list(AlarmType)[alarmindex2]
-                            self.alarmbits |= 1 << alarmtype2.value
-                            self.logger.debug("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(self.alarmbits)))
-                        else:
-                            self.logger.debug("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(self.alarmbits)))
+                        # if random.randint(0,3) == 0:
+                        #     alarmindex2 = random.randrange(len(list(AlarmType)))
+                        #     alarmtype2 = list(AlarmType)[alarmindex2]
+                        #     self.alarmbits |= 1 << alarmtype2.value
+                        #     self.logger.debug("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(self.alarmbits)))
+                        # else:
+                        #     self.logger.debug("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(self.alarmbits)))
 
                         self.new_alarms.emit(self.alarmbits)
 

@@ -57,6 +57,7 @@ from utils.ranges import Ranges
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType
 from utils.control_state import ControlState
+from utils.ui_calibration_state import UICalibrationState
 
 # Setup logger at global scope
 logger = logging.getLogger()
@@ -143,7 +144,6 @@ class MainWindow(QWidget):
         self.prev_index = None
 
 
-
         self.alarm_handler = AlarmHandler()
         self.comms_handler.new_alarms.connect(
             self.alarm_handler.set_active_alarms)
@@ -151,6 +151,7 @@ class MainWindow(QWidget):
             self.comms_handler.set_alarm_ackbits)
         self.dismissedAlarms = []
 
+        self.ui_calibration_state = UICalibrationState.UNCALIBRATED
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.comms_handler.lost_comms_signal.connect(self.lost_comms)
@@ -352,30 +353,29 @@ class MainWindow(QWidget):
         self.logger.debug("Control state: " + str(self.params.control_state))
         if (self.params.control_state == ControlState.UNCALIBRATED):
             self.logger.debug("Control state is UNCALIBRATED")
-            self.calibration_complete = False
+            self.ui_calibration_state = UICalibrationState.UNCALIBRATED
             self.main_stack.setCurrentIndex(1)
-        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION):
+        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION and
+              self.ui_calibration_state == UICalibrationState.UNCALIBRATED):
             self.logger.debug("Control state is SENSOR_CALIBRATION")
-            self.calibration_complete = False
+            self.ui_calibration_state = UICalibrationState.SENSOR_CALIBRATION
             self.main_stack.setCurrentIndex(0)
-            if not self.shown_alarm is None:
-                self.display(15)
-        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE):
+            self.display(15)
+        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE and
+              self.ui_calibration_state == UICalibrationState.SENSOR_CALIBRATION):
             self.logger.debug("Control state is SENSOR_CALIBRATION_DONE")
-            self.calibration_complete = False
-            if not self.shown_alarm is None:
-                self.display(16)
+            self.ui_calibration_state = UICalibrationState.CALIBRATION_PENDING
+            self.display(16)
         elif (self.params.control_state == ControlState.HALT):
             self.logger.debug("Control state is HALT")
-            self.calibration_complete = False
         else:   # Controller is idle or ventilating
-            self.calibration_complete = True 
+            self.ui_calibration_state = UICalibrationState.CALIBRATION_DONE
             if self.params.run_state > 0:
                 self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
         if ((self.alarm_handler.alarms_pending() > 0) and 
-            self.calibration_complete):
+            self.ui_calibration_state == UICalibrationState.CALIBRATION_DONE):
         
             self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
             pending_alarm = self.alarm_handler.get_highest_priority_alarm()
