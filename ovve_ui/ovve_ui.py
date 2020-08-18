@@ -375,7 +375,6 @@ class MainWindow(QWidget):
                 self.updateGraphs()
 
     def update_ui_alarms(self) -> None:
-        print(str(self.ui_calibration_state))
         if ((self.alarm_handler.alarms_pending() > 0) and 
             self.ui_calibration_state == UICalibrationState.CALIBRATION_DONE):
         
