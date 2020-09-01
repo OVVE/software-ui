@@ -68,7 +68,7 @@ def initializeHomeScreenWidget(
     window.main_battery_level_label = QLabel(f"{window.params.battery_level}%")
     window.main_battery_level_label.setFont(
         window.ui_settings.page_settings.topBarFont)
-    window.main_battery_level_label.setFixedWidth(50)
+    window.main_battery_level_label.setFixedWidth(60)
     window.main_battery_level_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
     main_battery_icon_path = path.abspath(
@@ -631,6 +631,8 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
     h_box_6bottom.setAlignment(Qt.AlignCenter)
 
     alarm_page_label = QLabel("Alarm")
+    alarm_page_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+
     alarm_page_label.setFont(window.ui_settings.page_settings.mainLabelFont)
     alarm_page_label.setAlignment(Qt.AlignCenter)
 
@@ -644,11 +646,7 @@ def initializeAlarmWidget(window: MainWindow) -> None:  #Alarm
 
     alarm_silence_button = window.makeSimpleDisplayButton(
         f"Silence for {window.settings.silence_time} min.",
-        button_settings=SimpleButtonSettings(
-            valueSetting=window.ui_settings.page_settings.cancelSetting,
-            fillColor=window.ui_settings.page_settings.alarmSilenceButtonColor
-        ),
-        size=(200, 65))
+        size=(250, 80))
     alarm_silence_button.clicked.connect(lambda: window.silenceAlarm())
 
     h_box_6top.addWidget(alarm_page_label)
@@ -692,22 +690,34 @@ def initializeSettingsWidget(window: MainWindow) -> None:
 
     settings_change_patient_button = window.makeSimpleDisplayButton(
         "Change Patient",
+        button_settings = SimpleButtonSettings(
+            valueSetting = TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_change_patient_button.clicked.connect(lambda: window.display(8))
 
     settings_change_datetime_button = window.makeSimpleDisplayButton(
         "Change Date/Time",
+        button_settings=SimpleButtonSettings(
+            valueSetting=TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_change_datetime_button.clicked.connect(lambda: window.display(9))
 
     settings_change_alarm_limits_button = window.makeSimpleDisplayButton(
         "Change Alarm Limits",
+        button_settings=SimpleButtonSettings(
+            valueSetting=TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_change_alarm_limits_button.clicked.connect(
         lambda: window.display(10))
 
     settings_back_button = window.makeSimpleDisplayButton(
         "Back to Main",
+        button_settings=SimpleButtonSettings(
+            valueSetting=TextSetting("Arial Black", 14, False),
+        ),
         size=(200, 60))
     settings_back_button.clicked.connect(lambda: window.display(0))
 
