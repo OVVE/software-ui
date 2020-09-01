@@ -46,6 +46,7 @@ class CommsSimulator(QThread):
 
     def fireAlarm(self, key: int):
         self.firedAlarms.append(key)
+        self.new_alarms.emit(key)
 
     def run(self) -> None:
         params = Params()
@@ -86,19 +87,19 @@ class CommsSimulator(QThread):
                 #     self.lost_comms_signal.emit()
 
                 #if (self.seqnum % 300 == 299):
-                if (self.seqnum % 10 == 0):
-                    alarmindex = random.randrange(len(list(AlarmType)))
-                    alarmtype = list(AlarmType)[alarmindex]
-                    self.alarmbits |= 1 << alarmtype.value
-                    if random.randint(0,3) == 0:
-                        alarmindex2 = random.randrange(len(list(AlarmType)))
-                        alarmtype2 = list(AlarmType)[alarmindex2]
-                        self.alarmbits |= 1 << alarmtype2.value
-                        self.logger.debug("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(self.alarmbits)))
-                    else:
-                        self.logger.debug("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(self.alarmbits)))
+                # if (self.seqnum % 10 == 0):
+                #     alarmindex = random.randrange(len(list(AlarmType)))
+                #     alarmtype = list(AlarmType)[alarmindex]
+                #     self.alarmbits |= 1 << alarmtype.value
+                #     if random.randint(0,3) == 0:
+                #         alarmindex2 = random.randrange(len(list(AlarmType)))
+                #         alarmtype2 = list(AlarmType)[alarmindex2]
+                #         self.alarmbits |= 1 << alarmtype2.value
+                #         self.logger.debug("Emitting two alarms " + alarmtype.name + ", " + alarmtype2.name + " bits: " + str(bin(self.alarmbits)))
+                #     else:
+                #         self.logger.debug("Emitting an alarm " + alarmtype.name + " bits: " + str(bin(self.alarmbits)))
 
-                    self.new_alarms.emit(self.alarmbits)
+                #     self.new_alarms.emit(self.alarmbits)
 
                 self.seqnum += 1
 
