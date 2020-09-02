@@ -20,13 +20,14 @@ from display.selectors import AlarmLimitSelector, AlarmLimitSelectorPair
 
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType, AlarmLimitPair
+from utils.ui_calibration_state import UICalibrationState
 
 # Used for documentation purposes only
 MainWindow = TypeVar('MainWindow')
 
 
 def initializeHomeScreenWidget(
-        window: MainWindow) -> (QVBoxLayout, QStackedWidget):
+        window: MainWindow) -> None:
     """ Creates Home Screen for Widgets """
     layout = QVBoxLayout()
     h_box_1 = QHBoxLayout()
@@ -229,7 +230,12 @@ def initializeHomeScreenWidget(
     for h_layout in [h_box_1, h_box_2, h_box_3]:
         layout.addLayout(h_layout)
 
-    return layout, stack
+    wrapper = QWidget()
+    wrapper.setLayout(layout)
+
+    window.home_screen_widget = wrapper
+
+    window.stack = stack
 
 
 def initializeGraphWidget(window: MainWindow) -> None:
@@ -1308,51 +1314,127 @@ def initializeLostCommsScreen(window: MainWindow) -> None:
 
     window.page["15"].setLayout(v_box_15)
 
-
-  
-
-def initializePowerDownScreen(window: MainWindow) -> None:
-    v_box_14 = QVBoxLayout()
-    h_box_14top = QHBoxLayout()
-    h_box_14bottom = QHBoxLayout()
-
-    h_box_14top.setAlignment(Qt.AlignCenter)
-    h_box_14bottom.setAlignment(Qt.AlignCenter)
-
-    confirm_power_down_value_label = QLabel(
-        "Power down the device?")
-    confirm_power_down_value_label.setFont(
+def initializeCalibWidget(window: MainWindow) -> None:
+    v_box_16 = QVBoxLayout()
+    h_box_16_1 = QHBoxLayout()
+    calib_label = QLabel("Calibration in progress. Please wait")
+    calib_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    calib_label.setFont(
         window.ui_settings.page_settings.mainLabelFont)
-    confirm_power_down_value_label.setWordWrap(True)
-    confirm_power_down_value_label.setAlignment(Qt.AlignCenter)
-    confirm_power_down_value_label.setFixedHeight(150)
-    confirm_power_down_value_label.setFixedWidth(400)
-    confirm_power_down_value_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    window.disableStartButton()
+    window.disableMainButtons()
 
-    confirm_power_down_cancel_button = window.makePicButton(
-        "cancel",
-        size=(60, 60),
+    h_box_16_1.addWidget(calib_label)
+    v_box_16.addLayout(h_box_16_1)
+
+    window.page["16"].setLayout(v_box_16)
+
+def initializeReadyWidget(window: MainWindow) -> None:
+    def beginVentilation():
+        window.display(0)
+        window.ready_to_ventilate_signal.emit()
+        window.enableStartButton()
+        window.enableMainButtons()
+        window.setUICalibrationState(UICalibrationState.CALIBRATION_DONE)
+
+    v_box_17 = QVBoxLayout()
+    h_box_17_1 = QHBoxLayout()
+    h_box_17_2 = QHBoxLayout()
+
+    ready_label = QLabel("Calibration completed. Please check initial settings, connect to patient, and start ventilation.")
+    ready_label.setStyleSheet("QLabel {color: #FFFFFF ;}")
+    ready_label.setFixedWidth(400)
+    ready_label.setWordWrap(True)
+    ready_label.setAlignment(Qt.AlignCenter)
+    ready_label.setFont(
+        window.ui_settings.page_settings.mainLabelFont)
+
+    ready_confirm = window.makePicButton("confirm")
+    ready_confirm.clicked.connect(beginVentilation)
+
+    h_box_17_1.addWidget(ready_label)
+    h_box_17_2.addWidget(ready_confirm)
+
+    for h_box in [h_box_17_1, h_box_17_2]:
+        h_box.setAlignment(Qt.AlignCenter)
+        v_box_17.addLayout(h_box)
+
+    window.page["17"].setLayout(v_box_17)
+
+def initializeSetupWidget(window: MainWindow) -> None:
+    window.setup_stack = QStackedWidget()
+    for step in range(1 , 5):
+        window.setup_stack.addWidget(
+            initializeSetupStepWidget(window, step, window.setup_stack)
+        )
+
+
+def initializeSetupStepWidget(window, step, stack):
+    setup_messages = {"1": "Please confirm that the device is disconnected from the patient.",
+                        "2": "Please ensure the pressure sensor is disconnected "
+                             "from the breathing circuit",
+                        "3": "Please ensure the airflow sensor is connected "
+                             "to the breathing circuit",
+                        "4": "Press Calibrate to begin calibration"
+                        }
+
+    setup_layout = QVBoxLayout()
+    setup_sub_layouts = {str(j): QHBoxLayout() for j in range(1, 5)}
+
+    logo_path = path.abspath(
+        path.join(path.dirname(__file__), "images/lm_logo_dark.png"))
+    setup_logo = window.makePicButton(
+        logo_path,
+        size=(370, 60),
+        custom_path=True
     )
-    confirm_power_down_cancel_button.clicked.connect(lambda: window.display(0))
 
-    confirm_power_down_confirm_button = window.makePicButton(
-        "confirm",
-        size=(60, 60),
-    )
-    confirm_power_down_confirm_button.clicked.connect(window.powerDown)
+    setup_instruction = QLabel(setup_messages[str(step)])
+    label_list = [setup_instruction]
 
-    confirm_power_down_confirm_button.setFont(
-        window.ui_settings.simple_button_settings.valueFont)
+    if step == 1:
+        setup_header = QLabel("Welcome to the LifeMech Adaptive Ventilation System")
+        label_list.append(setup_header)
 
-    h_box_14bottom.setSpacing(100)
+    for label in label_list:
+        label.setFont(window.ui_settings.page_settings.mainLabelFont)
+        label.setWordWrap(True)
+        label.setAlignment(Qt.AlignCenter)
+        label.setFixedHeight(150)
+        label.setFixedWidth(400)
+        label.setStyleSheet("QLabel {color: #FFFFFF ;}")
 
-    h_box_14top.addWidget(confirm_power_down_value_label)
-    h_box_14bottom.addWidget(confirm_power_down_cancel_button)
-    h_box_14bottom.addWidget(confirm_power_down_confirm_button)
-    v_box_14.addLayout(h_box_14top)
-    v_box_14.addLayout(h_box_14bottom)
+    if step == 4:
+        setup_confirm = window.makeSimpleDisplayButton("Calibrate", size=(200, 80))
+        setup_confirm.clicked.connect(lambda: window.ready_to_calibrate_signal.emit())
+    else:
+        setup_confirm = window.makeSimpleDisplayButton("Confirm", size=(200, 80))
+        setup_confirm.clicked.connect(lambda: stack.setCurrentIndex(step))
 
-    window.page["14"].setLayout(v_box_14)
+    setup_sub_layouts["1"].addWidget(setup_logo)
+    if step == 1:
+        setup_sub_layouts["2"].addWidget(setup_header)
+    setup_sub_layouts["3"].addWidget(setup_instruction)
+    setup_sub_layouts["4"].addWidget(setup_confirm)
+
+    for j in range(1, 5):
+        if j != 2 or step == 1:
+            layout = setup_sub_layouts[str(j)]
+            layout.setAlignment(Qt.AlignCenter)
+            setup_layout.addLayout(layout)
+
+    wrapper = QWidget()
+    wrapper.setLayout(setup_layout)
+
+    return wrapper
+
+
+
+
+
+
+
+
 
   
 

@@ -27,7 +27,8 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QAbstractButton, QApplication, QHBoxLayout,
                              QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                             QWidget, QTabWidget, QMessageBox, QDialog)
+                             QStackedLayout, QWidget, QTabWidget, QMessageBox,
+                             QDialog)
 
 from display.button import FancyDisplayButton, SimpleDisplayButton, PicButton
 from display.rectangle import DisplayRect
@@ -43,7 +44,9 @@ from display.widgets import (initializeHomeScreenWidget, initializeModeWidget,
                              initializeChangeDatetimeWidget, initializeAlarmLimitWidget,
                              initializeWarningScreen, 
                              initializeStopVentilationAndPowerDownScreen, 
-                             initializePowerDownScreen, initializeLostCommsScreen)
+                             initializePowerDownScreen, initializeLostCommsScreen,
+                             initializeCalibWidget, initializeReadyWidget,
+                             initializeSetupWidget)
 
 from utils.params import Params
 from utils.settings import Settings
@@ -53,6 +56,8 @@ from utils.comms_link import CommsLink
 from utils.ranges import Ranges
 from utils.alarm_limits import AlarmLimits
 from utils.alarm_limit_type import AlarmLimitType
+from utils.control_state import ControlState
+from utils.ui_calibration_state import UICalibrationState
 
 # Setup logger at global scope
 logger = logging.getLogger()
@@ -68,6 +73,8 @@ sys.excepthook = myExceptHook
 class MainWindow(QWidget):
     new_settings_signal = pyqtSignal(dict)
     pwr_button_pressed_signal = pyqtSignal()
+    ready_to_calibrate_signal = pyqtSignal()
+    ready_to_ventilate_signal = pyqtSignal()
 
     def __init__(self,
                  port: str,
@@ -83,6 +90,7 @@ class MainWindow(QWidget):
         self.dev_mode = dev_mode
         self.last_main_update_time = 0
         self.main_update_interval = 1.0
+        self.calibration_complete = False
 
         self.patient_id = uuid.uuid4()
         self.patient_id_display = 1
@@ -104,20 +112,23 @@ class MainWindow(QWidget):
         self.time_update_timer.timeout.connect(self.updateTimeLabel)
 
         self.setFixedSize(800, 480)  # hardcoded (non-adjustable) screensize
-        (layout, stack) = initializeHomeScreenWidget(self)
 
-        self.stack = stack
-        self.page = {str(i): QWidget() for i in range(1,16)}
+        initializeHomeScreenWidget(self)
 
-        self.shown_alarm = None
-        self.prev_index = None
-
+        self.page = {str(i): QWidget() for i in range(1, 18)}
         lim = AlarmLimits()
         self.alarm_limits = lim.alarm_limits
         self.alarm_limit_pairs = lim.alarm_limit_pairs
-        self.initializeAndAddStackWidgets()
 
-        layout.setContentsMargins(10, 10, 10, 10)
+        self.initializeWidgets()
+        self.addStackWidgets()
+
+        self.main_stack = QStackedWidget()
+        self.main_stack.addWidget(self.home_screen_widget)
+        self.main_stack.addWidget(self.setup_stack)
+
+        layout = self.main_stack.layout()
+
         self.setLayout(layout)
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.Background, QColor("#2C2C2C"))
@@ -128,6 +139,11 @@ class MainWindow(QWidget):
         else:
             self.comms_handler = CommsSimulator()
 
+
+        self.shown_alarm = None
+        self.prev_index = None
+
+
         self.alarm_handler = AlarmHandler()
         self.comms_handler.new_alarms.connect(
             self.alarm_handler.set_active_alarms)
@@ -135,11 +151,14 @@ class MainWindow(QWidget):
             self.comms_handler.set_alarm_ackbits)
         self.dismissedAlarms = []
 
+        self.ui_calibration_state = UICalibrationState.UNCALIBRATED
         self.comms_handler.new_params.connect(self.update_ui_params)
         self.comms_handler.new_alarms.connect(self.update_ui_alarms)
         self.comms_handler.lost_comms_signal.connect(self.lost_comms)
 
         self.new_settings_signal.connect(self.comms_handler.update_settings)
+        self.ready_to_calibrate_signal.connect(self.comms_handler.ready_to_calibrate)
+        self.ready_to_ventilate_signal.connect(self.comms_handler.ready_to_ventilate)
         self.comms_handler.start()
 
         # If running on the RPi, the GPIO library will be loaded
@@ -156,6 +175,33 @@ class MainWindow(QWidget):
 
         self.pwr_button_pressed_signal.connect(self.pwrButtonHandler)
 
+    def initializeWidgets(self) -> None:
+        initializeGraphWidget(self)
+        initializeModeWidget(self)
+        initializeRespiratoryRateWidget(self)
+        initializeTidalVolumeWidget(self)
+        initializeIERatioWidget(self)
+        initializeAlarmWidget(self)
+        initializeSettingsWidget(self)
+        initializeConfirmStopWidget(self)
+        initializeChangePatientWidget(self)
+        initializeChangeDatetimeWidget(self)
+        initializeAlarmLimitWidget(self)
+        initializeWarningScreen(self)
+        initializeLostCommsScreen(self)
+        initializeStopVentilationAndPowerDownScreen(self)
+        initializePowerDownScreen(self)
+        initializeCalibWidget(self)
+        initializeReadyWidget(self)
+
+        initializeSetupWidget(self)
+
+    def addStackWidgets(self):
+        for i in self.page:
+            self.stack.addWidget(self.page[i])
+
+    def display(self, i) -> None:
+        self.stack.setCurrentIndex(i)
 
     def setupLogging(self, logger, patient_id):
         logpath = os.path.join("/tmp", "ovve_logs", str(patient_id))
@@ -180,7 +226,7 @@ class MainWindow(QWidget):
 
         # Log to console with human-readable output
         ch = logging.StreamHandler()
-        ch.setLevel(logging.WARNING)
+        ch.setLevel(logging.DEBUG)
 
         # TODO: Create a custom handler for Ignition
 
@@ -294,39 +340,52 @@ class MainWindow(QWidget):
                            rect_settings=self.ui_settings.display_rect_settings
                            if rect_settings is None else rect_settings)
 
-    def initializeAndAddStackWidgets(self) -> None:
-        initializeGraphWidget(self)
-        initializeModeWidget(self)
-        initializeRespiratoryRateWidget(self)
-        initializeTidalVolumeWidget(self)
-        initializeIERatioWidget(self)
-        initializeAlarmWidget(self)
-        initializeSettingsWidget(self)
-        initializeConfirmStopWidget(self)
-        initializeChangePatientWidget(self)
-        initializeChangeDatetimeWidget(self)
-        initializeAlarmLimitWidget(self)
-        initializeWarningScreen(self)
-        initializeLostCommsScreen(self)
-        initializeStopVentilationAndPowerDownScreen(self)
-        initializePowerDownScreen(self)
-
-        for i in self.page:
-            self.stack.addWidget(self.page[i])
-
-    def display(self, i) -> None:
-        self.stack.setCurrentIndex(i)
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
+<<<<<<< HEAD
+        try:
+            self.logger.info(self.params.to_JSON())
+        except:
+            pass
+        self.update_ui_alarms()
+        self.updateMainDisplays()
+
+        self.logger.debug("Control state: " + str(self.params.control_state))
+        if (self.params.control_state == ControlState.UNCALIBRATED):
+            self.logger.debug("Control state is UNCALIBRATED")
+            self.setUICalibrationState(UICalibrationState.UNCALIBRATED)
+            self.main_stack.setCurrentIndex(1)
+        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION and
+              self.ui_calibration_state == UICalibrationState.UNCALIBRATED):
+            self.logger.debug("Control state is SENSOR_CALIBRATION")
+            self.setUICalibrationState(UICalibrationState.SENSOR_CALIBRATION)
+            self.main_stack.setCurrentIndex(0)
+            self.display(15)
+        elif (self.params.control_state == ControlState.SENSOR_CALIBRATION_DONE and
+              self.ui_calibration_state == UICalibrationState.SENSOR_CALIBRATION):
+            self.logger.debug("Control state is SENSOR_CALIBRATION_DONE")
+            self.setUICalibrationState(UICalibrationState.CALIBRATION_PENDING)
+            # Note, the UI calibration state will be set to CALIBRATION_DONE
+            # When the user acknowledges the startup message raised by this dialog
+            self.display(16)
+        elif (self.params.control_state == ControlState.HALT):
+            self.logger.debug("Control state is HALT")
+        else:   # Controller is idle or ventilating
+            if self.params.run_state > 0:
+                self.updateGraphs()
+=======
         self.logger.info(self.params.to_JSON())
         self.update_ui_alarms()
         self.updateMainDisplays()
         if self.params.run_state > 0:
             self.updateGraphs()
+>>>>>>> develop
 
     def update_ui_alarms(self) -> None:
-        if self.alarm_handler.alarms_pending() > 0:
+        if ((self.alarm_handler.alarms_pending() > 0) and 
+            self.ui_calibration_state == UICalibrationState.CALIBRATION_DONE):
+        
             self.logger.debug("Pending : " + str(self.alarm_handler.alarms_pending()))
             pending_alarm = self.alarm_handler.get_highest_priority_alarm()
             if self.shown_alarm is None:
@@ -335,8 +394,7 @@ class MainWindow(QWidget):
         
             if (self.shown_alarm.alarm_type == AlarmType.ESTOP_PRESSED):
                 self.setStartStop(0)
-
-
+                
 
     def showAlarm(self) -> None:
         self.prev_index = self.stack.currentIndex()
@@ -354,6 +412,24 @@ class MainWindow(QWidget):
         self.prev_index = None
         self.enableMainButtons()
         self.update_ui_alarms()
+
+    def setUICalibrationState(self, uiCalibrationState):
+        self.ui_calibration_state = uiCalibrationState
+
+    def enableStartButton(self):
+        self.start_stop_button_main.button_settings = SimpleButtonSettings(
+            fillColor="#412828", borderColor="#fd0101", valueColor="#fd0101")
+        self.start_stop_button_main.update()
+        self.start_stop_button_main.setEnabled(True)
+
+    def disableStartButton(self):
+        self.start_stop_button_main.button_settings = SimpleButtonSettings(
+            fillColor="#808080", borderColor="#A9A9A9",
+            valueColor="#A9A9A9")
+
+        self.start_stop_button_main.update()
+        self.start_stop_button_main.setEnabled(False)
+
 
     def enableMainButtons(self) -> None:
         self.mode_button_main.setEnabled(True)
@@ -636,7 +712,7 @@ class MainWindow(QWidget):
                                            when='H',
                                            interval=1,
                                            backupCount=336)
-        self.fh.setLevel(logging.INFO)
+        self.fh.setLevel(logging.DEBUG)
         self.fh.setFormatter(self.formatter)
         self.logger.addHandler(self.fh)
 
@@ -818,6 +894,12 @@ class MainWindow(QWidget):
 
             elif event.key() == QtCore.Qt.Key_P:
                 self.pwr_button_pressed_signal.emit()
+
+            elif event.key() == QtCore.Qt.Key_C:
+                self.ready_to_calibrate_signal.emit()
+            
+            elif event.key() == QtCore.Qt.Key_V:
+                self.ready_to_ventilate_signal.emit()
 
 
 def main() -> None:
