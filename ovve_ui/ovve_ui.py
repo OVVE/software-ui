@@ -363,7 +363,6 @@ class MainWindow(QWidget):
 
     def update_ui_params(self, params: Params) -> None:
         self.params = params
-<<<<<<< HEAD
         try:
             self.logger.info(self.params.to_JSON())
         except:
@@ -394,13 +393,6 @@ class MainWindow(QWidget):
         else:   # Controller is idle or ventilating
             if self.params.run_state > 0:
                 self.updateGraphs()
-=======
-        self.logger.info(self.params.to_JSON())
-        self.update_ui_alarms()
-        self.updateMainDisplays()
-        if self.params.run_state > 0:
-            self.updateGraphs()
->>>>>>> develop
 
     def update_ui_alarms(self) -> None:
         if ((self.alarm_handler.alarms_pending() > 0) and 
