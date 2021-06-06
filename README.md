@@ -3,7 +3,7 @@ OVVE ( Oregon Ventilator Volunteer Effort(Aqualung)) is a  project of lifemech.o
 Key Software Components
 
 Software-ui
-Software controlelr 
+Software controller 
 
 More Information
 To setup a local developer environment, see setting up Software-ui for developers.
